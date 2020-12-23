@@ -687,6 +687,55 @@ QuicConvertFromMappedV6(
     }
 }
 
+// actual variables here because the tools will use the platform lib without the core lib
+pthread_key_t ThreadLocalJNIEnvKey;
+void* GlobalJvm = NULL; // JavaVM*
+void* (* AttachThreadFunc)(void*); // JavaVM* => JNIEnv*
+void (* DetachThreadFunc)(void*); // JavaVM* => void
+
+typedef struct st_quic_thread_create_ctx {
+    void* Context;
+    LPTHREAD_START_ROUTINE Callback;
+} quic_thread_create_ctx_t;
+
+void* quic_thread_runnable(void* data) {
+    quic_thread_create_ctx_t* ctx = data;
+    void* Context = ctx->Context;
+    LPTHREAD_START_ROUTINE Callback = ctx->Callback;
+    free(ctx);
+
+    if (GlobalJvm == NULL) {
+        QuicTraceEvent(
+            SimpleJavaError,
+            "[java] Error: %s.",
+            "GlobalJvm not set");
+        goto quic_thread_runnable_err;
+    }
+    void* env = AttachThreadFunc(GlobalJvm);
+    if (env == NULL) {
+        QuicTraceEvent(
+            SimpleJavaError,
+            "[java] Error: %s.",
+            "attaching thread failed");
+        goto quic_thread_runnable_err;
+    }
+    int err = pthread_setspecific(ThreadLocalJNIEnvKey, env);
+    if (err < 0) {
+        QuicTraceEvent(
+            JavaError,
+            "[java] Error: %u %s.",
+            errno,
+            "setting jni env to thread local failed");
+        DetachThreadFunc(GlobalJvm);
+        goto quic_thread_runnable_err;
+    }
+    void* ret = Callback(Context);
+    DetachThreadFunc(GlobalJvm);
+    return ret;
+quic_thread_runnable_err:
+    return Callback(Context);
+}
+
 QUIC_STATUS
 QuicThreadCreate(
     _In_ QUIC_THREAD_CONFIG* Config,
@@ -734,7 +783,10 @@ QuicThreadCreate(
         }
     }
 
-    if (pthread_create(Thread, &Attr, Config->Callback, Config->Context)) {
+    quic_thread_create_ctx_t* quic_thread_create_ctx = malloc(sizeof(quic_thread_create_ctx_t));
+    quic_thread_create_ctx->Callback = Config->Callback;
+    quic_thread_create_ctx->Context = Config->Context;
+    if (pthread_create(Thread, &Attr, quic_thread_runnable, quic_thread_create_ctx)) {
         Status = errno;
         QuicTraceEvent(
             LibraryErrorStatus,

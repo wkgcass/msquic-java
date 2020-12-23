@@ -1099,6 +1099,60 @@ Error:
     return Status;
 }
 
+// actual variables are defined in platform_linux.c
+// because the tools will use the platform lib without the core lib
+extern pthread_key_t ThreadLocalJNIEnvKey;
+extern void* GlobalJvm; // JavaVM*
+extern void* (* AttachThreadFunc)(void*); // JavaVM* => JNIEnv*
+extern void (* DetachThreadFunc)(void*); // JavaVM* => void
+
+_IRQL_requires_max_(PASSIVE_LEVEL)
+void
+QUIC_API
+MsQuicJavaInit(
+    _In_ void* Jvm, // JavaVM*
+    _In_ ATTACH_THREAD_FUNC AttachThreadFuncLocal,
+    _In_ DETACH_THREAD_FUNC DetachThreadFuncLocal
+    )
+{
+    int err = pthread_key_create(&ThreadLocalJNIEnvKey, NULL);
+    if (err < 0) {
+        QuicTraceEvent(
+            JavaError,
+            "[java] Error: %u %s.",
+            errno,
+            "create pthread_key failed");
+    }
+    GlobalJvm = Jvm;
+    AttachThreadFunc = AttachThreadFuncLocal;
+    DetachThreadFunc = DetachThreadFuncLocal;
+}
+
+_IRQL_requires_max_(PASSIVE_LEVEL)
+QUIC_STATUS
+QUIC_API
+MsQuicGetJNIEnv(
+    _Out_ void** OutEnv // &JNIEnv*
+    )
+{
+    void* env = pthread_getspecific(ThreadLocalJNIEnvKey);
+    if (env == NULL) {
+        if (GlobalJvm == NULL) {
+            QuicTraceEvent(
+                SimpleJavaError,
+                "[java] Error: %s.",
+                "GlobalJvm not set");
+        }
+        QuicTraceEvent(
+            SimpleJavaError,
+            "[java] Error: %s.",
+            "ThreadLocalJNIEnv not set");
+        return QUIC_STATUS_INTERNAL_ERROR;
+    }
+    *OutEnv = env;
+    return QUIC_STATUS_SUCCESS;
+}
+
 _IRQL_requires_max_(PASSIVE_LEVEL)
 QUIC_STATUS
 QUIC_API

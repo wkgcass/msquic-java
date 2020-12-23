@@ -9525,6 +9525,34 @@
         }
       ],
       "macroName": "QuicTraceLogInfo"
+    },
+    "JavaError": {
+      "ModuleProperites": {},
+      "TraceString": "[java] Error: %u %s.",
+      "UniqueId": "JavaError",
+      "splitArgs": [
+        {
+          "DefinationEncoding": "u",
+          "MacroVariableName": "arg2"
+        },
+        {
+          "DefinationEncoding": "s",
+          "MacroVariableName": "arg3"
+        }
+      ],
+      "macroName": "QuicTraceEvent"
+    },
+    "SimpleJavaError": {
+      "ModuleProperites": {},
+      "TraceString": "[java] Error: %s.",
+      "UniqueId": "SimpleJavaError",
+      "splitArgs": [
+        {
+          "DefinationEncoding": "s",
+          "MacroVariableName": "arg2"
+        }
+      ],
+      "macroName": "QuicTraceEvent"
     }
   },
   "Version": 1,
@@ -12374,6 +12402,14 @@
       {
         "UniquenessHash": "7368812e-a46d-0924-7643-009511288886",
         "TraceID": "InteropTestStop"
+      },
+      {
+        "UniquenessHash": "7ca9a627-ea0b-4a7a-76b5-02bd899e607a",
+        "TraceID": "JavaError"
+      },
+      {
+        "UniquenessHash": "6f7ab853-c29e-8843-88f2-56a8aff0aeab",
+        "TraceID": "SimpleJavaError"
       }
     ]
   }

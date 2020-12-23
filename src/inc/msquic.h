@@ -1154,6 +1154,35 @@ MsQuicClose(
     _In_ _Pre_defensive_ const QUIC_API_TABLE* QuicApi
     );
 
+//
+// JVM
+//
+
+typedef void* (* ATTACH_THREAD_FUNC)(void*); // JavaVM* => JNIEnv*
+typedef void (* DETACH_THREAD_FUNC)(void*); // JavaVM* => void
+
+//
+// Initiating Java environment
+//
+_IRQL_requires_max_(PASSIVE_LEVEL)
+void
+QUIC_API
+MsQuicJavaInit(
+    _In_ void* Jvm, // JavaVM*
+    _In_ ATTACH_THREAD_FUNC AttachThreadFunc,
+    _In_ DETACH_THREAD_FUNC DetachThreadFunc
+    );
+
+//
+// Retrieving the JNIEnv* for the current thread
+//
+_IRQL_requires_max_(PASSIVE_LEVEL)
+QUIC_STATUS
+QUIC_API
+MsQuicGetJNIEnv(
+    _Out_ void** OutEnv // &JNIEnv*
+    );
+
 #if defined(__cplusplus)
 }
 #endif
