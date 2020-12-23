@@ -1,0 +1,54 @@
+package msquic;
+
+import msquic.internal.Native;
+
+public class MsQuic {
+    private static boolean initiated = false;
+    public final long msquic;
+    private boolean isOpen = true;
+
+    private MsQuic(long msquic) {
+        this.msquic = msquic;
+    }
+
+    public static MsQuic open() throws MsQuicException {
+        if (!initiated) {
+            synchronized (MsQuic.class) {
+                if (!initiated) {
+                    initiated = true;
+                    Native.get().MsQuicJavaInit();
+                }
+            }
+        }
+        long msquic = Native.get().MsQuicOpen();
+        return new MsQuic(msquic);
+    }
+
+    public void close() {
+        if (!isOpen) {
+            return;
+        }
+        isOpen = false;
+        Native.get().MsQuicClose(msquic);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    protected void finalize() throws Throwable {
+        try {
+            close();
+        } finally {
+            super.finalize();
+        }
+    }
+
+    public Registration openRegistration(RegistrationConfig config) throws MsQuicException {
+        long reg = Native.get().RegistrationOpen(msquic, config.appName, config.profile.intValue);
+        return new Registration(this, reg);
+    }
+
+    @Override
+    public String toString() {
+        return "MsQuic(0x" + Long.toHexString(msquic) + "/" + (isOpen ? "open" : "closed") + ')';
+    }
+}
