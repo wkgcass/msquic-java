@@ -1,48 +1,44 @@
-MsQuic
-======
+# MsQuic Java Binding
 
-MsQuic is a Microsoft implementation of the [IETF QUIC](https://datatracker.ietf.org/wg/quic/about/)
-protocol. It is cross platform, written in C and designed to be a general purpose QUIC library.
+The original [README.md](https://github.com/wkgcass/msquic-java/blob/java/MSQUIC_README.md).
 
-> **Important** The QUIC protocol is currently in IETF last call (not RFC quite yet). MsQuic implements the latest published drafts.
+## Platform
 
-IETF Drafts: [Transport](https://tools.ietf.org/html/draft-ietf-quic-transport), [TLS](https://tools.ietf.org/html/draft-ietf-quic-tls), [Recovery](https://tools.ietf.org/html/draft-ietf-quic-recovery), [Datagram](https://tools.ietf.org/html/draft-ietf-quic-datagram), [Load Balancing](https://tools.ietf.org/html/draft-ietf-quic-load-balancers)
+Only Linux is supported.
 
-[![Build Status](https://dev.azure.com/ms/msquic/_apis/build/status/CI?branchName=main)](https://dev.azure.com/ms/msquic/_build/latest?definitionId=347&branchName=main) [![Test Status](https://img.shields.io/azure-devops/tests/ms/msquic/347/main)](https://dev.azure.com/ms/msquic/_build/latest?definitionId=347&branchName=main) [![Code Coverage](https://img.shields.io/azure-devops/coverage/ms/msquic/347/main)](https://dev.azure.com/ms/msquic/_build/latest?definitionId=347&branchName=main) ![CodeQL](https://github.com/microsoft/msquic/workflows/CodeQL/badge.svg?branch=main) [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/microsoft/msquic.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/microsoft/msquic/context:cpp)
+## Build
 
-## Protocol Features
+### 1. build msquic
 
-QUIC has many benefits when compared to existing "TLS over TCP" scenarios:
+Please follow the instructions in [BUILD.md](https://github.com/wkgcass/msquic-java/blob/java/docs/BUILD.md).
 
-  * All packets are encrypted and handshake is authenticated with TLS 1.3.
-  * Parallel streams of (reliable and unreliable) application data.
-  * Exchange application data in the first round trip (0-RTT).
-  * Improved congestion control and loss recovery.
-  * Survives a change in the clients IP address or port.
-  * Stateless load balancing.
-  * Easily extendable for new features and extensions.
+Note that the library should be built with `-Config Release`:
 
-## Library Features
+```
+./scripts/build.ps1 -Config Release
+```
 
-MsQuic has several features that differentiates it from other QUIC implementations:
+### 2. build msquicjava
 
-  * Optimized for client and server.
-  * Optimized for maximal throughput and minimal latency.
-  * Asynchronous IO.
-  * Receive side scaling ([RSS](https://docs.microsoft.com/en-us/windows-hardware/drivers/network/introduction-to-receive-side-scaling)) support.
-  * UDP send and receive coalescing support.
+```
+cd java/src/main/c
+./build.sh
+```
 
-# Documentation
+## Run
 
-  * For frequently asked questions, see the [FAQs](./docs/FAQ.md).
-  * For platform support details, see the [Platforms docs](./docs/Platforms.md).
-  * For release details, see the [Release docs](./docs/Release.md).
-  * For performance data, see the [Performance dashboard](https://aka.ms/msquicperformance).
-  * For building the MsQuic library, see the [Build docs](./docs/BUILD.md).
-  * For using the MsQuic API, see the [API docs](./docs/API.md) or the [Sample](./src/tools/sample/sample.cpp).
-  * For deploying with MsQuic, see the [Deployment docs](./docs/Deployment.md).
-  * For diagnosing MsQuic, see the [Diagnostics docs](./docs/Diagnostics.md).
+### sample server
 
-# Contributing
+#### 1. sample server in java
 
-For information on contributing, please see our [contribution guidlines](./.github/CONTRIBUTING.md).
+```
+cd java
+./gradlew SampleServer
+```
+
+#### 2. test it with sample client in c
+
+```
+cd artifacts/bin/linux/x64_Release_openssl
+./quicsample -client -target:127.0.0.1 -unsecure
+```
