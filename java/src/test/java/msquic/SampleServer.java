@@ -19,6 +19,9 @@ public class SampleServer {
     private static Listener lsn = null;
 
     public static void main(String[] args) throws Exception {
+        { // this is optional
+            MsQuic.setMemoryAllocator(new DirectByteBufferMemoryAllocator());
+        }
         MsQuic msquic = MsQuic.open();
         Path crt = Files.createTempFile("sample-", ".crt");
         Path key = Files.createTempFile("sample-", ".key");
@@ -126,6 +129,9 @@ public class SampleServer {
                 reg.close();
             }
             msquic.close();
+            { // this is optional
+                MsQuic.UNSAFE_release();
+            }
         }
     }
 
@@ -188,6 +194,23 @@ public class SampleServer {
             U = (Unsafe) field.get(null);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static class DirectByteBufferMemoryAllocator implements MemoryAllocator<ByteBuffer> {
+        @Override
+        public ByteBuffer allocate(int size) {
+            return ByteBuffer.allocateDirect(size);
+        }
+
+        @Override
+        public ByteBuffer getMemory(ByteBuffer mem) {
+            return mem;
+        }
+
+        @Override
+        public void release(ByteBuffer mem) {
+            U.invokeCleaner(mem);
         }
     }
 }

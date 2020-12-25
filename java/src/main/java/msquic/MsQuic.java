@@ -2,8 +2,11 @@ package msquic;
 
 import msquic.internal.Native;
 
+import java.util.Objects;
+
 public class MsQuic {
     private static boolean initiated = false;
+    private static MemoryAllocator<?> allocator = null;
     public final long msquic;
     private boolean isOpen = true;
 
@@ -11,12 +14,39 @@ public class MsQuic {
         this.msquic = msquic;
     }
 
+    public static void setMemoryAllocator(MemoryAllocator<?> allocatorLocal) {
+        Objects.requireNonNull(allocatorLocal);
+        if (initiated) {
+            throw new IllegalStateException("MsQuic is already initiated");
+        }
+        if (allocator == null) {
+            synchronized (MsQuic.class) {
+                if (allocator == null) {
+                    allocator = allocatorLocal;
+                    return;
+                }
+            }
+        }
+        throw new IllegalStateException("memory allocator already set: " + allocator);
+    }
+
+    public static void UNSAFE_release() {
+        if (!initiated) { // no need to release if it's not initiated
+            return;
+        }
+        synchronized (MsQuic.class) {
+            Native.get().MsQuicJavaRelease();
+            allocator = null;
+            initiated = false;
+        }
+    }
+
     public static MsQuic open() throws MsQuicException {
         if (!initiated) {
             synchronized (MsQuic.class) {
                 if (!initiated) {
                     initiated = true;
-                    Native.get().MsQuicJavaInit();
+                    Native.get().MsQuicJavaInit(allocator);
                 }
             }
         }

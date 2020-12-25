@@ -1,5 +1,6 @@
 package msquic.internal;
 
+import msquic.MemoryAllocator;
 import msquic.MsQuicException;
 
 import java.nio.ByteBuffer;
@@ -28,7 +29,9 @@ public class Native {
         return instance;
     }
 
-    public native void MsQuicJavaInit();
+    public native void MsQuicJavaInit(MemoryAllocator<?> allocator);
+
+    public native void MsQuicJavaRelease();
 
     public native long MsQuicOpen() throws MsQuicException;
 

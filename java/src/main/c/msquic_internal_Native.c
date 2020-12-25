@@ -10,15 +10,20 @@ jmethodID MsQuicException_init;
 jclass InternalListenerCallback;
 jmethodID InternalListenerCallback_attachOrGetConnectionWrapper;
 jmethodID InternalListenerCallback_callback;
-jobject Ref_InternalListenerCallback;
 
 jclass InternalConnectionCallback;
 jmethodID InternalConnectionCallback_attachOrGetStreamWrapper;
 jmethodID InternalConnectionCallback_callback;
-jobject Ref_InternalConnectionCallback;
 
 jclass InternalStreamCallback;
 jmethodID InternalStreamCallback_callback;
+
+jclass ClsMemoryAllocator;
+jmethodID MemoryAllocator_allocate;
+jmethodID MemoryAllocator_getMemory;
+jmethodID MemoryAllocator_release;
+
+jobject memoryAllocator;
 
 void* attachThread(void* ptr) {
   JavaVM* jvm = (JavaVM*)ptr;
@@ -42,7 +47,7 @@ void detachThread(void* ptr) {
 }
 
 JNIEXPORT void JNICALL Java_msquic_internal_Native_MsQuicJavaInit
-  (JNIEnv* env, jobject self) {
+  (JNIEnv* env, jobject self, jobject allocator) {
     MsQuicException = (jclass)(*env)->NewGlobalRef(env, (jobject)(*env)->FindClass(env, "msquic/MsQuicException"));
     MsQuicException_init = (*env)->GetMethodID(env, MsQuicException, "<init>", "(I)V");
 
@@ -59,6 +64,17 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_MsQuicJavaInit
     InternalStreamCallback = (jclass)(*env)->NewGlobalRef(env, (jobject)(*env)->FindClass(env, "msquic/internal/InternalStreamCallback"));
     InternalStreamCallback_callback = (*env)->GetMethodID(env, InternalStreamCallback, "callback", "(I)I");
 
+    ClsMemoryAllocator = (jclass)(*env)->NewGlobalRef(env, (jobject)(*env)->FindClass(env, "msquic/MemoryAllocator"));
+    MemoryAllocator_allocate = (*env)->GetMethodID(env, ClsMemoryAllocator, "allocate", "(I)Ljava/lang/Object;");
+    MemoryAllocator_getMemory = (*env)->GetMethodID(env, ClsMemoryAllocator, "getMemory", "(Ljava/lang/Object;)Ljava/nio/ByteBuffer;");
+    MemoryAllocator_release = (*env)->GetMethodID(env, ClsMemoryAllocator, "release", "(Ljava/lang/Object;)V");
+
+    if (allocator == NULL) {
+      memoryAllocator = NULL;
+    } else {
+      memoryAllocator = (*env)->NewGlobalRef(env, allocator);
+    }
+
     JavaVM* jvm;
     jint err = (*env)->GetJavaVM(env, &jvm);
     if (err != JNI_OK) {
@@ -69,9 +85,43 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_MsQuicJavaInit
     MsQuicJavaInit(jvm, attachThread, detachThread);
   }
 
+JNIEXPORT void JNICALL Java_msquic_internal_Native_MsQuicJavaRelease
+  (JNIEnv* env, jobject self) {
+    (*env)->DeleteGlobalRef(env, (jobject)MsQuicException);
+    (*env)->DeleteGlobalRef(env, (jobject)InternalListenerCallback);
+    (*env)->DeleteGlobalRef(env, (jobject)InternalConnectionCallback);
+    (*env)->DeleteGlobalRef(env, (jobject)InternalStreamCallback);
+    (*env)->DeleteGlobalRef(env, (jobject)ClsMemoryAllocator);
+
+    if (memoryAllocator) {
+      (*env)->DeleteGlobalRef(env, memoryAllocator);
+    }
+  }
+
 void throwException(JNIEnv* env, QUIC_STATUS err) {
   jobject exObj = (*env)->NewObject(env, MsQuicException, MsQuicException_init, (jint)err);
   (*env)->Throw(env, exObj);
+}
+
+void* allocateMemory(JNIEnv* env, size_t size, jobject* outMemoryObject) {
+  if (memoryAllocator != 0) {
+    jobject memoryObject = (*env)->CallObjectMethod(env, memoryAllocator, MemoryAllocator_allocate, (jint)size);
+    memoryObject = (*env)->NewGlobalRef(env, memoryObject);
+    *outMemoryObject = memoryObject;
+    return (void*)(*env)->GetDirectBufferAddress(env, memoryObject);
+  } else {
+    *outMemoryObject = NULL;
+    return malloc(size);
+  }
+}
+
+void releaseMemory(JNIEnv* env, void* ptr, jobject memoryObject) {
+  if (memoryObject != NULL) {
+    (*env)->CallVoidMethod(env, memoryAllocator, MemoryAllocator_release, memoryObject);
+    (*env)->DeleteGlobalRef(env, memoryObject);
+  } else {
+    free(ptr);
+  }
 }
 
 JNIEXPORT jlong JNICALL Java_msquic_internal_Native_MsQuicOpen
@@ -236,16 +286,19 @@ JNIEnv* getJNIEnv() {
 typedef struct st_msquic_listener {
   jobject cbRef;
   HQUIC lsn;
+  jobject memoryObject;
 } msquic_listener_t;
 
 typedef struct st_msquic_connection {
   jobject cbRef;
   HQUIC conn;
+  jobject memoryObject;
 } msquic_connection_t;
 
 typedef struct st_msquic_stream {
   jobject cbRef;
   HQUIC stream;
+  jobject memoryObject;
 } msquic_stream_t;
 
 msquic_connection_t* wrapConnectionOfListener(JNIEnv* env, jobject cbRef, HQUIC conn) {
@@ -253,12 +306,14 @@ msquic_connection_t* wrapConnectionOfListener(JNIEnv* env, jobject cbRef, HQUIC 
     return NULL;
   }
 
-  msquic_connection_t* wrapper = malloc(sizeof(msquic_connection_t));
+  jobject memoryObject;
+  msquic_connection_t* wrapper = allocateMemory(env, sizeof(msquic_connection_t), &memoryObject);
+  wrapper->memoryObject = memoryObject;
 
   jlong wrapper2 = (*env)->CallLongMethod(env, cbRef, InternalListenerCallback_attachOrGetConnectionWrapper, (jlong)conn, (jlong)wrapper);
   if (((jlong)wrapper) != wrapper2) {
     // already exists
-    free(wrapper);
+    releaseMemory(env, wrapper, memoryObject);
     return (msquic_connection_t*)wrapper2;
   }
   // new wrapper
@@ -291,7 +346,9 @@ JNIEXPORT jlong JNICALL Java_msquic_internal_Native_ListenerOpen
     HQUIC reg = (HQUIC)regPtr;
 
     jobject cbRef = (*env)->NewGlobalRef(env, cb);
-    msquic_listener_t* wrapper = malloc(sizeof(msquic_listener_t));
+    jobject memoryObject;
+    msquic_listener_t* wrapper = allocateMemory(env, sizeof(msquic_listener_t), &memoryObject);
+    wrapper->memoryObject = memoryObject;
     wrapper->cbRef = cbRef;
 
     HQUIC lsn;
@@ -299,7 +356,7 @@ JNIEXPORT jlong JNICALL Java_msquic_internal_Native_ListenerOpen
     if (QUIC_FAILED(err)) {
       // release ref
       (*env)->DeleteGlobalRef(env, wrapper->cbRef);
-      free(wrapper);
+      releaseMemory(env, wrapper, memoryObject);
       throwException(env, err);
       return 0;
     }
@@ -319,7 +376,7 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_ListenerClose
     if (wrapper->cbRef != NULL) {
       (*env)->DeleteGlobalRef(env, wrapper->cbRef);
     }
-    free(wrapper);
+    releaseMemory(env, wrapper, wrapper->memoryObject);
   }
 
 JNIEXPORT void JNICALL Java_msquic_internal_Native_ListenerStart
@@ -376,7 +433,7 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_ConnectionClose
     if (wrapper->cbRef != NULL) {
       (*env)->DeleteGlobalRef(env, wrapper->cbRef);
     }
-    free(wrapper);
+    releaseMemory(env, wrapper, wrapper->memoryObject);
   }
 
 msquic_stream_t* wrapStream(JNIEnv* env, jobject cbRef, HQUIC stream) {
@@ -384,12 +441,14 @@ msquic_stream_t* wrapStream(JNIEnv* env, jobject cbRef, HQUIC stream) {
     return NULL;
   }
 
-  msquic_stream_t* wrapper = malloc(sizeof(msquic_stream_t));
+  jobject memoryObject;
+  msquic_stream_t* wrapper = allocateMemory(env, sizeof(msquic_stream_t), &memoryObject);
+  wrapper->memoryObject = memoryObject;
 
   jlong wrapper2 = (*env)->CallLongMethod(env, cbRef, InternalConnectionCallback_attachOrGetStreamWrapper, (jlong)stream, (jlong)wrapper);
   if (((jlong)wrapper) != wrapper2) {
     // already exists
-    free(wrapper);
+    releaseMemory(env, wrapper, memoryObject);
     return (msquic_stream_t*)wrapper2;
   }
   // new wrapper
@@ -461,20 +520,27 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_StreamClose
     if (wrapper->cbRef != NULL) {
       (*env)->DeleteGlobalRef(env, wrapper->cbRef);
     }
-    free(wrapper);
+    releaseMemory(env, wrapper, wrapper->memoryObject);
   }
+
+typedef struct st_qbuf_wrapper {
+  QUIC_BUFFER qbuf;
+  jobject memoryObject;
+} msquic_qbuf_t;
 
 QUIC_STATUS streamCallback(HQUIC stream, void* data, QUIC_STREAM_EVENT* event) {
   msquic_stream_t* wrapper = (msquic_stream_t*)data;
   jobject cbRef = wrapper->cbRef;
   jint type = event->Type;
 
+  JNIEnv* env = getJNIEnv();
+
   // release the buffer for sending
   if (type == QUIC_STREAM_EVENT_SEND_COMPLETE) {
-    free(event->SEND_COMPLETE.ClientContext);
+    msquic_qbuf_t* qbufwrapper = event->SEND_COMPLETE.ClientContext;
+    releaseMemory(env, qbufwrapper, qbufwrapper->memoryObject);
   }
 
-  JNIEnv* env = getJNIEnv();
   return (QUIC_STATUS) (*env)->CallIntMethod(env, cbRef, InternalStreamCallback_callback, type);
 }
 
@@ -509,13 +575,16 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_StreamSend
     HQUIC stream = wrapper->stream;
     char* buf = (*env)->GetDirectBufferAddress(env, directByteBuffer);
 
-    QUIC_BUFFER* qbuf = malloc(sizeof(QUIC_BUFFER));
+    jobject memoryObject;
+    msquic_qbuf_t* qbufwrapper = allocateMemory(env, sizeof(msquic_qbuf_t), &memoryObject);
+    QUIC_BUFFER* qbuf = &qbufwrapper->qbuf;
+    qbufwrapper->memoryObject = memoryObject;
     qbuf->Buffer = buf + off;
     qbuf->Length = len;
 
-    QUIC_STATUS err = msquic->StreamSend(stream, qbuf, 1, sendFlags, qbuf);
+    QUIC_STATUS err = msquic->StreamSend(stream, qbuf, 1, sendFlags, qbufwrapper);
     if (QUIC_FAILED(err)) {
-      free(qbuf);
+      releaseMemory(env, qbufwrapper, memoryObject);
       throwException(env, err);
       return;
     }

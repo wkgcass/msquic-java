@@ -10,9 +10,17 @@ extern "C" {
 /*
  * Class:     msquic_internal_Native
  * Method:    MsQuicJavaInit
- * Signature: ()V
+ * Signature: (Lmsquic/MemoryAllocator;)V
  */
 JNIEXPORT void JNICALL Java_msquic_internal_Native_MsQuicJavaInit
+  (JNIEnv *, jobject, jobject);
+
+/*
+ * Class:     msquic_internal_Native
+ * Method:    MsQuicJavaRelease
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_msquic_internal_Native_MsQuicJavaRelease
   (JNIEnv *, jobject);
 
 /*
