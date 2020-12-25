@@ -38,7 +38,7 @@ public class Registration {
         String[] alpnArr = Utils.collectionToArrayList(alpn);
         long conf = Native.get().ConfigurationOpen(msquic.msquic, reg, alpnArr,
             settings.idleTimeoutMs == null ? 0 : settings.idleTimeoutMs, settings.idleTimeoutMs != null,
-            settings.serverResumptionLevel == null ? 0 : settings.serverResumptionLevel.intValue, settings.serverResumptionLevel == null,
+            settings.serverResumptionLevel == null ? 0 : settings.serverResumptionLevel.intValue, settings.serverResumptionLevel != null,
             settings.peerBidiStreamCount == null ? 0 : settings.peerBidiStreamCount, settings.peerBidiStreamCount != null);
         return new Configuration(msquic, conf);
     }

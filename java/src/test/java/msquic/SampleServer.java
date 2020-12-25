@@ -27,7 +27,7 @@ public class SampleServer {
         Path key = Files.createTempFile("sample-", ".key");
         try {
             reg = msquic.openRegistration(new RegistrationConfig()
-                .setAppName("sample")
+                .setAppName("quicsample")
                 .setProfile(ExecutionProfile.LOW_LATENCY));
             conf = reg.openConfiguration(Set.of("sample"), new Settings()
                 .setIdleTimeoutMs(1000)
@@ -38,8 +38,7 @@ public class SampleServer {
             conf.loadCredential(crt.toAbsolutePath().toString(), key.toAbsolutePath().toString());
             lsn = reg.openListener(lsnEvent -> {
                 if (lsnEvent.type == ListenerEventType.NEW_CONNECTION) {
-                    Connection conn = lsnEvent.newConnection;
-                    conn.setConfiguration(conf);
+                    Connection conn = lsnEvent.NEW_CONNECTION.connection;
                     conn.setCallbackHandler(connEvent -> {
                         switch (connEvent.type) {
                             case CONNECTED:
@@ -57,7 +56,7 @@ public class SampleServer {
                                 conn.close();
                                 break;
                             case PEER_STREAM_STARTED:
-                                Stream stream = connEvent.peerStreamStarted;
+                                Stream stream = connEvent.PEER_STREAM_STARTED.stream;
                                 System.out.println("[strm][" + stream + "] Peer started");
                                 stream.setCallbackHandler(streamEvent -> {
                                     switch (streamEvent.type) {
@@ -101,6 +100,12 @@ public class SampleServer {
                                 break;
                         }
                     });
+                    try {
+                        conn.setConfiguration(conf);
+                    } catch (MsQuicException e) {
+                        conn.close();
+                        throw e;
+                    }
                     return;
                 }
                 throw new MsQuicException(Status.NOT_SUPPORTED);
@@ -135,7 +140,7 @@ public class SampleServer {
         }
     }
 
-    private static final Unsafe U;
+    static final Unsafe U;
     private static final String crtContent = "-----BEGIN CERTIFICATE-----\n" +
         "MIIDqzCCApOgAwIBAgIJAIvTzI2C9khpMA0GCSqGSIb3DQEBCwUAMGsxCzAJBgNV\n" +
         "BAYTAkNOMREwDwYDVQQIDAhaaGVqaWFuZzERMA8GA1UEBwwISGFuZ3pob3UxDTAL\n" +
@@ -197,7 +202,7 @@ public class SampleServer {
         }
     }
 
-    private static class DirectByteBufferMemoryAllocator implements MemoryAllocator<ByteBuffer> {
+    static class DirectByteBufferMemoryAllocator implements MemoryAllocator<ByteBuffer> {
         @Override
         public ByteBuffer allocate(int size) {
             return ByteBuffer.allocateDirect(size);
