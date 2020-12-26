@@ -599,6 +599,62 @@ JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1STATUS_1USER_1CAN
 JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1STATUS_1VER_1NEG_1ERROR
   (JNIEnv *, jobject);
 
+/*
+ * Class:     msquic_internal_NativeValues
+ * Method:    QUIC_STREAM_OPEN_FLAG_NONE
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1STREAM_1OPEN_1FLAG_1NONE
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     msquic_internal_NativeValues
+ * Method:    QUIC_STREAM_OPEN_FLAG_UNIDIRECTIONAL
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1STREAM_1OPEN_1FLAG_1UNIDIRECTIONAL
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     msquic_internal_NativeValues
+ * Method:    QUIC_STREAM_OPEN_FLAG_0_RTT
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1STREAM_1OPEN_1FLAG_10_1RTT
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     msquic_internal_NativeValues
+ * Method:    QUIC_STREAM_START_FLAG_NONE
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1STREAM_1START_1FLAG_1NONE
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     msquic_internal_NativeValues
+ * Method:    QUIC_STREAM_START_FLAG_FAIL_BLOCKED
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1STREAM_1START_1FLAG_1FAIL_1BLOCKED
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     msquic_internal_NativeValues
+ * Method:    QUIC_STREAM_START_FLAG_IMMEDIATE
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1STREAM_1START_1FLAG_1IMMEDIATE
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     msquic_internal_NativeValues
+ * Method:    QUIC_STREAM_START_FLAG_ASYNC
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1STREAM_1START_1FLAG_1ASYNC
+  (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif

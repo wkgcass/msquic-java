@@ -22,9 +22,14 @@ public class InternalConnectionCallback {
 
     @SuppressWarnings("unused")
     @UsedByJNI
-    public int callback(int type, long peerStreamStarted) {
+    public int callback(int type,
+                        long PEER_STREAM_STARTED_stream,
+                        boolean SHUTDOWN_COMPLETE_appCloseInProgress) {
         try {
-            cb.callback(new ConnectionEvent(ConnectionEventType.valueOf(type), getStreamByWrapperPtr(peerStreamStarted)));
+            cb.callback(new ConnectionEvent(ConnectionEventType.valueOf(type),
+                getStreamByWrapperPtr(PEER_STREAM_STARTED_stream),
+                SHUTDOWN_COMPLETE_appCloseInProgress
+            ));
         } catch (MsQuicException e) {
             return e.status.intValue;
         } catch (Throwable t) {
@@ -52,7 +57,7 @@ public class InternalConnectionCallback {
         streamWrapperPtrMap.remove(s.wrapper);
     }
 
-    private Stream getStreamByWrapperPtr(long wrapperPtr) {
+    public Stream getStreamByWrapperPtr(long wrapperPtr) {
         if (wrapperPtr == 0) {
             return null;
         }

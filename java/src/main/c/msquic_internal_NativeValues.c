@@ -370,3 +370,38 @@ JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1STATUS_1VER_1NEG_
   (JNIEnv* env, jobject self) {
     return QUIC_STATUS_VER_NEG_ERROR;
   }
+
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1STREAM_1OPEN_1FLAG_1NONE
+  (JNIEnv* env, jobject self) {
+    return QUIC_STREAM_OPEN_FLAG_NONE;
+  }
+
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1STREAM_1OPEN_1FLAG_1UNIDIRECTIONAL
+  (JNIEnv* env, jobject self) {
+    return QUIC_STREAM_OPEN_FLAG_UNIDIRECTIONAL;
+  }
+
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1STREAM_1OPEN_1FLAG_10_1RTT
+  (JNIEnv* env, jobject self) {
+    return QUIC_STREAM_OPEN_FLAG_0_RTT;
+  }
+
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1STREAM_1START_1FLAG_1NONE
+  (JNIEnv* env, jobject self) {
+    return QUIC_STREAM_START_FLAG_NONE;
+  }
+
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1STREAM_1START_1FLAG_1FAIL_1BLOCKED
+  (JNIEnv* env, jobject self) {
+    return QUIC_STREAM_START_FLAG_FAIL_BLOCKED;
+  }
+
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1STREAM_1START_1FLAG_1IMMEDIATE
+  (JNIEnv* env, jobject self) {
+    return QUIC_STREAM_START_FLAG_IMMEDIATE;
+  }
+
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1STREAM_1START_1FLAG_1ASYNC
+  (JNIEnv* env, jobject self) {
+    return QUIC_STREAM_START_FLAG_ASYNC;
+  }

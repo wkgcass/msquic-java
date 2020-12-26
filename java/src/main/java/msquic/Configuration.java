@@ -34,6 +34,10 @@ public class Configuration {
         Native.get().ConfigurationLoadCredential(msquic.msquic, conf, certFilePath, keyFilePath);
     }
 
+    public void initAsClient(boolean noCertValidation) throws MsQuicException {
+        Native.get().ConfigurationLoadAsClient(msquic.msquic, conf, noCertValidation);
+    }
+
     @Override
     public String toString() {
         return "Configuration(0x" + Long.toHexString(conf) + "/" + (isOpen ? "open" : "closed") + ')';

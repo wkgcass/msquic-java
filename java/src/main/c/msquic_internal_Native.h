@@ -81,6 +81,14 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_ConfigurationLoadCredential
 
 /*
  * Class:     msquic_internal_Native
+ * Method:    ConfigurationLoadAsClient
+ * Signature: (JJZ)V
+ */
+JNIEXPORT void JNICALL Java_msquic_internal_Native_ConfigurationLoadAsClient
+  (JNIEnv *, jobject, jlong, jlong, jboolean);
+
+/*
+ * Class:     msquic_internal_Native
  * Method:    ListenerOpen
  * Signature: (JJLmsquic/internal/InternalListenerCallback;)J
  */
@@ -105,11 +113,27 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_ListenerStart
 
 /*
  * Class:     msquic_internal_Native
+ * Method:    ConnectionOpen
+ * Signature: (JJLmsquic/internal/InternalConnectionCallback;)J
+ */
+JNIEXPORT jlong JNICALL Java_msquic_internal_Native_ConnectionOpen
+  (JNIEnv *, jobject, jlong, jlong, jobject);
+
+/*
+ * Class:     msquic_internal_Native
  * Method:    ConnectionClose
  * Signature: (JJ)V
  */
 JNIEXPORT void JNICALL Java_msquic_internal_Native_ConnectionClose
   (JNIEnv *, jobject, jlong, jlong);
+
+/*
+ * Class:     msquic_internal_Native
+ * Method:    ConnectionStart
+ * Signature: (JJJILjava/lang/String;I)V
+ */
+JNIEXPORT void JNICALL Java_msquic_internal_Native_ConnectionStart
+  (JNIEnv *, jobject, jlong, jlong, jlong, jint, jstring, jint);
 
 /*
  * Class:     msquic_internal_Native
@@ -137,11 +161,27 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_ConnectionSendResumptionTicke
 
 /*
  * Class:     msquic_internal_Native
+ * Method:    StreamOpen
+ * Signature: (Lmsquic/internal/InternalConnectionCallback;JJILmsquic/internal/InternalStreamCallback;)J
+ */
+JNIEXPORT jlong JNICALL Java_msquic_internal_Native_StreamOpen
+  (JNIEnv *, jobject, jobject, jlong, jlong, jint, jobject);
+
+/*
+ * Class:     msquic_internal_Native
  * Method:    StreamClose
  * Signature: (JJ)V
  */
 JNIEXPORT void JNICALL Java_msquic_internal_Native_StreamClose
   (JNIEnv *, jobject, jlong, jlong);
+
+/*
+ * Class:     msquic_internal_Native
+ * Method:    StreamStart
+ * Signature: (JJI)V
+ */
+JNIEXPORT void JNICALL Java_msquic_internal_Native_StreamStart
+  (JNIEnv *, jobject, jlong, jlong, jint);
 
 /*
  * Class:     msquic_internal_Native

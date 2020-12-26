@@ -51,13 +51,19 @@ public class Native {
 
     public native void ConfigurationLoadCredential(long msquic, long conf, String certFilePath, String keyFilePath) throws MsQuicException;
 
+    public native void ConfigurationLoadAsClient(long msquic, long conf, boolean noCertValidation) throws MsQuicException;
+
     public native long ListenerOpen(long msquic, long reg, InternalListenerCallback cb) throws MsQuicException;
 
     public native void ListenerClose(long msquic, long lsn);
 
     public native void ListenerStart(long msquic, long lsn, String[] alpn, int family, boolean loopback, int port) throws MsQuicException;
 
+    public native long ConnectionOpen(long msquic, long reg, InternalConnectionCallback cb) throws MsQuicException;
+
     public native void ConnectionClose(long msquic, long conn);
+
+    public native void ConnectionStart(long msquic, long conn, long conf, int family, String address, int port) throws MsQuicException;
 
     public native void ConnectionSetCallbackHandler(long msquic, long conn, InternalConnectionCallback cb);
 
@@ -65,7 +71,11 @@ public class Native {
 
     public native void ConnectionSendResumptionTicket(long msquic, long conn, int sendResumptionFlags) throws MsQuicException;
 
+    public native long StreamOpen(InternalConnectionCallback connCB, long msquic, long conn, int streamOpenFlags, InternalStreamCallback cb) throws MsQuicException;
+
     public native void StreamClose(long msquic, long stream);
+
+    public native void StreamStart(long msquic, long stream, int streamStartFlags) throws MsQuicException;
 
     public native void StreamSetCallbackHandler(long msquic, long stream, InternalStreamCallback cb);
 

@@ -1,5 +1,6 @@
 package msquic;
 
+import msquic.internal.InternalConnectionCallback;
 import msquic.internal.InternalListenerCallback;
 import msquic.internal.Native;
 import msquic.internal.Utils;
@@ -47,6 +48,14 @@ public class Registration {
         var internalCB = new InternalListenerCallback(msquic, cb);
         long lsn = Native.get().ListenerOpen(msquic.msquic, reg, internalCB);
         return new Listener(msquic, lsn);
+    }
+
+    public Connection openConnection(ConnectionCallback cb) throws MsQuicException {
+        var internalCB = new InternalConnectionCallback(msquic, cb);
+        long conn = Native.get().ConnectionOpen(msquic.msquic, reg, internalCB);
+        Connection connO = new Connection(msquic, -1, conn, null);
+        connO.setCallbackHandler0(internalCB);
+        return connO;
     }
 
     @Override

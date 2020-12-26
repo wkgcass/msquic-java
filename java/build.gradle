@@ -19,3 +19,9 @@ task SampleServer(type: JavaExec) {
     systemProperty("java.library.path", "../artifacts/bin/linux/x64_Release_openssl" + File.pathSeparator + "./src/main/c")
     main = "msquic.SampleServer"
 }
+
+task SampleClient(type: JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    systemProperty("java.library.path", "../artifacts/bin/linux/x64_Release_openssl" + File.pathSeparator + "./src/main/c")
+    main = "msquic.SampleClient"
+}

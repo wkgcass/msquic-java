@@ -4,6 +4,13 @@
 #include <stdio.h>
 #include "msquic_internal_Native.h"
 
+#ifndef likely
+#define likely(x)      __builtin_expect(!!(x), 1)
+#endif
+#ifndef unlikely
+#define unlikely(x)    __builtin_expect(!!(x), 0)
+#endif
+
 jclass MsQuicException;
 jmethodID MsQuicException_init;
 
@@ -59,7 +66,11 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_MsQuicJavaInit
     InternalConnectionCallback = (jclass)(*env)->NewGlobalRef(env, (jobject)(*env)->FindClass(env, "msquic/internal/InternalConnectionCallback"));
     InternalConnectionCallback_attachOrGetStreamWrapper =
       (*env)->GetMethodID(env, InternalConnectionCallback, "attachOrGetStreamWrapper", "(JJ)J"); // (real, wrapper)->wrapper
-    InternalConnectionCallback_callback = (*env)->GetMethodID(env, InternalConnectionCallback, "callback", "(IJ)I");
+    InternalConnectionCallback_callback = (*env)->GetMethodID(env, InternalConnectionCallback, "callback",
+      // int type
+      // long PEER_STREAM_STARTED_stream
+      // boolean SHUTDOWN_COMPLETE_appCloseInProgress
+      "(IJZ)I");
 
     InternalStreamCallback = (jclass)(*env)->NewGlobalRef(env, (jobject)(*env)->FindClass(env, "msquic/internal/InternalStreamCallback"));
     InternalStreamCallback_callback = (*env)->GetMethodID(env, InternalStreamCallback, "callback", "(I)I");
@@ -272,6 +283,29 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_ConfigurationLoadCredential
     return;
   }
 
+JNIEXPORT void JNICALL Java_msquic_internal_Native_ConfigurationLoadAsClient
+  (JNIEnv* env, jobject self, jlong msquicPtr, jlong confPtr, jboolean noCertValidation) {
+
+    QUIC_API_TABLE* msquic = (QUIC_API_TABLE*)msquicPtr;
+    HQUIC conf = (HQUIC)confPtr;
+
+    QUIC_CREDENTIAL_CONFIG credConfig;
+    memset(&credConfig, 0, sizeof(QUIC_CREDENTIAL_CONFIG));
+    credConfig.Type = QUIC_CREDENTIAL_TYPE_NONE;
+    credConfig.Flags = QUIC_CREDENTIAL_FLAG_CLIENT;
+    if (noCertValidation) {
+      credConfig.Flags |= QUIC_CREDENTIAL_FLAG_NO_CERTIFICATE_VALIDATION;
+    }
+
+    QUIC_STATUS err = msquic->ConfigurationLoadCredential(conf, &credConfig);
+
+    if (QUIC_FAILED(err)) {
+      throwException(env, err);
+      return;
+    }
+    return;
+  }
+
 JNIEnv* getJNIEnv() {
   void* ptr;
   QUIC_STATUS err = MsQuicGetJNIEnv(&ptr);
@@ -308,7 +342,6 @@ msquic_connection_t* wrapConnectionOfListener(JNIEnv* env, jobject cbRef, HQUIC 
 
   jobject memoryObject;
   msquic_connection_t* wrapper = allocateMemory(env, sizeof(msquic_connection_t), &memoryObject);
-  wrapper->memoryObject = memoryObject;
 
   jlong wrapper2 = (*env)->CallLongMethod(env, cbRef, InternalListenerCallback_attachOrGetConnectionWrapper, (jlong)conn, (jlong)wrapper);
   if (((jlong)wrapper) != wrapper2) {
@@ -319,6 +352,7 @@ msquic_connection_t* wrapConnectionOfListener(JNIEnv* env, jobject cbRef, HQUIC 
   // new wrapper
   memset(wrapper, 0, sizeof(msquic_connection_t));
   wrapper->conn = conn;
+  wrapper->memoryObject = memoryObject;
   return wrapper;
 }
 
@@ -422,20 +456,6 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_ListenerStart
     return;
   }
 
-JNIEXPORT void JNICALL Java_msquic_internal_Native_ConnectionClose
-  (JNIEnv* env, jobject self, jlong msquicPtr, jlong connPtr) {
-
-    QUIC_API_TABLE* msquic = (QUIC_API_TABLE*)msquicPtr;
-    msquic_connection_t* wrapper = (msquic_connection_t*)connPtr;
-    HQUIC conn = wrapper->conn;
-
-    msquic->ConnectionClose(conn);
-    if (wrapper->cbRef != NULL) {
-      (*env)->DeleteGlobalRef(env, wrapper->cbRef);
-    }
-    releaseMemory(env, wrapper, wrapper->memoryObject);
-  }
-
 msquic_stream_t* wrapStream(JNIEnv* env, jobject cbRef, HQUIC stream) {
   if (stream == NULL) {
     return NULL;
@@ -443,7 +463,6 @@ msquic_stream_t* wrapStream(JNIEnv* env, jobject cbRef, HQUIC stream) {
 
   jobject memoryObject;
   msquic_stream_t* wrapper = allocateMemory(env, sizeof(msquic_stream_t), &memoryObject);
-  wrapper->memoryObject = memoryObject;
 
   jlong wrapper2 = (*env)->CallLongMethod(env, cbRef, InternalConnectionCallback_attachOrGetStreamWrapper, (jlong)stream, (jlong)wrapper);
   if (((jlong)wrapper) != wrapper2) {
@@ -454,6 +473,7 @@ msquic_stream_t* wrapStream(JNIEnv* env, jobject cbRef, HQUIC stream) {
   // new wrapper
   memset(wrapper, 0, sizeof(msquic_stream_t));
   wrapper->stream = stream;
+  wrapper->memoryObject = memoryObject;
   return wrapper;
 }
 
@@ -469,10 +489,75 @@ QUIC_STATUS connectionCallback(HQUIC conn, void* data, QUIC_CONNECTION_EVENT* ev
   if (type == QUIC_CONNECTION_EVENT_PEER_STREAM_STARTED) {
     peerStreamStarted = event->PEER_STREAM_STARTED.Stream;
   }
-  jlong peerStreamStartedPtr = (jlong)wrapStream(env, cbRef, peerStreamStarted);
+  jlong PEER_STREAM_STARTED_stream = (jlong)wrapStream(env, cbRef, peerStreamStarted);
+  jboolean SHUTDOWN_COMPLETE_appCloseInProgress = 0;
+  if (type == QUIC_CONNECTION_EVENT_SHUTDOWN_COMPLETE) {
+    SHUTDOWN_COMPLETE_appCloseInProgress = event->SHUTDOWN_COMPLETE.AppCloseInProgress;
+  }
 
-  return (QUIC_STATUS) (*env)->CallIntMethod(env, cbRef, InternalConnectionCallback_callback, type, peerStreamStartedPtr);
+  return (QUIC_STATUS) (*env)->CallIntMethod(env, cbRef, InternalConnectionCallback_callback, type,
+    PEER_STREAM_STARTED_stream,
+    SHUTDOWN_COMPLETE_appCloseInProgress
+  );
 }
+
+JNIEXPORT jlong JNICALL Java_msquic_internal_Native_ConnectionOpen
+  (JNIEnv* env, jobject self, jlong msquicPtr, jlong regPtr, jobject cb) {
+
+    QUIC_API_TABLE* msquic = (QUIC_API_TABLE*)msquicPtr;
+    HQUIC reg = (HQUIC)regPtr;
+
+    jobject memoryObject;
+    msquic_connection_t* wrapper = allocateMemory(env, sizeof(msquic_connection_t), &memoryObject);
+    HQUIC conn;
+    QUIC_STATUS err = msquic->ConnectionOpen(reg, connectionCallback, wrapper, &conn);
+    if (QUIC_FAILED(err)) {
+      releaseMemory(env, wrapper, memoryObject);
+      throwException(env, err);
+      return 0;
+    }
+    wrapper->conn = conn;
+    wrapper->memoryObject = memoryObject;
+    wrapper->cbRef = (*env)->NewGlobalRef(env, cb);
+    return (jlong)wrapper;
+  }
+
+JNIEXPORT void JNICALL Java_msquic_internal_Native_ConnectionClose
+  (JNIEnv* env, jobject self, jlong msquicPtr, jlong connPtr) {
+
+    QUIC_API_TABLE* msquic = (QUIC_API_TABLE*)msquicPtr;
+    msquic_connection_t* wrapper = (msquic_connection_t*)connPtr;
+    HQUIC conn = wrapper->conn;
+
+    msquic->ConnectionClose(conn);
+    if (wrapper->cbRef != NULL) {
+      (*env)->DeleteGlobalRef(env, wrapper->cbRef);
+    }
+    releaseMemory(env, wrapper, wrapper->memoryObject);
+  }
+
+JNIEXPORT void JNICALL Java_msquic_internal_Native_ConnectionStart
+  (JNIEnv* env, jobject self, jlong msquicPtr, jlong connPtr, jlong confPtr, jint family, jstring address, jint port) {
+
+    QUIC_API_TABLE* msquic = (QUIC_API_TABLE*)msquicPtr;
+    msquic_connection_t* wrapper = (msquic_connection_t*)connPtr;
+    HQUIC conn = wrapper->conn;
+    HQUIC conf = (HQUIC)confPtr;
+
+    const char* addressChars = (*env)->GetStringUTFChars(env, address, NULL);
+
+    QUIC_STATUS err = msquic->ConnectionStart(conn, conf, family, addressChars, port);
+
+    { // release
+      (*env)->ReleaseStringUTFChars(env, address, addressChars);
+    }
+
+    if (QUIC_FAILED(err)) {
+      throwException(env, err);
+      return;
+    }
+    return;
+  }
 
 JNIEXPORT void JNICALL Java_msquic_internal_Native_ConnectionSetCallbackHandler
   (JNIEnv* env, jobject self, jlong msquicPtr, jlong connPtr, jobject cb) {
@@ -509,20 +594,6 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_ConnectionSendResumptionTicke
     msquic->ConnectionSendResumptionTicket(conn, flags, 0, NULL);
   }
 
-JNIEXPORT void JNICALL Java_msquic_internal_Native_StreamClose
-  (JNIEnv* env, jobject self, jlong msquicPtr, jlong streamPtr) {
-
-    QUIC_API_TABLE* msquic = (QUIC_API_TABLE*)msquicPtr;
-    msquic_stream_t* wrapper = (msquic_stream_t*)streamPtr;
-    HQUIC stream = wrapper->stream;
-
-    msquic->StreamClose(stream);
-    if (wrapper->cbRef != NULL) {
-      (*env)->DeleteGlobalRef(env, wrapper->cbRef);
-    }
-    releaseMemory(env, wrapper, wrapper->memoryObject);
-  }
-
 typedef struct st_qbuf_wrapper {
   QUIC_BUFFER qbuf;
   jobject memoryObject;
@@ -543,6 +614,64 @@ QUIC_STATUS streamCallback(HQUIC stream, void* data, QUIC_STREAM_EVENT* event) {
 
   return (QUIC_STATUS) (*env)->CallIntMethod(env, cbRef, InternalStreamCallback_callback, type);
 }
+
+JNIEXPORT jlong JNICALL Java_msquic_internal_Native_StreamOpen
+  (JNIEnv* env, jobject self, jobject connCB, jlong msquicPtr, jlong connPtr, jint streamOpenFlags, jobject cb) {
+
+    QUIC_API_TABLE* msquic = (QUIC_API_TABLE*)msquicPtr;
+    msquic_connection_t* conn_wrapper = (msquic_connection_t*)connPtr;
+    HQUIC conn = conn_wrapper->conn;
+
+    jobject memoryObject;
+    msquic_stream_t* wrapper = allocateMemory(env, sizeof(msquic_stream_t), &memoryObject);
+    HQUIC stream;
+    QUIC_STATUS err = msquic->StreamOpen(conn, streamOpenFlags, streamCallback, wrapper, &stream);
+    if (QUIC_FAILED(err)) {
+      releaseMemory(env, wrapper, memoryObject);
+      throwException(env, err);
+      return 0;
+    }
+    wrapper->stream = stream;
+    wrapper->memoryObject = memoryObject;
+    wrapper->cbRef = (*env)->NewGlobalRef(env, cb);
+
+    jlong wrapper2 = (*env)->CallLongMethod(env, connCB, InternalConnectionCallback_attachOrGetStreamWrapper, (jlong)stream, (jlong)wrapper);
+    if (unlikely(wrapper2 != (jlong)wrapper)) {
+      printf("attaching in StreamOpen but already exists: real: %lu, wrapper: %lu", (long)stream, (long)wrapper);
+      fflush(stdout);
+    }
+
+    return (jlong)wrapper;
+  }
+
+JNIEXPORT void JNICALL Java_msquic_internal_Native_StreamClose
+  (JNIEnv* env, jobject self, jlong msquicPtr, jlong streamPtr) {
+
+    QUIC_API_TABLE* msquic = (QUIC_API_TABLE*)msquicPtr;
+    msquic_stream_t* wrapper = (msquic_stream_t*)streamPtr;
+    HQUIC stream = wrapper->stream;
+
+    msquic->StreamClose(stream);
+    if (wrapper->cbRef != NULL) {
+      (*env)->DeleteGlobalRef(env, wrapper->cbRef);
+    }
+    releaseMemory(env, wrapper, wrapper->memoryObject);
+  }
+
+JNIEXPORT void JNICALL Java_msquic_internal_Native_StreamStart
+  (JNIEnv* env, jobject self, jlong msquicPtr, jlong streamPtr, jint streamStartFlags) {
+
+    QUIC_API_TABLE* msquic = (QUIC_API_TABLE*)msquicPtr;
+    msquic_stream_t* wrapper = (msquic_stream_t*)streamPtr;
+    HQUIC stream = wrapper->stream;
+
+    QUIC_STATUS err = msquic->StreamStart(stream, streamStartFlags);
+    if (QUIC_FAILED(err)) {
+      throwException(env, err);
+      return;
+    }
+    return;
+  }
 
 JNIEXPORT void JNICALL Java_msquic_internal_Native_StreamSetCallbackHandler
   (JNIEnv* env, jobject self, jlong msquicPtr, jlong streamPtr, jobject cb) {

@@ -171,4 +171,18 @@ public class NativeValues {
     public native int QUIC_STATUS_USER_CANCELED();
 
     public native int QUIC_STATUS_VER_NEG_ERROR();
+
+    public native int QUIC_STREAM_OPEN_FLAG_NONE();
+
+    public native int QUIC_STREAM_OPEN_FLAG_UNIDIRECTIONAL();
+
+    public native int QUIC_STREAM_OPEN_FLAG_0_RTT();
+
+    public native int QUIC_STREAM_START_FLAG_NONE();
+
+    public native int QUIC_STREAM_START_FLAG_FAIL_BLOCKED();
+
+    public native int QUIC_STREAM_START_FLAG_IMMEDIATE();
+
+    public native int QUIC_STREAM_START_FLAG_ASYNC();
 }

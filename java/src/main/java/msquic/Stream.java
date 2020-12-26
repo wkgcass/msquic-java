@@ -44,6 +44,10 @@ public class Stream {
         }
     }
 
+    public void start(int flags) throws MsQuicException {
+        Native.get().StreamStart(msquic.msquic, wrapper, flags);
+    }
+
     public void setCallbackHandler(StreamCallback cb) {
         var streamCB = new InternalStreamCallback(msquic, cb);
         Native.get().StreamSetCallbackHandler(msquic.msquic, wrapper, streamCB);
