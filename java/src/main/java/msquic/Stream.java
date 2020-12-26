@@ -3,6 +3,7 @@ package msquic;
 import msquic.internal.InternalConnectionCallback;
 import msquic.internal.InternalStreamCallback;
 import msquic.internal.Native;
+import msquic.internal.Utils;
 
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
@@ -59,12 +60,17 @@ public class Stream {
 
     private final LinkedList<ByteBuffer> wBufs = new LinkedList<>();
 
-    public void send(int flags, ByteBuffer buf) throws MsQuicException {
+    public int send(int flags, ByteBuffer buf) throws MsQuicException {
+        if (buf == null) {
+            Native.get().StreamSend(msquic.msquic, wrapper, flags, Utils.EMPTY_BUFFER, 0, 0);
+            return 0;
+        }
         int off = buf.position();
         int len = buf.limit() - buf.position();
         Native.get().StreamSend(msquic.msquic, wrapper, flags, buf, off, len);
         buf.position(buf.limit());
         wBufs.add(buf);
+        return len;
     }
 
     public ByteBuffer pollWBuf() {
