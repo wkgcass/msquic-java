@@ -50,6 +50,10 @@ public class Connection {
         Native.get().ConnectionStart(msquic.msquic, wrapper, conf.conf, family.intValue, targetHost, targetPort);
     }
 
+    public void shutdown(int flags, long errorCode) {
+        Native.get().ConnectionShutdown(msquic.msquic, wrapper, flags, errorCode);
+    }
+
     public void setCallbackHandler(ConnectionCallback cb) {
         if (connectionCallback != null) {
             throw new IllegalStateException("callback already set");
@@ -82,6 +86,14 @@ public class Connection {
             throw new IllegalStateException("getting stream of " + stream + " failed");
         }
         return s;
+    }
+
+    public String getLocalAddress() throws MsQuicException {
+        return Native.get().GetConnectionLocalAddress(msquic.msquic, wrapper);
+    }
+
+    public String getRemoteAddress() throws MsQuicException {
+        return Native.get().GetConnectionRemoteAddress(msquic.msquic, wrapper);
     }
 
     @Override

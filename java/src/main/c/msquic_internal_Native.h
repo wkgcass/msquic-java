@@ -9,6 +9,22 @@ extern "C" {
 #endif
 /*
  * Class:     msquic_internal_Native
+ * Method:    QuicBufferLength
+ * Signature: (J)I
+ */
+JNIEXPORT jint JNICALL Java_msquic_internal_Native_QuicBufferLength
+  (JNIEnv *, jobject, jlong);
+
+/*
+ * Class:     msquic_internal_Native
+ * Method:    QuicBufferRead
+ * Signature: (JJLjava/nio/ByteBuffer;II)I
+ */
+JNIEXPORT jint JNICALL Java_msquic_internal_Native_QuicBufferRead
+  (JNIEnv *, jobject, jlong, jlong, jobject, jint, jint);
+
+/*
+ * Class:     msquic_internal_Native
  * Method:    MsQuicJavaInit
  * Signature: (Lmsquic/MemoryAllocator;)V
  */
@@ -54,6 +70,14 @@ JNIEXPORT jlong JNICALL Java_msquic_internal_Native_RegistrationOpen
  */
 JNIEXPORT void JNICALL Java_msquic_internal_Native_RegistrationClose
   (JNIEnv *, jobject, jlong, jlong);
+
+/*
+ * Class:     msquic_internal_Native
+ * Method:    RegistrationShutdown
+ * Signature: (JJIJ)V
+ */
+JNIEXPORT void JNICALL Java_msquic_internal_Native_RegistrationShutdown
+  (JNIEnv *, jobject, jlong, jlong, jint, jlong);
 
 /*
  * Class:     msquic_internal_Native
@@ -137,6 +161,14 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_ConnectionStart
 
 /*
  * Class:     msquic_internal_Native
+ * Method:    ConnectionShutdown
+ * Signature: (JJIJ)V
+ */
+JNIEXPORT void JNICALL Java_msquic_internal_Native_ConnectionShutdown
+  (JNIEnv *, jobject, jlong, jlong, jint, jlong);
+
+/*
+ * Class:     msquic_internal_Native
  * Method:    ConnectionSetCallbackHandler
  * Signature: (JJLmsquic/internal/InternalConnectionCallback;)V
  */
@@ -158,6 +190,22 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_ConnectionSetConfiguration
  */
 JNIEXPORT void JNICALL Java_msquic_internal_Native_ConnectionSendResumptionTicket
   (JNIEnv *, jobject, jlong, jlong, jint);
+
+/*
+ * Class:     msquic_internal_Native
+ * Method:    GetConnectionLocalAddress
+ * Signature: (JJ)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_msquic_internal_Native_GetConnectionLocalAddress
+  (JNIEnv *, jobject, jlong, jlong);
+
+/*
+ * Class:     msquic_internal_Native
+ * Method:    GetConnectionRemoteAddress
+ * Signature: (JJ)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_msquic_internal_Native_GetConnectionRemoteAddress
+  (JNIEnv *, jobject, jlong, jlong);
 
 /*
  * Class:     msquic_internal_Native
@@ -206,6 +254,38 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_StreamShutdown
  */
 JNIEXPORT void JNICALL Java_msquic_internal_Native_StreamSend
   (JNIEnv *, jobject, jlong, jlong, jint, jobject, jint, jint);
+
+/*
+ * Class:     msquic_internal_Native
+ * Method:    StreamReceiveComplete
+ * Signature: (JJJ)V
+ */
+JNIEXPORT void JNICALL Java_msquic_internal_Native_StreamReceiveComplete
+  (JNIEnv *, jobject, jlong, jlong, jlong);
+
+/*
+ * Class:     msquic_internal_Native
+ * Method:    StreamReceiveSetEnabled
+ * Signature: (JJZ)V
+ */
+JNIEXPORT void JNICALL Java_msquic_internal_Native_StreamReceiveSetEnabled
+  (JNIEnv *, jobject, jlong, jlong, jboolean);
+
+/*
+ * Class:     msquic_internal_Native
+ * Method:    StreamReceiveSetTotalLength
+ * Signature: (JJ)V
+ */
+JNIEXPORT void JNICALL Java_msquic_internal_Native_StreamReceiveSetTotalLength
+  (JNIEnv *, jobject, jlong, jlong);
+
+/*
+ * Class:     msquic_internal_Native
+ * Method:    GetStreamId
+ * Signature: (JJ)J
+ */
+JNIEXPORT jlong JNICALL Java_msquic_internal_Native_GetStreamId
+  (JNIEnv *, jobject, jlong, jlong);
 
 #ifdef __cplusplus
 }

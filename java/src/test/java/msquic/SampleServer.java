@@ -1,17 +1,14 @@
 package msquic;
 
 import msquic.nativevalues.*;
-import sun.misc.Unsafe;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class SampleServer {
     private static Registration reg = null;
@@ -20,7 +17,7 @@ public class SampleServer {
 
     public static void main(String[] args) throws Exception {
         { // this is optional
-            MsQuic.setMemoryAllocator(new DirectByteBufferMemoryAllocator());
+            MsQuic.setMemoryAllocator(new Utils.DirectByteBufferMemoryAllocator());
         }
         MsQuic msquic = MsQuic.open();
         Path crt = Files.createTempFile("sample-", ".crt");
@@ -38,7 +35,9 @@ public class SampleServer {
             conf.loadCredential(crt.toAbsolutePath().toString(), key.toAbsolutePath().toString());
             lsn = reg.openListener(lsnEvent -> {
                 if (lsnEvent.type == ListenerEventType.NEW_CONNECTION) {
+                    System.out.println("[ lsn][" + lsn + "] New connection: " + lsnEvent.NEW_CONNECTION.info);
                     Connection conn = lsnEvent.NEW_CONNECTION.connection;
+                    System.out.println("[ lsn][" + lsn + "] New connection: local=" + conn.getLocalAddress() + ", remote=" + conn.getRemoteAddress());
                     conn.setCallbackHandler(connEvent -> {
                         switch (connEvent.type) {
                             case CONNECTED:
@@ -57,29 +56,42 @@ public class SampleServer {
                                 break;
                             case PEER_STREAM_STARTED:
                                 Stream stream = connEvent.PEER_STREAM_STARTED.stream;
-                                System.out.println("[strm][" + stream + "] Peer started");
+                                System.out.println("[strm][" + stream + "] Peer started: " + stream.getId());
                                 stream.setCallbackHandler(streamEvent -> {
                                     switch (streamEvent.type) {
                                         case SEND_COMPLETE:
                                             System.out.println("[strm][" + stream + "] Data sent");
-                                            U.invokeCleaner(stream.pollWBuf());
+                                            Utils.U.invokeCleaner(stream.pollWBuf());
                                             break;
                                         case RECEIVE:
                                             System.out.println("[strm][" + stream + "] Data received");
+                                            int len = (int) streamEvent.RECEIVE.getTotalBufferLength();
+                                            System.out.println("[strm][" + stream + "] Received bytes: " + len);
+
+                                            ByteBuffer rcvBuf = ByteBuffer.allocateDirect(len);
+                                            for (QuicBuffer qbuf : streamEvent.RECEIVE.buffers) {
+                                                qbuf.read(rcvBuf);
+                                            }
+                                            rcvBuf.flip();
+                                            byte[] rcvByteArray = new byte[len];
+                                            rcvBuf.get(rcvByteArray);
+                                            Utils.U.invokeCleaner(rcvBuf);
+                                            System.out.println("[strm][" + stream + "] Received data: " + new String(rcvByteArray));
+
                                             break;
                                         case PEER_SEND_SHUTDOWN:
                                             System.out.println("[strm][" + stream + "] Peer shut down");
-                                            System.out.println("[strm][" + stream + "] Sending data...");
+                                            String rndStr = Utils.randomStr(100);
+                                            System.out.println("[strm][" + stream + "] Sending data: " + rndStr);
                                             ByteBuffer buf = ByteBuffer.allocateDirect(100);
-                                            ThreadLocalRandom rnd = ThreadLocalRandom.current();
-                                            byte[] bytes = new byte[100];
-                                            rnd.nextBytes(bytes);
+                                            byte[] bytes = rndStr.getBytes();
                                             buf.put(bytes);
+                                            buf.flip();
                                             try {
                                                 stream.send(SendFlags.FIN, buf);
                                             } catch (MsQuicException e) {
                                                 System.out.println("StreamSend failed: " + e.status);
-                                                U.invokeCleaner(buf);
+                                                Utils.U.invokeCleaner(buf);
                                             }
                                             break;
                                         case PEER_SEND_ABORTED:
@@ -140,7 +152,6 @@ public class SampleServer {
         }
     }
 
-    static final Unsafe U;
     private static final String crtContent = "-----BEGIN CERTIFICATE-----\n" +
         "MIIDqzCCApOgAwIBAgIJAIvTzI2C9khpMA0GCSqGSIb3DQEBCwUAMGsxCzAJBgNV\n" +
         "BAYTAkNOMREwDwYDVQQIDAhaaGVqaWFuZzERMA8GA1UEBwwISGFuZ3pob3UxDTAL\n" +
@@ -191,31 +202,4 @@ public class SampleServer {
         "yXjgioRbuEqcjo/bamQHg3D5U3eDdelETapWsp8jq8K+L5I3rLxwZwgFaqT3d3Yh\n" +
         "KszwcglypMXpemRptTLSi7cNPw==\n" +
         "-----END PRIVATE KEY-----\n";
-
-    static {
-        try {
-            Field field = Unsafe.class.getDeclaredField("theUnsafe");
-            field.setAccessible(true);
-            U = (Unsafe) field.get(null);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    static class DirectByteBufferMemoryAllocator implements MemoryAllocator<ByteBuffer> {
-        @Override
-        public ByteBuffer allocate(int size) {
-            return ByteBuffer.allocateDirect(size);
-        }
-
-        @Override
-        public ByteBuffer getMemory(ByteBuffer mem) {
-            return mem;
-        }
-
-        @Override
-        public void release(ByteBuffer mem) {
-            U.invokeCleaner(mem);
-        }
-    }
 }

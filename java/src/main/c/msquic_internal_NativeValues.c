@@ -405,3 +405,18 @@ JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1STREAM_1START_1FL
   (JNIEnv* env, jobject self) {
     return QUIC_STREAM_START_FLAG_ASYNC;
   }
+
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1RECEIVE_1FLAG_1NONE
+  (JNIEnv* env, jobject self) {
+    return QUIC_RECEIVE_FLAG_NONE;
+  }
+
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1RECEIVE_1FLAG_10_1RTT
+  (JNIEnv* env, jobject self) {
+    return QUIC_RECEIVE_FLAG_0_RTT;
+  }
+
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1RECEIVE_1FLAG_1FIN
+  (JNIEnv* env, jobject self) {
+    return QUIC_RECEIVE_FLAG_FIN;
+  }

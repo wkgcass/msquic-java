@@ -185,4 +185,10 @@ public class NativeValues {
     public native int QUIC_STREAM_START_FLAG_IMMEDIATE();
 
     public native int QUIC_STREAM_START_FLAG_ASYNC();
+
+    public native int QUIC_RECEIVE_FLAG_NONE();
+
+    public native int QUIC_RECEIVE_FLAG_0_RTT();
+
+    public native int QUIC_RECEIVE_FLAG_FIN();
 }

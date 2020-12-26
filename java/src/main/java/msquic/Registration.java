@@ -35,6 +35,10 @@ public class Registration {
         }
     }
 
+    public void shutdown(int connShutdownFlags, long connShutdownErrorCode) {
+        Native.get().RegistrationShutdown(msquic.msquic, reg, connShutdownFlags, connShutdownErrorCode);
+    }
+
     public Configuration openConfiguration(Collection<String> alpn, Settings settings) throws MsQuicException {
         String[] alpnArr = Utils.collectionToArrayList(alpn);
         long conf = Native.get().ConfigurationOpen(msquic.msquic, reg, alpnArr,

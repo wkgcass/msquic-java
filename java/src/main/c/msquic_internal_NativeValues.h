@@ -655,6 +655,30 @@ JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1STREAM_1START_1FL
 JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1STREAM_1START_1FLAG_1ASYNC
   (JNIEnv *, jobject);
 
+/*
+ * Class:     msquic_internal_NativeValues
+ * Method:    QUIC_RECEIVE_FLAG_NONE
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1RECEIVE_1FLAG_1NONE
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     msquic_internal_NativeValues
+ * Method:    QUIC_RECEIVE_FLAG_0_RTT
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1RECEIVE_1FLAG_10_1RTT
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     msquic_internal_NativeValues
+ * Method:    QUIC_RECEIVE_FLAG_FIN
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1RECEIVE_1FLAG_1FIN
+  (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif

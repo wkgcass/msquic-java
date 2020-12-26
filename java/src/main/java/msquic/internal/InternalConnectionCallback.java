@@ -23,12 +23,27 @@ public class InternalConnectionCallback {
     @SuppressWarnings("unused")
     @UsedByJNI
     public int callback(int type,
+                        //
                         long PEER_STREAM_STARTED_stream,
-                        boolean SHUTDOWN_COMPLETE_appCloseInProgress) {
+                        //
+                        boolean SHUTDOWN_COMPLETE_appCloseInProgress,
+                        //
+                        String LOCAL_ADDRESS_CHANGED_address,
+                        //
+                        String PEER_ADDRESS_CHANGED_address,
+                        //
+                        boolean CONNECTED_sessionResumed,
+                        String CONNECTED_negotiatedAlpn
+                        //
+    ) {
         try {
             cb.callback(new ConnectionEvent(ConnectionEventType.valueOf(type),
                 getStreamByWrapperPtr(PEER_STREAM_STARTED_stream),
-                SHUTDOWN_COMPLETE_appCloseInProgress
+                SHUTDOWN_COMPLETE_appCloseInProgress,
+                LOCAL_ADDRESS_CHANGED_address,
+                PEER_ADDRESS_CHANGED_address,
+                CONNECTED_sessionResumed,
+                CONNECTED_negotiatedAlpn
             ));
         } catch (MsQuicException e) {
             return e.status.intValue;

@@ -48,13 +48,13 @@ public class Stream {
         Native.get().StreamStart(msquic.msquic, wrapper, flags);
     }
 
+    public void shutdown(int flags) throws MsQuicException {
+        Native.get().StreamShutdown(msquic.msquic, wrapper, flags);
+    }
+
     public void setCallbackHandler(StreamCallback cb) {
         var streamCB = new InternalStreamCallback(msquic, cb);
         Native.get().StreamSetCallbackHandler(msquic.msquic, wrapper, streamCB);
-    }
-
-    public void shutdown(int flags) throws MsQuicException {
-        Native.get().StreamShutdown(msquic.msquic, wrapper, flags);
     }
 
     private final LinkedList<ByteBuffer> wBufs = new LinkedList<>();
@@ -69,6 +69,18 @@ public class Stream {
 
     public ByteBuffer pollWBuf() {
         return wBufs.pollFirst();
+    }
+
+    public void receiveComplete(long consumedLength) {
+        Native.get().StreamReceiveComplete(msquic.msquic, wrapper, consumedLength);
+    }
+
+    public void setReceiveEnabled(boolean enabled) {
+        Native.get().StreamReceiveSetEnabled(msquic.msquic, wrapper, enabled);
+    }
+
+    public long getId() throws MsQuicException {
+        return Native.get().GetStreamId(msquic.msquic, wrapper);
     }
 
     @Override

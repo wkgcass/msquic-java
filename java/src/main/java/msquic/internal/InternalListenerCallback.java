@@ -22,9 +22,19 @@ public class InternalListenerCallback {
 
     @SuppressWarnings("unused")
     @UsedByJNI
-    public int callback(int type, long newConnection) { // wrapper_ptr
+    public int callback(int type,
+                        //
+                        long newConnection,
+                        String newConnNegotiatedAlpn,
+                        String newConnServerName
+                        //
+    ) { // wrapper_ptr
         try {
-            cb.callback(new ListenerEvent(ListenerEventType.valueOf(type), getConnectionByWrapperPtr(newConnection)));
+            cb.callback(new ListenerEvent(ListenerEventType.valueOf(type),
+                getConnectionByWrapperPtr(newConnection),
+                newConnNegotiatedAlpn,
+                newConnServerName
+            ));
         } catch (MsQuicException e) {
             return e.status.intValue;
         } catch (Throwable t) {

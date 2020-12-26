@@ -2,6 +2,8 @@
 #include <errno.h>
 #include <msquic.h>
 #include <stdio.h>
+#include <string.h>
+#include <arpa/inet.h>
 #include "msquic_internal_Native.h"
 
 #ifndef likely
@@ -10,6 +12,25 @@
 #ifndef unlikely
 #define unlikely(x)    __builtin_expect(!!(x), 0)
 #endif
+
+JNIEXPORT jint JNICALL Java_msquic_internal_Native_QuicBufferLength
+  (JNIEnv* env, jobject self, jlong qbufPtr) {
+    QUIC_BUFFER* qbuf = (QUIC_BUFFER*)qbufPtr;
+    return qbuf->Length;
+  }
+
+JNIEXPORT jint JNICALL Java_msquic_internal_Native_QuicBufferRead
+  (JNIEnv* env, jobject self, jlong qbufPtr, jlong srcOff, jobject dstBuf, jint dstOff, jint maxReadLen) {
+    QUIC_BUFFER* qbuf = (QUIC_BUFFER*)qbufPtr;
+    char* src = qbuf->Buffer;
+    int readLen = qbuf->Length - srcOff;
+    if (readLen > maxReadLen) {
+      readLen = maxReadLen;
+    }
+    char* dst = (*env)->GetDirectBufferAddress(env, dstBuf);
+    memcpy(dst, src, readLen);
+    return readLen;
+  }
 
 jclass MsQuicException;
 jmethodID MsQuicException_init;
@@ -29,6 +50,8 @@ jclass ClsMemoryAllocator;
 jmethodID MemoryAllocator_allocate;
 jmethodID MemoryAllocator_getMemory;
 jmethodID MemoryAllocator_release;
+
+jclass ClsString;
 
 jobject memoryAllocator;
 
@@ -61,7 +84,12 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_MsQuicJavaInit
     InternalListenerCallback = (jclass)(*env)->NewGlobalRef(env, (jobject)(*env)->FindClass(env, "msquic/internal/InternalListenerCallback"));
     InternalListenerCallback_attachOrGetConnectionWrapper =
       (*env)->GetMethodID(env, InternalListenerCallback, "attachOrGetConnectionWrapper", "(JJ)J"); // (real, wrapper)->wrapper
-    InternalListenerCallback_callback = (*env)->GetMethodID(env, InternalListenerCallback, "callback", "(IJ)I");
+    InternalListenerCallback_callback = (*env)->GetMethodID(env, InternalListenerCallback, "callback",
+      // int type
+      // long NEW_CONNECTION_connection
+      // String newConnNegotiatedAlpn
+      // String newConnServerName
+      "(IJLjava/lang/String;Ljava/lang/String;)I");
 
     InternalConnectionCallback = (jclass)(*env)->NewGlobalRef(env, (jobject)(*env)->FindClass(env, "msquic/internal/InternalConnectionCallback"));
     InternalConnectionCallback_attachOrGetStreamWrapper =
@@ -70,15 +98,28 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_MsQuicJavaInit
       // int type
       // long PEER_STREAM_STARTED_stream
       // boolean SHUTDOWN_COMPLETE_appCloseInProgress
-      "(IJZ)I");
+      // String LOCAL_ADDRESS_CHANGED_address
+      // String PEER_ADDRESS_CHANGED_address
+      // boolean CONNECTED_sessionResumed
+      // String CONNECTED_negotiatedAlpn
+      "(IJZLjava/lang/String;Ljava/lang/String;ZLjava/lang/String;)I");
 
     InternalStreamCallback = (jclass)(*env)->NewGlobalRef(env, (jobject)(*env)->FindClass(env, "msquic/internal/InternalStreamCallback"));
-    InternalStreamCallback_callback = (*env)->GetMethodID(env, InternalStreamCallback, "callback", "(I)I");
+    InternalStreamCallback_callback = (*env)->GetMethodID(env, InternalStreamCallback, "callback",
+      // int type
+      // long RECEIVE_totalBufferLengthPtr
+      // long RECEIVE_absoluteOffset
+      // long RECEIVE_totalBufferLength
+      // long[] RECEIVE_bufferPtrs
+      // int RECEIVE_receiveFlags
+      "(IJJJ[JI)I");
 
     ClsMemoryAllocator = (jclass)(*env)->NewGlobalRef(env, (jobject)(*env)->FindClass(env, "msquic/MemoryAllocator"));
     MemoryAllocator_allocate = (*env)->GetMethodID(env, ClsMemoryAllocator, "allocate", "(I)Ljava/lang/Object;");
     MemoryAllocator_getMemory = (*env)->GetMethodID(env, ClsMemoryAllocator, "getMemory", "(Ljava/lang/Object;)Ljava/nio/ByteBuffer;");
     MemoryAllocator_release = (*env)->GetMethodID(env, ClsMemoryAllocator, "release", "(Ljava/lang/Object;)V");
+
+    ClsString = (jclass)(*env)->NewGlobalRef(env, (jobject)(*env)->FindClass(env, "java/lang/String"));
 
     if (allocator == NULL) {
       memoryAllocator = NULL;
@@ -103,6 +144,7 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_MsQuicJavaRelease
     (*env)->DeleteGlobalRef(env, (jobject)InternalConnectionCallback);
     (*env)->DeleteGlobalRef(env, (jobject)InternalStreamCallback);
     (*env)->DeleteGlobalRef(env, (jobject)ClsMemoryAllocator);
+    (*env)->DeleteGlobalRef(env, (jobject)ClsString);
 
     if (memoryAllocator) {
       (*env)->DeleteGlobalRef(env, memoryAllocator);
@@ -185,6 +227,15 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_RegistrationClose
     HQUIC reg = (HQUIC)regPtr;
 
     msquic->RegistrationClose(reg);
+  }
+
+JNIEXPORT void JNICALL Java_msquic_internal_Native_RegistrationShutdown
+  (JNIEnv* env, jobject self, jlong msquicPtr, jlong regPtr, jint flags, jlong errorCode) {
+
+    QUIC_API_TABLE* msquic = (QUIC_API_TABLE*)msquicPtr;
+    HQUIC reg = (HQUIC)regPtr;
+
+    msquic->RegistrationShutdown(reg, flags, errorCode);
   }
 
 JNIEXPORT jlong JNICALL Java_msquic_internal_Native_ConfigurationOpen
@@ -335,6 +386,36 @@ typedef struct st_msquic_stream {
   jobject memoryObject;
 } msquic_stream_t;
 
+jstring addressToString(JNIEnv* env, const QUIC_ADDR* addr) {
+  QUIC_ADDRESS_FAMILY family = QuicAddrGetFamily(addr);
+  int port = QuicAddrGetPort(addr);
+  // see msquic_linux.h
+  char addressChars[39 + 1];
+  if (family == QUIC_ADDRESS_FAMILY_INET) {
+    inet_ntop(AF_INET, &addr->Ipv4.sin_addr, addressChars, sizeof(char) * 40);
+  } else {
+    inet_ntop(AF_INET6, &addr->Ipv6.sin6_addr, addressChars, sizeof(char) * 40);
+  }
+  char l4addrChars[1 + 39 + 1 + 1 + 5 + 1];
+  if (family == QUIC_ADDRESS_FAMILY_INET) {
+    sprintf(l4addrChars, "%s:%d", addressChars, port);
+  } else {
+    sprintf(l4addrChars, "[%s]:%d", addressChars, port);
+  }
+  return (*env)->NewStringUTF(env, l4addrChars);
+}
+
+jstring buildAlpnString(JNIEnv* env, uint8_t len, const uint8_t* negotiatedAlpn) {
+  char foo[256];
+  int i = 0;
+  for (;i < len; ++i) {
+    foo[i] = negotiatedAlpn[i];
+  }
+  foo[i] = '\0';
+  jstring alpn = (*env)->NewStringUTF(env, foo);
+  return alpn;
+}
+
 msquic_connection_t* wrapConnectionOfListener(JNIEnv* env, jobject cbRef, HQUIC conn) {
   if (conn == NULL) {
     return NULL;
@@ -364,13 +445,21 @@ QUIC_STATUS listenerCallback(HQUIC lsn, void* data, QUIC_LISTENER_EVENT* event) 
   msquic_listener_t* wrapper = (msquic_listener_t*)data;
   jobject cbRef = wrapper->cbRef;
   jint type = event->Type;
-  HQUIC newConnection = NULL;
+  jlong newConnectionPtr = 0;
+  jstring negotiatedAlpn = NULL;
+  jstring serverName = NULL;
   if (type == QUIC_LISTENER_EVENT_NEW_CONNECTION) {
-    newConnection = event->NEW_CONNECTION.Connection;
+    HQUIC newConnection = event->NEW_CONNECTION.Connection;
+    newConnectionPtr = (jlong)wrapConnectionOfListener(env, cbRef, newConnection);
+    negotiatedAlpn = buildAlpnString(env,
+      event->NEW_CONNECTION.Info->NegotiatedAlpnLength,
+      event->NEW_CONNECTION.Info->NegotiatedAlpn
+    );
+    serverName = (*env)->NewStringUTF(env, event->NEW_CONNECTION.Info->ServerName);
   }
-  jlong newConnectionPtr = (jlong)wrapConnectionOfListener(env, cbRef, newConnection);
 
-  return (QUIC_STATUS) (*env)->CallIntMethod(env, cbRef, InternalListenerCallback_callback, type, newConnectionPtr);
+  return (QUIC_STATUS) (*env)->CallIntMethod(env, cbRef, InternalListenerCallback_callback, type,
+    newConnectionPtr, negotiatedAlpn, serverName);
 }
 
 JNIEXPORT jlong JNICALL Java_msquic_internal_Native_ListenerOpen
@@ -494,10 +583,28 @@ QUIC_STATUS connectionCallback(HQUIC conn, void* data, QUIC_CONNECTION_EVENT* ev
   if (type == QUIC_CONNECTION_EVENT_SHUTDOWN_COMPLETE) {
     SHUTDOWN_COMPLETE_appCloseInProgress = event->SHUTDOWN_COMPLETE.AppCloseInProgress;
   }
+  jstring LOCAL_ADDRESS_CHANGED_address = NULL;
+  if (type == QUIC_CONNECTION_EVENT_LOCAL_ADDRESS_CHANGED) {
+    LOCAL_ADDRESS_CHANGED_address = addressToString(env, event->LOCAL_ADDRESS_CHANGED.Address);
+  }
+  jstring PEER_ADDRESS_CHANGED_address = NULL;
+  if (type == QUIC_CONNECTION_EVENT_PEER_ADDRESS_CHANGED) {
+    PEER_ADDRESS_CHANGED_address = addressToString(env, event->PEER_ADDRESS_CHANGED.Address);
+  }
+  jboolean CONNECTED_sessionResumed = 0;
+  jstring CONNECTED_negotiatedAlpn = NULL;
+  if (type == QUIC_CONNECTION_EVENT_CONNECTED) {
+    CONNECTED_sessionResumed = event->CONNECTED.SessionResumed;
+    CONNECTED_negotiatedAlpn = buildAlpnString(env, event->CONNECTED.NegotiatedAlpnLength, event->CONNECTED.NegotiatedAlpn);
+  }
 
   return (QUIC_STATUS) (*env)->CallIntMethod(env, cbRef, InternalConnectionCallback_callback, type,
     PEER_STREAM_STARTED_stream,
-    SHUTDOWN_COMPLETE_appCloseInProgress
+    SHUTDOWN_COMPLETE_appCloseInProgress,
+    LOCAL_ADDRESS_CHANGED_address,
+    PEER_ADDRESS_CHANGED_address,
+    CONNECTED_sessionResumed,
+    CONNECTED_negotiatedAlpn
   );
 }
 
@@ -559,6 +666,16 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_ConnectionStart
     return;
   }
 
+JNIEXPORT void JNICALL Java_msquic_internal_Native_ConnectionShutdown
+  (JNIEnv* env, jobject self, jlong msquicPtr, jlong connPtr, jint flags, jlong errorCode) {
+
+    QUIC_API_TABLE* msquic = (QUIC_API_TABLE*)msquicPtr;
+    msquic_connection_t* wrapper = (msquic_connection_t*)connPtr;
+    HQUIC conn = wrapper->conn;
+
+    msquic->ConnectionShutdown(conn, flags, errorCode);
+  }
+
 JNIEXPORT void JNICALL Java_msquic_internal_Native_ConnectionSetCallbackHandler
   (JNIEnv* env, jobject self, jlong msquicPtr, jlong connPtr, jobject cb) {
 
@@ -594,6 +711,40 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_ConnectionSendResumptionTicke
     msquic->ConnectionSendResumptionTicket(conn, flags, 0, NULL);
   }
 
+JNIEXPORT jstring JNICALL Java_msquic_internal_Native_GetConnectionLocalAddress
+  (JNIEnv* env, jobject self, jlong msquicPtr, jlong connPtr) {
+
+    QUIC_API_TABLE* msquic = (QUIC_API_TABLE*)msquicPtr;
+    msquic_connection_t* wrapper = (msquic_connection_t*)connPtr;
+    HQUIC conn = wrapper->conn;
+
+    QUIC_ADDR addr;
+    uint32_t size = sizeof(QUIC_ADDR);
+    QUIC_STATUS err = msquic->GetParam(conn, QUIC_PARAM_LEVEL_CONNECTION, QUIC_PARAM_CONN_LOCAL_ADDRESS, &size, &addr);
+    if (QUIC_FAILED(err)) {
+      throwException(env, err);
+      return NULL;
+    }
+    return addressToString(env, &addr);
+  }
+
+JNIEXPORT jstring JNICALL Java_msquic_internal_Native_GetConnectionRemoteAddress
+  (JNIEnv* env, jobject self, jlong msquicPtr, jlong connPtr) {
+
+    QUIC_API_TABLE* msquic = (QUIC_API_TABLE*)msquicPtr;
+    msquic_connection_t* wrapper = (msquic_connection_t*)connPtr;
+    HQUIC conn = wrapper->conn;
+
+    QUIC_ADDR addr;
+    uint32_t size = sizeof(QUIC_ADDR);
+    QUIC_STATUS err = msquic->GetParam(conn, QUIC_PARAM_LEVEL_CONNECTION, QUIC_PARAM_CONN_REMOTE_ADDRESS, &size, &addr);
+    if (QUIC_FAILED(err)) {
+      throwException(env, err);
+      return NULL;
+    }
+    return addressToString(env, &addr);
+  }
+
 typedef struct st_qbuf_wrapper {
   QUIC_BUFFER qbuf;
   jobject memoryObject;
@@ -612,7 +763,33 @@ QUIC_STATUS streamCallback(HQUIC stream, void* data, QUIC_STREAM_EVENT* event) {
     releaseMemory(env, qbufwrapper, qbufwrapper->memoryObject);
   }
 
-  return (QUIC_STATUS) (*env)->CallIntMethod(env, cbRef, InternalStreamCallback_callback, type);
+  jlong RECEIVE_totalBufferLengthPtr = 0;
+  jlong RECEIVE_absoluteOffset = 0;
+  jlong RECEIVE_totalBufferLength = 0;
+  jlongArray RECEIVE_bufferPtrs = NULL;
+  jint RECEIVE_receiveFlags = 0;
+  if (type == QUIC_STREAM_EVENT_RECEIVE) {
+    RECEIVE_totalBufferLengthPtr = (jlong)(&(event->RECEIVE.TotalBufferLength));
+    RECEIVE_absoluteOffset = event->RECEIVE.AbsoluteOffset;
+    RECEIVE_totalBufferLength = event->RECEIVE.TotalBufferLength;
+    int bufcount = event->RECEIVE.BufferCount;
+    RECEIVE_bufferPtrs = (*env)->NewLongArray(env, bufcount);
+    long* foo = malloc(bufcount * sizeof(long));
+    for (int i = 0; i < bufcount; ++i) {
+      foo[i] = (jlong)(&event->RECEIVE.Buffers[i]);
+    }
+    (*env)->SetLongArrayRegion(env, RECEIVE_bufferPtrs, 0, bufcount, foo);
+    free(foo);
+    RECEIVE_receiveFlags = event->RECEIVE.Flags;
+  }
+
+  return (QUIC_STATUS) (*env)->CallIntMethod(env, cbRef, InternalStreamCallback_callback, type,
+    RECEIVE_totalBufferLengthPtr,
+    RECEIVE_absoluteOffset,
+    RECEIVE_totalBufferLength,
+    RECEIVE_bufferPtrs,
+    RECEIVE_receiveFlags
+  );
 }
 
 JNIEXPORT jlong JNICALL Java_msquic_internal_Native_StreamOpen
@@ -718,4 +895,51 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_StreamSend
       return;
     }
     return;
+  }
+
+JNIEXPORT void JNICALL Java_msquic_internal_Native_StreamReceiveComplete
+  (JNIEnv* env, jobject self, jlong msquicPtr, jlong streamPtr, jlong consumedLen) {
+    QUIC_API_TABLE* msquic = (QUIC_API_TABLE*)msquicPtr;
+    msquic_stream_t* wrapper = (msquic_stream_t*)streamPtr;
+    HQUIC stream = wrapper->stream;
+
+    msquic->StreamReceiveComplete(stream, consumedLen);
+  }
+
+JNIEXPORT void JNICALL Java_msquic_internal_Native_StreamReceiveSetEnabled
+  (JNIEnv* env, jobject self, jlong msquicPtr, jlong streamPtr, jboolean enabled) {
+
+    QUIC_API_TABLE* msquic = (QUIC_API_TABLE*)msquicPtr;
+    msquic_stream_t* wrapper = (msquic_stream_t*)streamPtr;
+    HQUIC stream = wrapper->stream;
+
+    QUIC_STATUS err = msquic->StreamReceiveSetEnabled(stream, enabled);
+    if (QUIC_FAILED(err)) {
+      throwException(env, err);
+      return;
+    }
+    return;
+  }
+
+JNIEXPORT void JNICALL Java_msquic_internal_Native_StreamReceiveSetTotalLength
+  (JNIEnv* env, jobject self, jlong totalLengthPtrLong, jlong len) {
+    uint64_t* totalLengthPtr = (uint64_t*)totalLengthPtrLong;
+    *totalLengthPtr = len;
+  }
+
+JNIEXPORT jlong JNICALL Java_msquic_internal_Native_GetStreamId
+  (JNIEnv* env, jobject self, jlong msquicPtr, jlong streamPtr) {
+
+    QUIC_API_TABLE* msquic = (QUIC_API_TABLE*)msquicPtr;
+    msquic_stream_t* wrapper = (msquic_stream_t*)streamPtr;
+    HQUIC stream = wrapper->stream;
+
+    QUIC_UINT62 streamId;
+    uint32_t size = sizeof(QUIC_UINT62);
+    QUIC_STATUS err = msquic->GetParam(stream, QUIC_PARAM_LEVEL_STREAM, QUIC_PARAM_STREAM_ID, &size, &streamId);
+    if (QUIC_FAILED(err)) {
+      throwException(env, err);
+      return 0;
+    }
+    return streamId;
   }

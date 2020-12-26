@@ -4,7 +4,6 @@ import msquic.nativevalues.*;
 
 import java.nio.ByteBuffer;
 import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class SampleClient {
     private static Registration reg = null;
@@ -14,7 +13,7 @@ public class SampleClient {
 
     public static void main(String[] args) throws Exception {
         // { // this is optional
-        //     MsQuic.setMemoryAllocator(new SampleServer.DirectByteBufferMemoryAllocator());
+        //     MsQuic.setMemoryAllocator(new Utils.DirectByteBufferMemoryAllocator());
         // }
         MsQuic msquic = MsQuic.open();
         try {
@@ -27,7 +26,12 @@ public class SampleClient {
             conn = reg.openConnection(event -> {
                 switch (event.type) {
                     case CONNECTED:
-                        System.out.println("[conn][" + conn + "] Connected");
+                        System.out.println("[conn][" + conn + "] Connected: " +
+                            "local=" + conn.getLocalAddress() + ", " +
+                            "remote=" + conn.getRemoteAddress());
+                        System.out.println("[conn][" + conn + "] " +
+                            "Negotiated alpn: " + event.CONNECTED.negotiatedAlpn + ", " +
+                            "Session resumed: " + event.CONNECTED.sessionResumed);
                         try {
                             clientSend();
                         } catch (MsQuicException e) {
@@ -76,12 +80,28 @@ public class SampleClient {
         try {
             stream = conn.openStream(StreamOpenFlags.NONE, event -> {
                 switch (event.type) {
+                    case START_COMPLETE:
+                        System.out.println("[strm][" + stream + "] Stream started: " + stream.getId());
+                        break;
                     case SEND_COMPLETE:
                         System.out.println("[strm][" + stream + "] Data sent");
-                        SampleServer.U.invokeCleaner(stream.pollWBuf());
+                        Utils.U.invokeCleaner(stream.pollWBuf());
                         break;
                     case RECEIVE:
                         System.out.println("[strm][" + stream + "] Data received");
+                        int len = (int) event.RECEIVE.getTotalBufferLength();
+                        System.out.println("[strm][" + stream + "] Received bytes: " + len);
+
+                        ByteBuffer rcvBuf = ByteBuffer.allocateDirect(len);
+                        for (QuicBuffer qbuf : event.RECEIVE.buffers) {
+                            qbuf.read(rcvBuf);
+                        }
+                        rcvBuf.flip();
+                        byte[] rcvByteArray = new byte[len];
+                        rcvBuf.get(rcvByteArray);
+                        Utils.U.invokeCleaner(rcvBuf);
+                        System.out.println("[strm][" + stream + "] Received data: " + new String(rcvByteArray));
+
                         break;
                     case PEER_SEND_ABORTED:
                         System.out.println("[strm][" + stream + "] Peer aborted");
@@ -109,17 +129,17 @@ public class SampleClient {
             stream.close();
             throw e;
         }
-        System.out.println("[strm][" + stream + "] Sending data...");
+        String sndStr = Utils.randomStr(100);
+        System.out.println("[strm][" + stream + "] Sending data: " + sndStr);
         ByteBuffer buf = ByteBuffer.allocateDirect(100);
-        ThreadLocalRandom rnd = ThreadLocalRandom.current();
-        byte[] bytes = new byte[100];
-        rnd.nextBytes(bytes);
+        byte[] bytes = sndStr.getBytes();
         buf.put(bytes);
+        buf.flip();
         try {
             stream.send(SendFlags.FIN, buf);
         } catch (MsQuicException e) {
             System.out.println("StreamSend failed: " + e.status);
-            SampleServer.U.invokeCleaner(buf);
+            Utils.U.invokeCleaner(buf);
         }
     }
 }

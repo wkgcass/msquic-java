@@ -29,6 +29,10 @@ public class Native {
         return instance;
     }
 
+    public native int QuicBufferLength(long bufPtr);
+
+    public native int QuicBufferRead(long bufPtr, long srcOff, ByteBuffer dst, int dstOff, int maxReadLen);
+
     public native void MsQuicJavaInit(MemoryAllocator<?> allocator);
 
     public native void MsQuicJavaRelease();
@@ -40,6 +44,8 @@ public class Native {
     public native long RegistrationOpen(long msquic, String appName, int profile) throws MsQuicException;
 
     public native void RegistrationClose(long msquic, long reg);
+
+    public native void RegistrationShutdown(long msquic, long reg, int connectionShutdownFlags, long errorCode);
 
     public native long ConfigurationOpen(long msquic, long reg, String[] alpn,
                                          int idleTimeoutMs, boolean isSetIdleTimeoutMs,
@@ -65,11 +71,17 @@ public class Native {
 
     public native void ConnectionStart(long msquic, long conn, long conf, int family, String address, int port) throws MsQuicException;
 
+    public native void ConnectionShutdown(long msquic, long conn, int flags, long errorCode);
+
     public native void ConnectionSetCallbackHandler(long msquic, long conn, InternalConnectionCallback cb);
 
     public native void ConnectionSetConfiguration(long msquic, long conn, long conf) throws MsQuicException;
 
     public native void ConnectionSendResumptionTicket(long msquic, long conn, int sendResumptionFlags) throws MsQuicException;
+
+    public native String GetConnectionLocalAddress(long msquic, long conn) throws MsQuicException;
+
+    public native String GetConnectionRemoteAddress(long msquic, long conn) throws MsQuicException;
 
     public native long StreamOpen(InternalConnectionCallback connCB, long msquic, long conn, int streamOpenFlags, InternalStreamCallback cb) throws MsQuicException;
 
@@ -82,4 +94,12 @@ public class Native {
     public native void StreamShutdown(long msquic, long stream, int shutdownFlags) throws MsQuicException;
 
     public native void StreamSend(long msquic, long stream, int sendFlags, ByteBuffer directByteBuffer, int off, int lim) throws MsQuicException;
+
+    public native void StreamReceiveComplete(long msquic, long stream, long consumedLen);
+
+    public native void StreamReceiveSetEnabled(long msquic, long stream, boolean enabled);
+
+    public native void StreamReceiveSetTotalLength(long ptr, long len);
+
+    public native long GetStreamId(long msquic, long stream) throws MsQuicException;
 }
