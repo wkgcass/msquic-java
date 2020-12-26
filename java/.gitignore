@@ -3,6 +3,6 @@
 *.class
 *.jar
 !gradle/wrapper/gradle-wrapper.jar
-src/main/c/libmsquicjava.so
-src/main/c/libmsquicjava.dylib
-src/main/c/msquicjava.dll
+msquic-java/src/main/c/libmsquicjava.so
+msquic-java/src/main/c/libmsquicjava.dylib
+msquic-java/src/main/c/msquicjava.dll

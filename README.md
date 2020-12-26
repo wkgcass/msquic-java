@@ -21,7 +21,7 @@ Note that the library should be built with `-Config Release`:
 ### 2. build msquicjava
 
 ```shell
-cd java/src/main/c
+cd java/msquic-java/src/main/c
 ./build.sh
 ```
 

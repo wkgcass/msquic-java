@@ -1,0 +1,12 @@
+compileJava {
+    doFirst {
+        options.compilerArgs << '--module-path' << classpath.asPath
+    }
+    options.compilerArgs << '--add-modules' << [
+            'msquic-java',
+    ].join(',')
+}
+
+jar {
+    archiveName "msquic-vproxy.jar"
+}

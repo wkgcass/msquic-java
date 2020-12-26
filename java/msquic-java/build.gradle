@@ -1,0 +1,3 @@
+jar {
+    archiveName "msquic-java.jar"
+}

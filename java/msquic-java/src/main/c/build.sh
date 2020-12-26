@@ -6,8 +6,8 @@ then
 	exit 1
 fi
 #  main/src/java/msquic/
-MSQUIC_INC="../../../../src/inc"
-MSQUIC_LIB="../../../../artifacts/bin/linux/x64_Release_openssl"
+MSQUIC_INC="../../../../../src/inc"
+MSQUIC_LIB="../../../../../artifacts/bin/linux/x64_Release_openssl"
 
 os=`uname`
 target="msquicjava"

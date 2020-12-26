@@ -1,2 +1,3 @@
 rootProject.name = 'msquic'
-
+include 'msquic-java'
+include 'msquic-vproxy'
