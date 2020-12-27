@@ -18,10 +18,10 @@ JNIEXPORT jint JNICALL Java_msquic_internal_Native_QuicBufferLength
 /*
  * Class:     msquic_internal_Native
  * Method:    QuicBufferRead
- * Signature: (JJLjava/nio/ByteBuffer;II)I
+ * Signature: (JILjava/nio/ByteBuffer;II)I
  */
 JNIEXPORT jint JNICALL Java_msquic_internal_Native_QuicBufferRead
-  (JNIEnv *, jobject, jlong, jlong, jobject, jint, jint);
+  (JNIEnv *, jobject, jlong, jint, jobject, jint, jint);
 
 /*
  * Class:     msquic_internal_Native

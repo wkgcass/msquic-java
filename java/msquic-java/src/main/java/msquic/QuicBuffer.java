@@ -23,7 +23,7 @@ public class QuicBuffer {
         return read(dst, 0);
     }
 
-    public int read(ByteBuffer dst, long srcOffset) {
+    public int read(ByteBuffer dst, int srcOffset) {
         int dstOff = dst.position();
         int maxLen = dst.limit() - dst.position();
 
@@ -35,6 +35,6 @@ public class QuicBuffer {
 
     @Override
     public String toString() {
-        return "QuicBuffer(0x" + Long.toHexString(ptr) + "/" + length + ')';
+        return "QuicBuffer(0x" + Long.toHexString(ptr) + "/" + length() + ')';
     }
 }

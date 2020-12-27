@@ -21,7 +21,7 @@ public class InternalStreamCallback {
     @UsedByJNI
     public int callback(int type,
                         //
-                        long RECEIVE_totalBufferLengthPtr,
+                        long RECEIVE_eventPtr,
                         long RECEIVE_absoluteOffset,
                         long RECEIVE_totalBufferLength,
                         long[] RECEIVE_bufferPtrs,
@@ -30,7 +30,7 @@ public class InternalStreamCallback {
     ) {
         try {
             cb.callback(new StreamEvent(StreamEventType.valueOf(type),
-                RECEIVE_totalBufferLengthPtr, RECEIVE_absoluteOffset, RECEIVE_totalBufferLength, RECEIVE_bufferPtrs, RECEIVE_receiveFlags
+                RECEIVE_eventPtr, RECEIVE_absoluteOffset, RECEIVE_totalBufferLength, RECEIVE_bufferPtrs, RECEIVE_receiveFlags
             ));
         } catch (MsQuicException e) {
             return e.status.intValue;

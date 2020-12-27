@@ -31,7 +31,7 @@ public class Native {
 
     public native int QuicBufferLength(long bufPtr);
 
-    public native int QuicBufferRead(long bufPtr, long srcOff, ByteBuffer dst, int dstOff, int maxReadLen);
+    public native int QuicBufferRead(long bufPtr, int srcOff, ByteBuffer dst, int dstOff, int maxReadLen);
 
     public native void MsQuicJavaInit(MemoryAllocator<?> allocator);
 

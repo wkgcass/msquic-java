@@ -20,7 +20,7 @@ JNIEXPORT jint JNICALL Java_msquic_internal_Native_QuicBufferLength
   }
 
 JNIEXPORT jint JNICALL Java_msquic_internal_Native_QuicBufferRead
-  (JNIEnv* env, jobject self, jlong qbufPtr, jlong srcOff, jobject dstBuf, jint dstOff, jint maxReadLen) {
+  (JNIEnv* env, jobject self, jlong qbufPtr, jint srcOff, jobject dstBuf, jint dstOff, jint maxReadLen) {
     QUIC_BUFFER* qbuf = (QUIC_BUFFER*)qbufPtr;
     char* src = qbuf->Buffer;
     int readLen = qbuf->Length - srcOff;
@@ -28,7 +28,7 @@ JNIEXPORT jint JNICALL Java_msquic_internal_Native_QuicBufferRead
       readLen = maxReadLen;
     }
     char* dst = (*env)->GetDirectBufferAddress(env, dstBuf);
-    memcpy(dst, src, readLen);
+    memcpy(dst + dstOff, src, readLen);
     return readLen;
   }
 
@@ -107,7 +107,7 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_MsQuicJavaInit
     InternalStreamCallback = (jclass)(*env)->NewGlobalRef(env, (jobject)(*env)->FindClass(env, "msquic/internal/InternalStreamCallback"));
     InternalStreamCallback_callback = (*env)->GetMethodID(env, InternalStreamCallback, "callback",
       // int type
-      // long RECEIVE_totalBufferLengthPtr
+      // long RECEIVE_eventPtr
       // long RECEIVE_absoluteOffset
       // long RECEIVE_totalBufferLength
       // long[] RECEIVE_bufferPtrs
@@ -384,6 +384,8 @@ typedef struct st_msquic_stream {
   jobject cbRef;
   HQUIC stream;
   jobject memoryObject;
+  int currentRcvBuffersCount;
+  QUIC_BUFFER* rcvBuffers;
 } msquic_stream_t;
 
 jstring addressToString(JNIEnv* env, const QUIC_ADDR* addr) {
@@ -563,6 +565,8 @@ msquic_stream_t* wrapStream(JNIEnv* env, jobject cbRef, HQUIC stream) {
   memset(wrapper, 0, sizeof(msquic_stream_t));
   wrapper->stream = stream;
   wrapper->memoryObject = memoryObject;
+  wrapper->currentRcvBuffersCount = 2;
+  wrapper->rcvBuffers = malloc(sizeof(QUIC_BUFFER) * 2);
   return wrapper;
 }
 
@@ -763,20 +767,29 @@ QUIC_STATUS streamCallback(HQUIC stream, void* data, QUIC_STREAM_EVENT* event) {
     releaseMemory(env, qbufwrapper, qbufwrapper->memoryObject);
   }
 
-  jlong RECEIVE_totalBufferLengthPtr = 0;
+  jlong RECEIVE_eventPtr = 0;
   jlong RECEIVE_absoluteOffset = 0;
   jlong RECEIVE_totalBufferLength = 0;
   jlongArray RECEIVE_bufferPtrs = NULL;
   jint RECEIVE_receiveFlags = 0;
   if (type == QUIC_STREAM_EVENT_RECEIVE) {
-    RECEIVE_totalBufferLengthPtr = (jlong)(&(event->RECEIVE.TotalBufferLength));
+    RECEIVE_eventPtr = (jlong)event;
     RECEIVE_absoluteOffset = event->RECEIVE.AbsoluteOffset;
     RECEIVE_totalBufferLength = event->RECEIVE.TotalBufferLength;
     int bufcount = event->RECEIVE.BufferCount;
     RECEIVE_bufferPtrs = (*env)->NewLongArray(env, bufcount);
     long* foo = malloc(bufcount * sizeof(long));
+    // make enough room for rcvBuffers
+    if (bufcount > wrapper->currentRcvBuffersCount) {
+      // for async handling, the buffers must be fully read otherwise the rcv process should not be resumed
+      // so here we can safely free the buffers
+      free(wrapper->rcvBuffers);
+      wrapper->currentRcvBuffersCount = bufcount;
+      wrapper->rcvBuffers = malloc(sizeof(QUIC_BUFFER) * bufcount);
+    }
     for (int i = 0; i < bufcount; ++i) {
-      foo[i] = (jlong)(&event->RECEIVE.Buffers[i]);
+      wrapper->rcvBuffers[i] = event->RECEIVE.Buffers[i];
+      foo[i] = (jlong)(&wrapper->rcvBuffers[i]);
     }
     (*env)->SetLongArrayRegion(env, RECEIVE_bufferPtrs, 0, bufcount, foo);
     free(foo);
@@ -784,7 +797,7 @@ QUIC_STATUS streamCallback(HQUIC stream, void* data, QUIC_STREAM_EVENT* event) {
   }
 
   return (QUIC_STATUS) (*env)->CallIntMethod(env, cbRef, InternalStreamCallback_callback, type,
-    RECEIVE_totalBufferLengthPtr,
+    RECEIVE_eventPtr,
     RECEIVE_absoluteOffset,
     RECEIVE_totalBufferLength,
     RECEIVE_bufferPtrs,
@@ -811,6 +824,8 @@ JNIEXPORT jlong JNICALL Java_msquic_internal_Native_StreamOpen
     wrapper->stream = stream;
     wrapper->memoryObject = memoryObject;
     wrapper->cbRef = (*env)->NewGlobalRef(env, cb);
+    wrapper->currentRcvBuffersCount = 2;
+    wrapper->rcvBuffers = malloc(sizeof(QUIC_BUFFER) * 2);
 
     jlong wrapper2 = (*env)->CallLongMethod(env, connCB, InternalConnectionCallback_attachOrGetStreamWrapper, (jlong)stream, (jlong)wrapper);
     if (unlikely(wrapper2 != (jlong)wrapper)) {
@@ -832,6 +847,7 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_StreamClose
     if (wrapper->cbRef != NULL) {
       (*env)->DeleteGlobalRef(env, wrapper->cbRef);
     }
+    free(wrapper->rcvBuffers);
     releaseMemory(env, wrapper, wrapper->memoryObject);
   }
 
@@ -922,9 +938,9 @@ JNIEXPORT void JNICALL Java_msquic_internal_Native_StreamReceiveSetEnabled
   }
 
 JNIEXPORT void JNICALL Java_msquic_internal_Native_StreamReceiveSetTotalLength
-  (JNIEnv* env, jobject self, jlong totalLengthPtrLong, jlong len) {
-    uint64_t* totalLengthPtr = (uint64_t*)totalLengthPtrLong;
-    *totalLengthPtr = len;
+  (JNIEnv* env, jobject self, jlong eventPtr, jlong len) {
+    QUIC_STREAM_EVENT* event = (QUIC_STREAM_EVENT*)eventPtr;
+    event->RECEIVE.TotalBufferLength = len;
   }
 
 JNIEXPORT jlong JNICALL Java_msquic_internal_Native_GetStreamId

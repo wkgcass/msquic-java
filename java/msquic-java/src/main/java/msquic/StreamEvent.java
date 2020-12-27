@@ -13,7 +13,7 @@ public class StreamEvent {
 
     public StreamEvent(StreamEventType type,
                        //
-                       long RECEIVE_totalBufferLengthPtr,
+                       long RECEIVE_eventPtr,
                        long RECEIVE_absoluteOffset,
                        long RECEIVE_totalBufferLength,
                        long[] RECEIVE_bufferPtrs,
@@ -22,21 +22,21 @@ public class StreamEvent {
     ) {
         this.type = type;
         if (type == StreamEventType.RECEIVE) {
-            RECEIVE = new RECEIVE_DATA(RECEIVE_totalBufferLengthPtr, RECEIVE_absoluteOffset, RECEIVE_totalBufferLength, RECEIVE_bufferPtrs, RECEIVE_receiveFlags);
+            RECEIVE = new RECEIVE_DATA(RECEIVE_eventPtr, RECEIVE_absoluteOffset, RECEIVE_totalBufferLength, RECEIVE_bufferPtrs, RECEIVE_receiveFlags);
         } else {
             RECEIVE = null;
         }
     }
 
     public static class RECEIVE_DATA {
-        private final long totalBufferLengthPtr;
+        private final long eventPtr;
         public final long absoluteOffset;
         private long totalBufferLength;
         public final List<QuicBuffer> buffers;
         public final int receiveFlags;
 
-        public RECEIVE_DATA(long totalBufferLengthPtr, long absoluteOffset, long totalBufferLength, long[] bufferPtrs, int receiveFlags) {
-            this.totalBufferLengthPtr = totalBufferLengthPtr;
+        public RECEIVE_DATA(long eventPtr, long absoluteOffset, long totalBufferLength, long[] bufferPtrs, int receiveFlags) {
+            this.eventPtr = eventPtr;
             this.absoluteOffset = absoluteOffset;
             this.totalBufferLength = totalBufferLength;
             var bufs = new ArrayList<QuicBuffer>(bufferPtrs.length);
@@ -52,7 +52,7 @@ public class StreamEvent {
         }
 
         public void setTotalBufferLength(long len) {
-            Native.get().StreamReceiveSetTotalLength(totalBufferLengthPtr, len);
+            Native.get().StreamReceiveSetTotalLength(eventPtr, len);
             this.totalBufferLength = len;
         }
     }

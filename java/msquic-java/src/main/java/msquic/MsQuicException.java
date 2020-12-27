@@ -5,6 +5,8 @@ import msquic.nativevalues.Status;
 import java.io.IOException;
 
 public class MsQuicException extends IOException {
+    public static final MsQuicException PENDING = new MsQuicException(Status.PENDING);
+
     public final Status status;
     public final int errCode;
 

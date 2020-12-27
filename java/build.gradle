@@ -47,7 +47,28 @@ project(':msquic-java') {
 project(':msquic-vproxy') {
     dependencies {
         compile project(':msquic-java')
+        compile files(project.rootProject.rootDir.getAbsolutePath() + '/msquic-vproxy/vproxy.jar')
         testCompile group: 'junit', name: 'junit', version: '4.12'
+    }
+
+    task PingPongServer(type: JavaExec) {
+        if ("true" == System.getProperty("enableAssertions")) {
+            enableAssertions = true
+        }
+        classpath = sourceSets.test.runtimeClasspath
+        workingDir = project.rootProject.rootDir.getAbsolutePath()
+        systemProperty("java.library.path", "../artifacts/bin/linux/x64_Release_openssl" + File.pathSeparator + "./msquic-java/src/main/c")
+        main = "msquic.vproxy.PingPongServer"
+    }
+
+    task PingPongClient(type: JavaExec) {
+        if ("true" == System.getProperty("enableAssertions")) {
+            enableAssertions = true
+        }
+        classpath = sourceSets.test.runtimeClasspath
+        workingDir = project.rootProject.rootDir.getAbsolutePath()
+        systemProperty("java.library.path", "../artifacts/bin/linux/x64_Release_openssl" + File.pathSeparator + "./msquic-java/src/main/c")
+        main = "msquic.vproxy.PingPongClient"
     }
 }
 
