@@ -191,4 +191,8 @@ public class NativeValues {
     public native int QUIC_RECEIVE_FLAG_0_RTT();
 
     public native int QUIC_RECEIVE_FLAG_FIN();
+
+    public native int QUIC_CONNECTION_SHUTDOWN_FLAG_NONE();
+
+    public native int QUIC_CONNECTION_SHUTDOWN_FLAG_SILENT();
 }

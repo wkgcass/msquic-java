@@ -679,6 +679,22 @@ JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1RECEIVE_1FLAG_10_
 JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1RECEIVE_1FLAG_1FIN
   (JNIEnv *, jobject);
 
+/*
+ * Class:     msquic_internal_NativeValues
+ * Method:    QUIC_CONNECTION_SHUTDOWN_FLAG_NONE
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1CONNECTION_1SHUTDOWN_1FLAG_1NONE
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     msquic_internal_NativeValues
+ * Method:    QUIC_CONNECTION_SHUTDOWN_FLAG_SILENT
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1CONNECTION_1SHUTDOWN_1FLAG_1SILENT
+  (JNIEnv *, jobject);
+
 #ifdef __cplusplus
 }
 #endif

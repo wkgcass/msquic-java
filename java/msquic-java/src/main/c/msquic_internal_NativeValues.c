@@ -420,3 +420,13 @@ JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1RECEIVE_1FLAG_1FI
   (JNIEnv* env, jobject self) {
     return QUIC_RECEIVE_FLAG_FIN;
   }
+
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1CONNECTION_1SHUTDOWN_1FLAG_1NONE
+  (JNIEnv* env, jobject self) {
+    return QUIC_CONNECTION_SHUTDOWN_FLAG_NONE;
+  }
+
+JNIEXPORT jint JNICALL Java_msquic_internal_NativeValues_QUIC_1CONNECTION_1SHUTDOWN_1FLAG_1SILENT
+  (JNIEnv* env, jobject self) {
+    return QUIC_CONNECTION_SHUTDOWN_FLAG_SILENT;
+  }
