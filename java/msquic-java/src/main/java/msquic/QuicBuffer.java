@@ -8,6 +8,8 @@ public class QuicBuffer {
     private final long ptr;
     private int length = -1;
 
+    private int off = 0;
+
     QuicBuffer(long ptr) {
         this.ptr = ptr;
     }
@@ -19,8 +21,14 @@ public class QuicBuffer {
         return length;
     }
 
+    public int used() {
+        return length() - off;
+    }
+
     public int read(ByteBuffer dst) {
-        return read(dst, 0);
+        int n = read(dst, off);
+        off += n;
+        return n;
     }
 
     public int read(ByteBuffer dst, int srcOffset) {

@@ -1,6 +1,7 @@
 package msquic.vproxy;
 
 import msquic.MsQuicException;
+import msquic.QuicBuffer;
 import msquic.Stream;
 import msquic.StreamEvent;
 import msquic.nativevalues.*;
@@ -228,7 +229,7 @@ public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualF
         // do nothing
     }
 
-    private final LinkedList<QuicBufferEx> readBuffers = new LinkedList<>();
+    private final LinkedList<QuicBuffer> readBuffers = new LinkedList<>();
     private final DirectBuffer writeToStreamBuffer;
     private boolean peerSendShutdown = false;
     private boolean peerAbort = false;
@@ -394,7 +395,7 @@ public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualF
                 continue;
             }
             received = true;
-            readBuffers.add(new QuicBufferEx(buf));
+            readBuffers.add(buf);
         }
 
         if (loop == null) {
