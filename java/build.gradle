@@ -51,13 +51,16 @@ project(':msquic-vproxy') {
         testCompile group: 'junit', name: 'junit', version: '4.12'
     }
 
+    String wdir = project.rootProject.rootDir.getAbsolutePath()
+    String libPath = "../artifacts/bin/linux/x64_Release_openssl" + File.pathSeparator + "./msquic-java/src/main/c"
+
     task PingPongServer(type: JavaExec) {
         if ("true" == System.getProperty("enableAssertions")) {
             enableAssertions = true
         }
         classpath = sourceSets.test.runtimeClasspath
-        workingDir = project.rootProject.rootDir.getAbsolutePath()
-        systemProperty("java.library.path", "../artifacts/bin/linux/x64_Release_openssl" + File.pathSeparator + "./msquic-java/src/main/c")
+        workingDir = wdir
+        systemProperty("java.library.path", libPath)
         main = "msquic.vproxy.PingPongServer"
     }
 
@@ -66,9 +69,29 @@ project(':msquic-vproxy') {
             enableAssertions = true
         }
         classpath = sourceSets.test.runtimeClasspath
-        workingDir = project.rootProject.rootDir.getAbsolutePath()
-        systemProperty("java.library.path", "../artifacts/bin/linux/x64_Release_openssl" + File.pathSeparator + "./msquic-java/src/main/c")
+        workingDir = wdir
+        systemProperty("java.library.path", libPath)
         main = "msquic.vproxy.PingPongClient"
+    }
+
+    task Http1QuicServer(type: JavaExec) {
+        if ("true" == System.getProperty("enableAssertions")) {
+            enableAssertions = true
+        }
+        classpath = sourceSets.test.runtimeClasspath
+        workingDir = wdir
+        systemProperty("java.library.path", libPath)
+        main = "msquic.vproxy.Http1QuicServer"
+    }
+
+    task Http1QuicClient(type: JavaExec) {
+        if ("true" == System.getProperty("enableAssertions")) {
+            enableAssertions = true
+        }
+        classpath = sourceSets.test.runtimeClasspath
+        workingDir = wdir
+        systemProperty("java.library.path", libPath)
+        main = "msquic.vproxy.Http1QuicClient"
     }
 }
 
