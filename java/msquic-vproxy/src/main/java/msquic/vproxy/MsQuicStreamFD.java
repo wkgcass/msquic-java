@@ -33,7 +33,7 @@ public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualF
     private SelectorEventLoop loop;
     private boolean closed = false;
     private boolean streamInitialPacketAlreadySent = false;
-    private boolean finishConnectDone = false;
+    private boolean startCompleteEventFired = false;
     private boolean connected = false;
 
     public MsQuicStreamFD(MsQuicConnectionFD connFD) throws MsQuicException {
@@ -43,7 +43,7 @@ public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualF
         connLocalOnInit = new IPPort(connFD.conn.getLocalAddress());
         connRemoteOnInit = new IPPort(connFD.conn.getRemoteAddress());
 
-        writeToStreamBuffer = new DirectBuffer(32768);
+        writeToStreamBuffer = new DirectBuffer(16384);
     }
 
     MsQuicStreamFD(MsQuicConnectionFD connFD, Stream acceptedStream) throws MsQuicException {
@@ -61,7 +61,7 @@ public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualF
             IP.from(ByteArray.allocate(16).int64(8, stream.real).toJavaArray()),
             (int) streamId);
 
-        writeToStreamBuffer = new DirectBuffer(32768);
+        writeToStreamBuffer = new DirectBuffer(16384);
 
         acceptedStream.setCallbackHandler(this::streamCallback);
     }
@@ -102,26 +102,23 @@ public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualF
 
     @Override
     public boolean isConnected() {
-        if (isAccepted) {
-            return connected;
-        } else {
-            return connected && finishConnectDone;
-        }
+        return connected;
     }
 
     @Override
     public void shutdownOutput() throws IOException {
         checkOpen();
         checkConnected();
-        stream.shutdown(StreamShutdownFlags.ABORT_SEND);
+        stream.send(SendFlags.FIN, null);
     }
 
     @Override
     public boolean finishConnect() throws IOException {
         if (!streamInitialPacketAlreadySent) throw new IOException("stream " + stream + " is not trying to start");
-        if (finishConnectDone) throw new IOException("finish connect already called");
-        if (connected) {
-            finishConnectDone = true;
+        if (connected) throw new IOException("already connected: " + this);
+        if (error != null) throw error;
+        if (startCompleteEventFired) {
+            connected = true;
         }
         return connected;
     }
@@ -232,14 +229,14 @@ public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualF
     private final LinkedList<QuicBuffer> readBuffers = new LinkedList<>();
     private final DirectBuffer writeToStreamBuffer;
     private boolean peerSendShutdown = false;
-    private boolean peerAbort = false;
+    private IOException error = null;
 
     @Override
     public int read(ByteBuffer dst) throws IOException {
         checkOpen();
         checkConnected();
-        if (peerAbort) {
-            throw new IOException("Connection reset");
+        if (error != null) {
+            throw error;
         }
 
         if (peerSendShutdown && readBuffers.isEmpty()) {
@@ -281,8 +278,8 @@ public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualF
     public int write(ByteBuffer src) throws IOException {
         checkOpen();
         checkConnected();
-        if (peerAbort) {
-            throw new IOException("Connection reset");
+        if (error != null) {
+            throw error;
         }
 
         int len = src.limit() - src.position();
@@ -331,7 +328,7 @@ public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualF
                 streamLocalOnInit = new IPPort(
                     IP.from(ByteArray.allocate(16).int64(8, stream.real).toJavaArray()),
                     (int) streamId);
-                connected = true;
+                startCompleteEventFired = true;
                 setWritable();
                 break;
             case SEND_COMPLETE:
@@ -348,10 +345,48 @@ public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualF
             case PEER_SEND_ABORTED:
             case PEER_RECEIVE_ABORTED:
                 assert Logger.lowLevelDebug("peer abort");
-                peerAbort = true;
+                error = new IOException("Connection reset");
                 setReadable();
                 setWritable();
                 break;
+            case SHUTDOWN_COMPLETE:
+                assert Logger.lowLevelDebug("shutdown complete");
+                if (closed) {
+                    assert Logger.lowLevelDebug("the stream is already closed, " +
+                        "nothing to be done here " +
+                        "(however this should not happen because the callback should not be called anymore after closing)");
+                } else {
+                    assert Logger.lowLevelDebug("the stream is not closed yet, " +
+                        "maybe the shutdown is because of the connection closing/shutting-down");
+                    error = new IOException("depended connection shutdown/closed");
+                    setReadable();
+                    setWritable();
+                }
+                break;
+            /*
+             * about SHUTDOWN_COMPLETE:
+             * tracing through the msquic code, I find that if ConnectionClose is called, the related streams are closed automatically
+             *
+             * here's the trace
+             *
+             * ConnectionClose
+             * MsQuicConnectionClose
+             * QuicConnCloseHandle (QUIC_CLOSE_SILENT | QUIC_CLOSE_QUIC_STATUS)
+             * QuicConnCloseLocally
+             * QuicConnTryClose
+             * if (IsFirstCloseForConnection)
+             *     QuicStreamSetShutdown
+             *     QuicStreamShutdown (
+             *         QUIC_STREAM_SHUTDOWN_FLAG_ABORT_SEND |
+             *         QUIC_STREAM_SHUTDOWN_FLAG_ABORT_RECEIVE |
+             *         QUIC_STREAM_SHUTDOWN_SILENT)
+             *     QuicStreamSendShutdown (Stream->Flags.LocalCloseAcked = TRUE) then QuicStreamRecvShutdown (Stream->Flags.RemoteCloseAcked = TRUE)
+             *     if (Silent)
+             *         QuicStreamTryCompleteShutdown
+             *         if (Stream->Flags.LocalCloseAcked && Stream->Flags.RemoteCloseAcked) {
+             *             QuicStreamIndicateShutdownComplete
+             *             Event.Type = QUIC_STREAM_EVENT_SHUTDOWN_COMPLETE
+             */
         }
     }
 

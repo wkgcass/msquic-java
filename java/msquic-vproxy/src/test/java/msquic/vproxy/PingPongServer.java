@@ -143,7 +143,7 @@ public class PingPongServer {
                 }
             }
         });
-        System.out.println("Server started");
+        Logger.alert("Server started");
     }
 
     private static final String crtContent = "-----BEGIN CERTIFICATE-----\n" +

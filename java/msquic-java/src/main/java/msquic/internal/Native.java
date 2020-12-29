@@ -93,7 +93,7 @@ public class Native {
 
     public native void StreamShutdown(long msquic, long stream, int shutdownFlags) throws MsQuicException;
 
-    public native void StreamSend(long msquic, long stream, int sendFlags, ByteBuffer directByteBuffer, int off, int lim) throws MsQuicException;
+    public native void StreamSend(long msquic, long stream, int sendFlags, ByteBuffer directByteBuffer, int off, int len) throws MsQuicException;
 
     public native void StreamReceiveComplete(long msquic, long stream, long consumedLen);
 

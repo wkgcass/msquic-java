@@ -34,7 +34,6 @@ public class MsQuicConnectionFD implements ServerSocketFD, SocketFD, VirtualFD {
     private SelectorEventLoop loop;
     private boolean closed = false;
     private boolean connectionInitialPacketAlreadySent = false;
-    private boolean finishConnectDone = false;
     private boolean connected = false;
     private boolean connectedEventFired = false;
 
@@ -66,8 +65,7 @@ public class MsQuicConnectionFD implements ServerSocketFD, SocketFD, VirtualFD {
         return info;
     }
 
-    @Comment("only valid if it's an active connection, " +
-        "the result will be null if it's is an accepted connection or not connected yet")
+    @Comment("the result will be null if it's not connected yet")
     public ConnectionEvent.CONNECTED_DATA getConnectedData() {
         return connectedData;
     }
@@ -181,9 +179,9 @@ public class MsQuicConnectionFD implements ServerSocketFD, SocketFD, VirtualFD {
     public boolean finishConnect() throws IOException {
         if (!connectionInitialPacketAlreadySent)
             throw new IOException("connection " + conn + " is not trying to start");
-        if (finishConnectDone) throw new IOException("finish connect already done: " + this);
+        if (connected) throw new IOException("already connected: " + this);
+        if (error != null) throw error;
         if (connectedEventFired) {
-            finishConnectDone = true;
             connected = true;
             cancelWritable();
         }
@@ -215,7 +213,7 @@ public class MsQuicConnectionFD implements ServerSocketFD, SocketFD, VirtualFD {
     private IOException error;
 
     @Override
-    public SocketFD accept() throws IOException {
+    public MsQuicStreamFD accept() throws IOException {
         assert Logger.lowLevelDebug("accept() called on " + this);
         checkOpen();
         checkConnected();
