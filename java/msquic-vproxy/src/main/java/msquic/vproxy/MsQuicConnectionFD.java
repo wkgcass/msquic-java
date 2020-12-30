@@ -2,20 +2,24 @@ package msquic.vproxy;
 
 import msquic.*;
 import msquic.nativevalues.AddressFamily;
+import msquic.nativevalues.ConnectionEventType;
 import msquic.nativevalues.ConnectionShutdownFlags;
 import msquic.nativevalues.SendResumptionFlags;
 import vfd.*;
 import vproxybase.selector.SelectorEventLoop;
+import vproxybase.selector.wrap.AbstractBaseVirtualServerSocketFD;
+import vproxybase.selector.wrap.AbstractBaseVirtualSocketFD;
 import vproxybase.selector.wrap.VirtualFD;
 import vproxybase.util.Comment;
+import vproxybase.util.LogType;
 import vproxybase.util.Logger;
 
 import java.io.IOException;
-import java.net.SocketOption;
 import java.nio.ByteBuffer;
-import java.util.LinkedList;
 
-public class MsQuicConnectionFD implements ServerSocketFD, SocketFD, VirtualFD {
+public class MsQuicConnectionFD extends AbstractBaseVirtualServerSocketFD<MsQuicStreamFD> implements ServerSocketFD, SocketFD, VirtualFD {
+    private final MsQuicConnectionVirtualSocketFD asSocket;
+
     private final Configuration conf;
     private final MsQuicListenerFD listenerFD;
     private final boolean isAccepted;
@@ -23,40 +27,34 @@ public class MsQuicConnectionFD implements ServerSocketFD, SocketFD, VirtualFD {
     private final ListenerEvent.NEW_CONNECTION_DATA.NewConnectionInfo info;
     private ConnectionEvent.CONNECTED_DATA connectedData;
 
-    private IPPort localOnInit;
-    private IPPort remoteOnInit;
-
     private IPPort currentLocal;
     private IPPort currentRemote;
 
-    private final LinkedList<MsQuicStreamFD> acceptQueue = new LinkedList<>();
-
-    private SelectorEventLoop loop;
-    private boolean closed = false;
-    private boolean connectionInitialPacketAlreadySent = false;
-    private boolean connected = false;
-    private boolean connectedEventFired = false;
-
     MsQuicConnectionFD(Configuration conf, MsQuicListenerFD listenerFD, Connection acceptedConn,
                        ListenerEvent.NEW_CONNECTION_DATA.NewConnectionInfo info) {
+        super();
+
         this.conf = conf;
         this.listenerFD = listenerFD;
         this.isAccepted = true;
-        this.connected = true;
         this.conn = acceptedConn;
         this.info = info;
 
-        this.localOnInit = listenerFD.localAddress;
-
         this.conn.setCallbackHandler(this::connectonCallback);
+
+        asSocket = new MsQuicConnectionVirtualSocketFD(true, listenerFD.localAddress, null);
     }
 
     public MsQuicConnectionFD(Registration reg, Configuration conf) throws MsQuicException {
+        super();
+
         this.conf = conf;
         this.listenerFD = null;
         this.isAccepted = false;
         this.conn = reg.openConnection(this::connectonCallback);
         this.info = null;
+
+        asSocket = new MsQuicConnectionVirtualSocketFD(false, null, null);
     }
 
     @Comment("only valid if it's accepted, " +
@@ -71,23 +69,11 @@ public class MsQuicConnectionFD implements ServerSocketFD, SocketFD, VirtualFD {
     }
 
     @Override
-    public void loopAware(SelectorEventLoop loop) {
-        assert Logger.lowLevelDebug(this + " loopAware " + loop);
-        this.loop = loop;
-    }
-
-    private void checkOpen() throws IOException {
-        if (closed) throw new IOException("closed");
-    }
-
-    private void checkConnected() throws IOException {
-        if (!connected) throw new IOException("not connected yet");
-    }
-
-    @Override
-    public IPPort getLocalAddress() throws IOException {
-        checkOpen();
-        return localOnInit;
+    public boolean loopAware(SelectorEventLoop loop) {
+        if (!super.loopAware(loop)) {
+            return false;
+        }
+        return asSocket.loopAware(loop);
     }
 
     public IPPort getCurrentLocalAddress() {
@@ -97,7 +83,7 @@ public class MsQuicConnectionFD implements ServerSocketFD, SocketFD, VirtualFD {
     @Override
     public IPPort getRemoteAddress() throws IOException {
         checkOpen();
-        return remoteOnInit;
+        return asSocket.getRemoteAddress();
     }
 
     public IPPort getCurrentRemoteAddress() {
@@ -105,101 +91,59 @@ public class MsQuicConnectionFD implements ServerSocketFD, SocketFD, VirtualFD {
     }
 
     @Override
-    public void bind(IPPort l4addr) {
-        // not supported but do not raise exception
-        assert Logger.lowLevelDebug("you should use MsQuicListenerFD to start a server");
-    }
-
-    @Override
-    public void configureBlocking(boolean b) {
-        if (b) throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public <T> void setOption(SocketOption<T> name, T value) {
-        // unsupported, but do not raise exceptions
-    }
-
-    @Override
-    public FD real() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean isOpen() {
-        return !closed;
-    }
-
-    @Override
     public void close() {
-        if (closed) {
-            return;
+        try {
+            super.close();
+        } catch (Throwable t) {
+            Logger.shouldNotHappen("closing MsQuicConnectionFD asServerSocket failed", t);
         }
-        closed = true;
-        conn.close();
+        try {
+            asSocket.close();
+        } catch (Throwable t) {
+            Logger.shouldNotHappen("closing MsQuicConnectionFD asSocket failed", t);
+        }
+    }
+
+    @Override
+    protected void doClose() {
+        conn.shutdown(ConnectionShutdownFlags.NONE, 0);
     }
 
     @Override
     public void connect(IPPort l4addr) throws IOException {
-        checkOpen();
-        if (isAccepted) throw new IOException("cannot call connect() on an accepted connection");
-        if (connectionInitialPacketAlreadySent) throw new IOException("connection packet is already sent");
-
-        AddressFamily family;
-        if (l4addr.getAddress() instanceof IPv4) {
-            family = AddressFamily.INET;
-        } else if (l4addr.getAddress() instanceof IPv6) {
-            family = AddressFamily.INET6;
-        } else {
-            throw new IOException("unsupported address family for msquic: " + l4addr);
-        }
-        connectionInitialPacketAlreadySent = true;
-        conn.start(conf, family, l4addr.getAddress().formatToIPString(), l4addr.getPort());
-        this.remoteOnInit = l4addr;
-        connectionInitialPacketAlreadySent = true;
+        asSocket.connect(l4addr);
     }
 
     @Override
     public boolean isConnected() {
-        return connected;
+        return asSocket.isConnected();
     }
 
     @Override
-    public void shutdownOutput() throws IOException {
-        shutdownOutput(ConnectionShutdownFlags.NONE, 1);
+    public void shutdownOutput() {
+        throw new UnsupportedOperationException();
     }
 
-    public void shutdownOutput(int flags, long errorCode) throws IOException {
+    public void shutdown(int flags, long errorCode) throws IOException {
         checkOpen();
-        checkConnected();
         conn.shutdown(flags, errorCode);
     }
 
     @Override
     public boolean finishConnect() throws IOException {
-        if (!connectionInitialPacketAlreadySent)
-            throw new IOException("connection " + conn + " is not trying to start");
-        if (connected) throw new IOException("already connected: " + this);
-        if (error != null) throw error;
-        if (connectedEventFired) {
-            connected = true;
-            cancelWritable();
-        }
-        return connected;
+        return asSocket.finishConnect();
     }
 
     @Override
     public int read(ByteBuffer dst) {
         assert Logger.lowLevelDebug("you should start a MsQuicStreamFD to read data, the read() here is a mock for alerting events");
-        if (dst.limit() == dst.position()) {
+        try {
+            return asSocket.read(dst);
+        } catch (IOException e) {
+            Logger.error(LogType.IMPROPER_USE, "reading from MsQuicConnectionFD failed, " +
+                "this fd only supports reading 1 byte for triggering events", e);
             return 0;
         }
-        // write one byte to trigger event
-        dst.put((byte) 0);
-        if (acceptQueue.isEmpty()) {
-            cancelReadable();
-        }
-        return 1;
     }
 
     @Override
@@ -207,86 +151,25 @@ public class MsQuicConnectionFD implements ServerSocketFD, SocketFD, VirtualFD {
         throw new UnsupportedOperationException("start a MsQuicStreamFD to write data. this fd should be used as a ServerSock");
     }
 
-    // =========
-    // impl
-    // =========
-    private IOException error;
-
-    @Override
-    public MsQuicStreamFD accept() throws IOException {
-        assert Logger.lowLevelDebug("accept() called on " + this);
-        checkOpen();
-        checkConnected();
-        if (error != null) {
-            throw error;
-        }
-        MsQuicStreamFD streamFD = acceptQueue.pollFirst();
-        if (streamFD == null) {
-            cancelReadable();
-        }
-        assert Logger.lowLevelDebug("accept() returns " + streamFD);
-        return streamFD;
-    }
-
-    private boolean readable = false;
-
-    private void setReadable() {
-        assert Logger.lowLevelDebug("set readable");
-        readable = true;
-        if (loop == null) {
-            return;
-        }
-        loop.runOnLoop(() -> loop.selector.registerVirtualReadable(this));
-    }
-
-    private void cancelReadable() {
-        assert Logger.lowLevelDebug("cancel readable");
-        readable = false;
-        if (loop == null) {
-            return;
-        }
-        loop.runOnLoop(() -> loop.selector.removeVirtualReadable(this));
-    }
-
-    private boolean writable = false;
-
-    private void setWritable() {
-        assert Logger.lowLevelDebug("set writable");
-        writable = true;
-        if (loop == null) {
-            return;
-        }
-        loop.runOnLoop(() -> loop.selector.registerVirtualWritable(this));
-    }
-
-    private void cancelWritable() {
-        assert Logger.lowLevelDebug("cancel writable");
-        writable = false;
-        if (loop == null) {
-            return;
-        }
-        loop.runOnLoop(() -> loop.selector.removeVirtualWritable(this));
-    }
-
     @Override
     public void onRegister() {
-        if (readable) {
-            setReadable();
-        }
-        if (writable) {
-            setWritable();
-        }
-    }
-
-    @Override
-    public void onRemove() {
-        if (acceptQueue.isEmpty()) {
-            cancelReadable(); // the readable event might be added when this fd is considered as a Connection
+        super.onRegister();
+        if (asSocket.isOpen()) {
+            asSocket.onRegister();
         }
     }
 
     private void connectonCallback(ConnectionEvent event) throws MsQuicException {
         assert Logger.lowLevelDebug(this + " event: " + event.type);
+
+        if (!isOpen()) {
+            assert Logger.lowLevelDebug("the connection is closed, event still firing: " + event.type);
+            // ignore events except SHUTDOWN_COMPLETE
+            if (event.type != ConnectionEventType.SHUTDOWN_COMPLETE) {
+                return;
+            }
+        }
+
         switch (event.type) {
             case CONNECTED:
                 if (isAccepted) {
@@ -295,33 +178,28 @@ public class MsQuicConnectionFD implements ServerSocketFD, SocketFD, VirtualFD {
                 } else {
                     assert Logger.lowLevelDebug("established connection connected callback");
                 }
-                connectedEventFired = true;
                 this.connectedData = event.CONNECTED;
-                if (!isAccepted) {
-                    this.localOnInit = new IPPort(conn.getLocalAddress());
-                }
-                if (isAccepted) {
-                    this.remoteOnInit = new IPPort(conn.getRemoteAddress());
-                }
-                currentLocal = localOnInit;
-                currentRemote = remoteOnInit;
-                setReadable();
-                if (!isAccepted) { // the active connection needs writable event to complete the connection process
-                    setWritable();
-                }
+                currentLocal = new IPPort(conn.getLocalAddress());
+                currentRemote = new IPPort(conn.getRemoteAddress());
 
                 if (isAccepted) {
+                    asSocket.setRemote(currentRemote);
                     listenerFD.pushAcceptableFD(this);
+                    setReadable(); // let user read one byte from the fd to finish the SocketFD part
+                } else {
+                    asSocket.alertConnected(new IPPort(conn.getLocalAddress()));
                 }
 
                 break;
             case SHUTDOWN_INITIATED_BY_PEER:
-                error = new IOException("shutdown initiated by peer");
-                setReadable();
+                var error = new IOException("shutdown initiated by peer");
+                raiseErrorOneTime(error);
+                asSocket.raiseError(error);
                 break;
             case SHUTDOWN_INITIATED_BY_TRANSPORT:
                 error = new IOException("shutdown initiated by transport");
-                setReadable();
+                raiseErrorOneTime(error);
+                asSocket.raiseError(error);
                 break;
             case LOCAL_ADDRESS_CHANGED:
                 var currentLocal = new IPPort(event.LOCAL_ADDRESS_CHANGED.address);
@@ -335,6 +213,18 @@ public class MsQuicConnectionFD implements ServerSocketFD, SocketFD, VirtualFD {
                 break;
             case PEER_STREAM_STARTED:
                 peerStreamStarted(event.PEER_STREAM_STARTED);
+                break;
+            case SHUTDOWN_COMPLETE:
+                assert Logger.lowLevelDebug("shutdown complete");
+                if (isOpen()) {
+                    assert Logger.lowLevelDebug("the connection is not closed yet, " +
+                        "it's shutdown unexpectedly");
+                    raiseErrorOneTime(new IOException("shutdown unexpectedly"));
+                } else {
+                    assert Logger.lowLevelDebug("the connectionFD is already closed, " +
+                        "do close the msquic connection");
+                    conn.close();
+                }
                 break;
         }
     }
@@ -350,22 +240,119 @@ public class MsQuicConnectionFD implements ServerSocketFD, SocketFD, VirtualFD {
             stream.close();
             throw e;
         }
-        if (loop == null) {
-            assert Logger.lowLevelDebug("new stream while loop not set");
-            recordAcceptableStream0(streamFD);
-        } else {
-            assert Logger.lowLevelDebug("new stream on loop");
-            loop.runOnLoop(() -> recordAcceptableStream0(streamFD));
-        }
-    }
-
-    private void recordAcceptableStream0(MsQuicStreamFD streamFD) {
-        acceptQueue.add(streamFD);
-        setReadable();
+        newAcceptableFD(streamFD);
     }
 
     @Override
-    public String toString() {
-        return "MsQuicConnectionFD(" + conn + ')';
+    protected String formatToString() {
+        return "MsQuicConnectionFD(" + conn + ")[" + (isOpen() ? "open" : "closed") + "]";
+    }
+
+    private class MsQuicConnectionVirtualSocketFD extends AbstractBaseVirtualSocketFD {
+        public MsQuicConnectionVirtualSocketFD(boolean isAccepted, IPPort local, IPPort remote) {
+            super(MsQuicConnectionFD.this, isAccepted, local, remote);
+        }
+
+        @Override
+        public void checkConnected() throws IOException {
+            super.checkConnected();
+        }
+
+        private IPPort remote;
+
+        @Override
+        public void setRemote(IPPort remote) {
+            super.setRemote(remote);
+            this.remote = remote;
+        }
+
+        @Override
+        public IPPort getRemoteAddress() {
+            return remote;
+        }
+
+        @Override
+        public void alertConnected(IPPort local) {
+            super.alertConnected(local);
+        }
+
+        @Override
+        public void connect(IPPort l4addr) throws IOException {
+            super.connect(l4addr);
+
+            AddressFamily family;
+            if (l4addr.getAddress() instanceof IPv4) {
+                family = AddressFamily.INET;
+            } else if (l4addr.getAddress() instanceof IPv6) {
+                family = AddressFamily.INET6;
+            } else {
+                throw new IOException("unsupported address family for msquic: " + l4addr);
+            }
+            conn.start(conf, family, l4addr.getAddress().formatToIPString(), l4addr.getPort());
+        }
+
+        @Override
+        public boolean finishConnect() throws IOException {
+            boolean ret = super.finishConnect();
+            if (ret) {
+                // this fd will not be considered as SocketFD anymore
+                asSocket.close();
+            }
+            return ret;
+        }
+
+        @Override
+        public void raiseError(IOException err) {
+            if (isOpen()) {
+                super.raiseError(err);
+            }
+        }
+
+        @Override
+        protected boolean noDataToRead() {
+            return false; // will not be called
+        }
+
+        @Override
+        public int read(ByteBuffer dst) throws IOException {
+            super.read(dst);
+
+            if (dst.limit() == dst.position()) {
+                return 0;
+            }
+            // write one byte to trigger event
+            dst.put((byte) 0);
+            if (acceptQueueIsEmpty()) {
+                cancelReadable();
+            }
+            // this fd will not be considered as SocketFD anymore
+            asSocket.close();
+            return 1;
+        }
+
+        @Override
+        protected int doRead(ByteBuffer dst) {
+            return 0; // will not be called
+        }
+
+        @Override
+        protected boolean noSpaceToWrite() {
+            return false; // will not be called
+        }
+
+        @Override
+        protected int doWrite(ByteBuffer src) {
+            return 0; // will not be called
+        }
+
+        @Override
+        protected void doClose(boolean reset) {
+            cancelWritable(); // writable should not fire anymore
+        }
+
+        @Override
+        protected String formatToString() {
+            return "MsQuicConnectionVirtualSocketFD(" + conn + ")[" + (isOpen() ? "open" : "closed") + "]"; // only for debug purpose
+        }
     }
 }

@@ -9,57 +9,43 @@ import vfd.FD;
 import vfd.IP;
 import vfd.IPPort;
 import vfd.SocketFD;
-import vfd.abs.AbstractBaseFD;
-import vproxybase.selector.SelectorEventLoop;
+import vproxybase.selector.wrap.AbstractBaseVirtualSocketFD;
 import vproxybase.selector.wrap.VirtualFD;
 import vproxybase.util.*;
+import vproxybase.util.promise.Promise;
 
 import java.io.IOException;
-import java.net.SocketOption;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 
-public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualFD {
+public class MsQuicStreamFD extends AbstractBaseVirtualSocketFD implements SocketFD, VirtualFD {
     private final MsQuicConnectionFD connFD;
-    private final boolean isAccepted;
     private Stream stream;
+    private volatile boolean msquicStreamIsAlreadyShutDown = false;
+    private Callback<Void, Throwable> closingCallback = null;
 
-    private final IPPort connLocalOnInit;
-    private final IPPort connRemoteOnInit;
     private long streamId;
-    private IPPort streamLocalOnInit;
-    private IPPort streamRemoteOnInit;
 
-    private SelectorEventLoop loop;
-    private boolean closed = false;
-    private boolean streamInitialPacketAlreadySent = false;
-    private boolean startCompleteEventFired = false;
-    private boolean connected = false;
+    private final Lock shutdownLock = Lock.create();
 
+    @SuppressWarnings("RedundantThrows")
     public MsQuicStreamFD(MsQuicConnectionFD connFD) throws MsQuicException {
+        super(false, null, null);
         this.connFD = connFD;
-        this.isAccepted = false;
-
-        connLocalOnInit = new IPPort(connFD.conn.getLocalAddress());
-        connRemoteOnInit = new IPPort(connFD.conn.getRemoteAddress());
-
         writeToStreamBuffer = new DirectBuffer(16384);
     }
 
     MsQuicStreamFD(MsQuicConnectionFD connFD, Stream acceptedStream) throws MsQuicException {
-        this.connFD = connFD;
-        this.isAccepted = true;
-        this.stream = acceptedStream;
-        connected = true;
+        super(true,
+            new IPPort(connFD.conn.getLocalAddress()),
+            new IPPort(
+                IP.from(ByteArray.allocate(16).int64(8, acceptedStream.real).toJavaArray()),
+                (int) acceptedStream.getId()));
 
-        connLocalOnInit = new IPPort(connFD.conn.getLocalAddress());
-        connRemoteOnInit = new IPPort(connFD.conn.getRemoteAddress());
+        this.connFD = connFD;
+        this.stream = acceptedStream;
 
         streamId = acceptedStream.getId();
-        streamLocalOnInit = connLocalOnInit;
-        streamRemoteOnInit = new IPPort(
-            IP.from(ByteArray.allocate(16).int64(8, stream.real).toJavaArray()),
-            (int) streamId);
 
         writeToStreamBuffer = new DirectBuffer(16384);
 
@@ -71,78 +57,25 @@ public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualF
         return streamId;
     }
 
-    @Override
-    public void loopAware(SelectorEventLoop loop) {
-        assert Logger.lowLevelDebug(this + " loopAware " + loop);
-        this.loop = loop;
+    public IPPort getConnectionCurrentRemoteAddress() {
+        return connFD.getCurrentRemoteAddress();
     }
 
-    private void checkOpen() throws IOException {
-        if (closed) throw new IOException("closed");
-    }
-
-    private void checkConnected() throws IOException {
-        if (!connected) throw new IOException("not connected yet");
+    public IPPort getConnectionCurrentLocalAddress() {
+        return connFD.getCurrentLocalAddress();
     }
 
     @Override
     public void connect(IPPort l4addr) throws IOException { // the address will not be used
-        checkOpen();
-        if (!connRemoteOnInit.equals(l4addr)) {
-            throw new IOException("the input address " + l4addr + " not the same as initial con remote address " + connRemoteOnInit);
-        }
-        if (isAccepted) throw new IOException("cannot call connect() on an accepted stream");
-        if (streamInitialPacketAlreadySent) throw new IOException("stream packet is already sent");
-        streamInitialPacketAlreadySent = true;
+        super.connect(l4addr);
         stream = connFD.conn.openStream(StreamOpenFlags.NONE, this::streamCallback);
         stream.start(StreamStartFlags.ASYNC);
-
-        streamRemoteOnInit = connRemoteOnInit;
-    }
-
-    @Override
-    public boolean isConnected() {
-        return connected;
     }
 
     @Override
     public void shutdownOutput() throws IOException {
-        checkOpen();
-        checkConnected();
+        super.shutdownOutput();
         stream.send(SendFlags.FIN, null);
-    }
-
-    @Override
-    public boolean finishConnect() throws IOException {
-        if (!streamInitialPacketAlreadySent) throw new IOException("stream " + stream + " is not trying to start");
-        if (connected) throw new IOException("already connected: " + this);
-        if (error != null) throw error;
-        if (startCompleteEventFired) {
-            connected = true;
-        }
-        return connected;
-    }
-
-    @Override
-    public IPPort getLocalAddress() throws IOException {
-        checkOpen();
-        return streamLocalOnInit;
-    }
-
-    @Override
-    public IPPort getRemoteAddress() throws IOException {
-        checkOpen();
-        return streamRemoteOnInit;
-    }
-
-    @Override
-    public void configureBlocking(boolean b) {
-        if (b) throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public <T> void setOption(SocketOption<T> name, T value) {
-        // unsupported, but do not raise exceptions
     }
 
     @Override
@@ -151,104 +84,69 @@ public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualF
     }
 
     @Override
-    public boolean isOpen() {
-        return !closed;
-    }
-
-    @Override
     public void close() {
-        if (closed) {
-            return;
-        }
-        try {
+        if (stream == null) {
+            assert Logger.lowLevelDebug("stream not initiated when the fd is closed");
             super.close();
-        } catch (IOException e) {
-            Logger.shouldNotHappen("closing base fd should not fail", e);
+            return;
         }
-        closed = true;
+        assert Logger.lowLevelDebug("async close the stream to prevent native buffer released while still in use");
+        asyncClose(reset -> {
+            //noinspection unused
+            try (var x = shutdownLock.lock()) {
+                if (msquicStreamIsAlreadyShutDown) {
+                    assert Logger.lowLevelDebug("the stream is already shutdown, directly release the streamFD");
+                    doClose(true);
+                    return Promise.resolve(null);
+                }
+                try {
+                    stream.shutdown(reset ? StreamShutdownFlags.ABORT : StreamShutdownFlags.GRACEFUL);
+                } catch (MsQuicException e) {
+                    assert Logger.lowLevelDebug("shutdown stream when closing got exception: " + e);
+                    stream.close(); // directly close to prevent the fd from leaking
+                    return Promise.resolve(null);
+                }
+                var tup = Promise.<Void>todo();
+                closingCallback = tup.right;
+                return tup.left;
+            }
+        });
+    }
+
+    @Override
+    protected void doClose(boolean reset) {
+        assert Logger.lowLevelDebug("closing " + this);
         if (stream != null) {
-            stream.close();
+            if (msquicStreamIsAlreadyShutDown) {
+                assert Logger.lowLevelDebug("already shutdown, so close stream now");
+                stream.close();
+            } else {
+                assert Logger.lowLevelDebug("try to shutdown the stream first");
+                try {
+                    stream.shutdown(reset ? StreamShutdownFlags.ABORT : StreamShutdownFlags.GRACEFUL);
+                } catch (MsQuicException e) {
+                    assert Logger.lowLevelDebug("shutdown stream when closing got exception: " + e);
+                    stream.close(); // directly close to prevent the fd from leaking
+                }
+            }
         }
+        releaseBuffers();
+    }
+
+    private void releaseBuffers() {
         writeToStreamBuffer.clean();
-    }
-
-    // ========
-    // impl
-    // ========
-    private boolean readable = false;
-
-    private void setReadable() {
-        readable = true;
-        if (loop == null) {
-            return;
-        }
-        loop.runOnLoop(() -> loop.selector.registerVirtualReadable(this));
-    }
-
-    private void cancelReadable() {
-        readable = false;
-        if (loop == null) {
-            return;
-        }
-        loop.runOnLoop(() -> loop.selector.removeVirtualReadable(this));
-    }
-
-    private boolean writable = false;
-
-    private void setWritable() {
-        writable = true;
-        if (loop == null) {
-            return;
-        }
-        loop.runOnLoop(() -> loop.selector.registerVirtualWritable(this));
-    }
-
-    private void cancelWritable() {
-        writable = false;
-        if (loop == null) {
-            return;
-        }
-        loop.runOnLoop(() -> loop.selector.removeVirtualWritable(this));
-    }
-
-    @Override
-    public void onRegister() {
-        if (readable) {
-            setReadable();
-        }
-        if (writable) {
-            setWritable();
-        }
-    }
-
-    @Override
-    public void onRemove() {
-        // do nothing
     }
 
     private final LinkedList<QuicBuffer> readBuffers = new LinkedList<>();
     private final DirectBuffer writeToStreamBuffer;
-    private boolean peerSendShutdown = false;
-    private IOException error = null;
 
     @Override
-    public int read(ByteBuffer dst) throws IOException {
-        checkOpen();
-        checkConnected();
-        if (error != null) {
-            throw error;
-        }
+    protected boolean noDataToRead() {
+        return readBuffers.isEmpty();
+    }
 
-        if (peerSendShutdown && readBuffers.isEmpty()) {
-            return -1; // EOF
-        }
-        if (dst.limit() == dst.position()) {
-            return 0; // empty dst
-        }
-        if (readBuffers.isEmpty()) { // nothing to read
-            cancelReadable();
-            return 0;
-        }
+    @Override
+    protected int doRead(ByteBuffer dst) throws IOException {
         int oldPos = dst.position();
         while (dst.limit() != dst.position() && !readBuffers.isEmpty()) {
             var buf = readBuffers.peekFirst();
@@ -261,11 +159,6 @@ public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualF
                 readBuffers.pollFirst();
             }
         }
-        if (readBuffers.isEmpty()) { // everything fully read
-            if (!peerSendShutdown) { // if EOF, do not cancel readable
-                cancelReadable();
-            }
-        }
         int readLen = dst.position() - oldPos;
         stream.receiveComplete(readLen);
         if (readBuffers.isEmpty()) {
@@ -275,17 +168,13 @@ public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualF
     }
 
     @Override
-    public int write(ByteBuffer src) throws IOException {
-        checkOpen();
-        checkConnected();
-        if (error != null) {
-            throw error;
-        }
+    protected boolean noSpaceToWrite() {
+        return writeToStreamBuffer.free() == 0;
+    }
 
+    @Override
+    protected int doWrite(ByteBuffer src) throws IOException {
         int len = src.limit() - src.position();
-        if (len == 0) { // nothing to write
-            return 0;
-        }
         DirectBuffer.Slice slice = writeToStreamBuffer.allocate(len);
         ByteBuffer b = slice.get();
         if (b == null) { // no space
@@ -300,12 +189,6 @@ public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualF
         b.put(src);
         src.limit(srcLim);
 
-        // check free space
-        int freeSpace = writeToStreamBuffer.free();
-        if (freeSpace == 0) {
-            cancelWritable();
-        }
-
         // send
         int sndLen;
         try {
@@ -315,21 +198,29 @@ public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualF
             throw e;
         }
         assert Logger.lowLevelDebug("sent " + sndLen + " bytes to " + stream);
+        assert sndLen == bufLen;
 
         return bufLen;
     }
 
     private void streamCallback(StreamEvent event) throws MsQuicException {
         assert Logger.lowLevelDebug(this + " event: " + event.type);
+
+        if (!isOpen()) {
+            assert Logger.lowLevelDebug("the stream is closed, event still firing: " + event.type);
+            // ignore events except SHUTDOWN_COMPLETE
+            if (event.type != StreamEventType.SHUTDOWN_COMPLETE) {
+                return;
+            }
+        }
+
         switch (event.type) {
             case START_COMPLETE:
                 assert Logger.lowLevelDebug("stream " + stream + " start complete");
                 streamId = stream.getId();
-                streamLocalOnInit = new IPPort(
+                alertConnected(new IPPort(
                     IP.from(ByteArray.allocate(16).int64(8, stream.real).toJavaArray()),
-                    (int) streamId);
-                startCompleteEventFired = true;
-                setWritable();
+                    (int) streamId));
                 break;
             case SEND_COMPLETE:
                 sendComplete();
@@ -339,28 +230,36 @@ public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualF
                 break;
             case PEER_SEND_SHUTDOWN:
                 assert Logger.lowLevelDebug("peer send shutdown");
-                peerSendShutdown = true;
-                setReadable();
+                setEof();
                 break;
             case PEER_SEND_ABORTED:
             case PEER_RECEIVE_ABORTED:
                 assert Logger.lowLevelDebug("peer abort");
-                error = new IOException("Connection reset");
-                setReadable();
-                setWritable();
+                raiseError(new IOException("Connection reset"));
                 break;
             case SHUTDOWN_COMPLETE:
-                assert Logger.lowLevelDebug("shutdown complete");
-                if (closed) {
-                    assert Logger.lowLevelDebug("the stream is already closed, " +
-                        "nothing to be done here " +
-                        "(however this should not happen because the callback should not be called anymore after closing)");
-                } else {
-                    assert Logger.lowLevelDebug("the stream is not closed yet, " +
-                        "maybe the shutdown is because of the connection closing/shutting-down");
-                    error = new IOException("depended connection shutdown/closed");
-                    setReadable();
-                    setWritable();
+                //noinspection unused
+                try (var x = shutdownLock.lock()) {
+                    assert Logger.lowLevelDebug("shutdown complete");
+                    msquicStreamIsAlreadyShutDown = true; // then it will be directly close when close() is called
+                    if (isOpen()) {
+                        assert Logger.lowLevelDebug("the stream is not closed yet, " +
+                            "maybe the shutdown is because of the connection closing/shutting-down");
+                        raiseError(new IOException("depended connection shutdown/closed"));
+                    } else {
+                        assert Logger.lowLevelDebug("the stream is already closed, " +
+                            "do close the stream");
+                        stream.close();
+                        if (closingCallback == null) {
+                            Logger.shouldNotHappen("the SHUTDOWN_COMPLETE event is lost, " +
+                                "stream " + stream + " will never be closed until the connection " + connFD + " closes " +
+                                "and garbage collected");
+                        } else {
+                            assert Logger.lowLevelDebug("callback exists, do final release and invoke the callback");
+                            releaseBuffers();
+                            closingCallback.succeeded();
+                        }
+                    }
                 }
                 break;
             /*
@@ -393,18 +292,10 @@ public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualF
     private void sendComplete() {
         assert Logger.lowLevelDebug("send complete, ready to send more data, setWritable");
         stream.pollWBuf(); // ignore
-        if (loop == null) {
-            assert Logger.lowLevelDebug("complete when loop not set");
-            sendComplete0();
-        } else {
-            assert Logger.lowLevelDebug("complete on loop");
-            loop.runOnLoop(this::sendComplete0);
-        }
-    }
-
-    private void sendComplete0() {
-        writeToStreamBuffer.release();
-        setWritable();
+        tryToRunOnLoop(() -> {
+            writeToStreamBuffer.release();
+            setWritable();
+        });
     }
 
     private void receive(StreamEvent event) throws MsQuicException {
@@ -433,14 +324,9 @@ public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualF
             readBuffers.add(buf);
         }
 
-        if (loop == null) {
-            assert Logger.lowLevelDebug("received message when loop not set");
-            receive0(received);
-        } else {
-            assert Logger.lowLevelDebug("received message on loop");
-            final boolean finalReceived = received;
-            loop.runOnLoop(() -> receive0(finalReceived));
-        }
+        assert Logger.lowLevelDebug("do received message");
+        final boolean finalReceived = received;
+        tryToRunOnLoop(() -> receive0(finalReceived));
 
         throw MsQuicException.PENDING;
     }
@@ -455,7 +341,7 @@ public class MsQuicStreamFD extends AbstractBaseFD implements SocketFD, VirtualF
     }
 
     @Override
-    public String toString() {
-        return "MsQuicStreamFD(" + stream + ')';
+    protected String formatToString() {
+        return "MsQuicStreamFD(" + stream + ")[" + (isOpen() ? "open" : "closed") + "]";
     }
 }
