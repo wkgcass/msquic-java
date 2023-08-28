@@ -43,3 +43,6 @@ bin/
 *.so
 *.dylib
 *.dll
+
+my-server.sh
+my-client.sh

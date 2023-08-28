@@ -1,0 +1,141 @@
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
+}
+
+group = 'io.vproxy'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+subprojects {
+    apply plugin: 'java-library'
+
+    group 'io.vproxy'
+    version rootProject.version
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+        options.incremental = false
+        options.compilerArgs += '--enable-preview'
+    }
+    tasks.withType(JavaExec) {
+        jvmArgs += '--enable-preview'
+        jvmArgs += '--enable-native-access=ALL-UNNAMED'
+        javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    }
+    tasks.withType(Test) {
+        jvmArgs += '--enable-preview'
+        jvmArgs += '--enable-native-access=ALL-UNNAMED'
+
+        testLogging {
+            showStandardStreams = true
+            events TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.STARTED
+            maxGranularity 100
+            exceptionFormat "full"
+            showCauses true
+            showExceptions true
+            showStackTraces true
+        }
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+    task javadocJar(type: Jar) {
+        classifier = 'javadoc'
+        from "$buildDir/docs/javadoc"
+    }
+
+    tasks.withType(GenerateModuleMetadata) {
+        enabled = false
+    }
+}
+
+def PNI_API_VERSION = '21.0.0.9'
+
+project(':template') {
+    dependencies {
+        implementation 'io.vproxy:pni-api-jdk21:' + PNI_API_VERSION
+    }
+    compileJava {
+        options.compilerArgs += '-parameters'
+    }
+    task pniClean(type: Exec) {
+        workingDir project.rootProject.rootDir.getAbsolutePath() + '/core/src/main/'
+        commandLine 'bash', '-c', 'rm -rf c-generated/* && rm -rf generated/*'
+    }
+    task pniGenerate(type: Exec) {
+        workingDir project.rootProject.rootDir.getAbsolutePath()
+        commandLine('java', '-jar', 'misc/pni.jar',
+                '-cp', 'template/build/classes/java/main',
+                '-d', 'core/src/main/generated',
+                '-h', 'core/src/main/c-generated')
+
+        dependsOn pniClean
+        dependsOn compileJava
+    }
+    task pniCompile(type: Exec) {
+        workingDir project.rootProject.rootDir.getAbsolutePath() + '/core/src/main/c'
+        commandLine './make-quic.sh'
+
+        dependsOn pniGenerate
+    }
+}
+
+project(':core') {
+    sourceSets {
+        main {
+            java {
+                srcDirs = ['src/main/java', 'src/main/generated', 'src/main/module-info']
+            }
+        }
+    }
+    dependencies {
+        api 'io.vproxy:pni-api-jdk21:' + PNI_API_VERSION
+        api 'io.vproxy:commons:1.1.3'
+    }
+}
+
+project(':sample') {
+    dependencies {
+        implementation project(':core')
+    }
+    task runSampleClient(type: JavaExec) {
+        standardInput = System.in
+
+        classpath = sourceSets.main.runtimeClasspath
+        mainClass = 'io.vproxy.msquic.sample.Client'
+        jvmArgs += '-Djava.library.path=' +
+                project.rootProject.rootDir.getAbsolutePath() + '/core/src/main/c' +
+                File.pathSeparator +
+                System.getenv("MSQUIC_LD")
+    }
+    task runSampleServer(type: JavaExec) {
+        standardInput = System.in
+
+        classpath = sourceSets.main.runtimeClasspath
+        mainClass = 'io.vproxy.msquic.sample.Server'
+        jvmArgs += '-Djava.library.path=' +
+                project.rootProject.rootDir.getAbsolutePath() + '/core/src/main/c' +
+                File.pathSeparator +
+                System.getenv("MSQUIC_LD")
+
+        dependsOn project(':template').tasks.pniCompile
+        dependsOn compileJava
+    }
+}

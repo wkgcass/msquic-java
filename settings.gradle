@@ -1,0 +1,5 @@
+rootProject.name = 'msquic-java'
+include 'template'
+include 'core'
+include 'sample'
+
