@@ -2,11 +2,6 @@
 
 error=0
 
-if [[ -z "$JAVA_HOME" ]]; then
-  echo "You must set JAVA_HOME properly"
-	error=1
-fi
-
 if [[ -z "$MSQUIC_INC" ]]; then
   echo "You must set MSQUIC_INC properly, where the msquic include files are located"
 	error=1
@@ -60,8 +55,6 @@ fi
 gcc -std=gnu11 -O2 \
     $GCC_OPTS \
     -I ./dep/ae \
-    -I "$JAVA_HOME/include" \
-    -I "$JAVA_HOME/include/$include_platform_dir" \
     -I "$MSQUIC_INC" \
     -I "../../../../misc" \
     -I "../c-generated" \
