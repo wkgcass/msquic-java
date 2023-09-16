@@ -44,11 +44,8 @@ JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_QuicApiTable_getParam(Qu
 
 JNIEXPORT QuicRegistration * JNICALL JavaCritical_io_vproxy_msquic_QuicApiTable_openRegistration(QuicApiTable * self, QUIC_REGISTRATION_CONFIG * Config, int32_t * returnStatus, QuicRegistration * return_) {
     QUIC_API_TABLE* api = self->Api;
-    QUIC_REGISTRATION_CONFIG config;
-    config.AppName = Config->AppName;
-    config.ExecutionProfile = Config->ExecutionProfile;
     HQUIC h;
-    QUIC_STATUS res = api->RegistrationOpen(&config, &h);
+    QUIC_STATUS res = api->RegistrationOpen(Config, &h);
     if (returnStatus != NULL)
         *returnStatus = res;
     if (QUIC_SUCCEEDED(res)) {
@@ -63,4 +60,4 @@ JNIEXPORT QuicRegistration * JNICALL JavaCritical_io_vproxy_msquic_QuicApiTable_
 }
 #endif
 // metadata.generator-version: pni 21.0.0.8
-// sha256:691a7e39b7604cc524329e389f26de7a03694b60cb95b1ceb0918e4597d6db5d
+// sha256:6a3dd49d0483722674ed1156229f178bc39358cd1d563bbe50bc0cea49cc869f

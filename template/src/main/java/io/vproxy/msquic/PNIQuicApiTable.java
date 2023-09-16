@@ -81,11 +81,8 @@ public abstract class PNIQuicApiTable {
         // language="c"
         c = """
             QUIC_API_TABLE* api = self->Api;
-            QUIC_REGISTRATION_CONFIG config;
-            config.AppName = Config->AppName;
-            config.ExecutionProfile = Config->ExecutionProfile;
             HQUIC h;
-            QUIC_STATUS res = api->RegistrationOpen(&config, &h);
+            QUIC_STATUS res = api->RegistrationOpen(Config, &h);
             if (returnStatus != NULL)
                 *returnStatus = res;
             if (QUIC_SUCCEEDED(res)) {
