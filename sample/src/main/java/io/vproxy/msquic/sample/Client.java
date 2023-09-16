@@ -2,6 +2,7 @@ package io.vproxy.msquic.sample;
 
 import io.vproxy.msquic.*;
 import io.vproxy.msquic.wrap.ApiTable;
+import io.vproxy.msquic.wrap.ApiTables;
 import io.vproxy.msquic.wrap.Configuration;
 import io.vproxy.msquic.wrap.Registration;
 import io.vproxy.pni.Allocator;
@@ -72,14 +73,7 @@ public class Client {
         System.out.println("Start quic client ...");
 
         System.out.println("MsQuicOpenVersion begin ...");
-        {
-            var apiTableAllocator = Allocator.ofUnsafe();
-            var apiTable = MsQuic.get().open(QUIC_API_VERSION_2, null, apiTableAllocator);
-            if (apiTable == null) {
-                throw new RuntimeException("MsQuicOpenVersion failed");
-            }
-            api = new ApiTable(apiTable, apiTableAllocator);
-        }
+        api = ApiTables.V2;
         System.out.println("MsQuicOpenVersion done");
 
         System.out.println("Init Registration begin ...");

@@ -15,6 +15,10 @@ public class ApiTable {
     private volatile boolean closed = false;
 
     public void close() {
+        if (allocator == null) {
+            return; // silently swallow because it's not allowed to be closed
+        }
+
         if (closed) {
             return;
         }
