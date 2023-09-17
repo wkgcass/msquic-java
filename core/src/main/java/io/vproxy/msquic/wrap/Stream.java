@@ -46,6 +46,8 @@ public abstract class Stream {
         this.allocator = allocator;
         this.stream = stream;
 
+        this.canCallClose = false;
+
         getIdFromStream(stream);
     }
 
@@ -66,6 +68,8 @@ public abstract class Stream {
 
     private volatile boolean closed = false;
     private volatile boolean streamIsClosed = false;
+    private volatile boolean streamIsShutdown = false;
+    private volatile boolean canCallClose = true;
 
     public void close() {
         if (closed) {
@@ -90,6 +94,13 @@ public abstract class Stream {
     protected void close0() {
     }
 
+    /**
+     * Call `close` if allowed.
+     * If `close` is not allowed to be called, then call `shutdown` instead.
+     * If `close` is called, `shutdown` will not be called.
+     * But if `shutdown` is called, `close` still can be called by re-invoking this method.
+     * `close` and `shutdown` would each only be called once.
+     */
     public void closeStream() {
         if (streamIsClosed) {
             return;
@@ -98,11 +109,27 @@ public abstract class Stream {
             if (streamIsClosed) {
                 return;
             }
-            streamIsClosed = true;
+            if (canCallClose) {
+                streamIsClosed = true;
+            }
         }
-        if (stream != null) {
-            stream.close();
+        if (canCallClose) {
+            if (stream != null) {
+                stream.close();
+            }
+            return;
         }
+        if (streamIsShutdown) {
+            return;
+        }
+        synchronized (this) {
+            if (streamIsShutdown) {
+                return;
+            }
+            streamIsShutdown = true;
+        }
+        stream.shutdown(QUIC_STREAM_SHUTDOWN_FLAG_ABORT_RECEIVE |
+                        QUIC_STREAM_SHUTDOWN_FLAG_ABORT_SEND, 0);
     }
 
     public int send(Allocator allocator, MemorySegment... dataArray) {
@@ -134,22 +161,27 @@ public abstract class Stream {
         return switch (event.getType()) {
             case QUIC_STREAM_EVENT_START_COMPLETE -> {
                 var data = event.getUnion().getSTART_COMPLETE();
-                id = data.getID();
-                if (id == -1) {
+                if (data.getStatus() != 0) {
                     closeStream();
+                    yield 0;
                 }
-                yield QUIC_STATUS_NOT_SUPPORTED;
+                canCallClose = false;
+                id = data.getID();
+                yield 0;
             }
             case QUIC_STREAM_EVENT_SEND_COMPLETE -> {
                 var data = event.getUnion().getSEND_COMPLETE();
                 var context = data.getClientContext();
-                var allocatorRef = PNIRef.<Allocator>of(context);
-                var allocator = allocatorRef.getRef();
-                allocator.close();
-                pendingAllocators.remove(allocator);
+                if (context != null) {
+                    var allocatorRef = PNIRef.<Allocator>of(context);
+                    var allocator = allocatorRef.getRef();
+                    allocator.close();
+                    pendingAllocators.remove(allocator);
+                }
                 yield 0;
             }
             case QUIC_STREAM_EVENT_SHUTDOWN_COMPLETE -> {
+                canCallClose = true;
                 close();
                 yield 0;
             }

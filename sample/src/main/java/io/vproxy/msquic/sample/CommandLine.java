@@ -115,6 +115,7 @@ public class CommandLine {
         send <stream-idx> <string>                send data through a stream
         shutdown <conn|stream> <idx> <code>       shutdown connection or stream
                 [r|w]*
+        fin <stream-idx>                          send fin through a stream
         close <conn|stream> <idx>                 close connection or stream
         sendResumptionTicket <conn-idx>           send resumption ticket via connection
         deleteResumptionTicket <ticket-idx>       remove a resumption ticket
@@ -204,6 +205,14 @@ public class CommandLine {
                 stream.send(allocator, pStr.MEMORY
                     // remove the last '\0'
                     .reinterpret(pStr.MEMORY.byteSize() - 1));
+            }
+            case "fin" -> {
+                if (ls.size() != 1) {
+                    throw new RuntimeException("invalid arguments");
+                }
+                int streamIndex = Integer.parseInt(ls.get(0));
+                var stream = getStream(streamIndex);
+                stream.stream.send(null, 0, QUIC_SEND_FLAG_FIN, null);
             }
             case "close" -> {
                 if (ls.size() != 2 || !List.of("conn", "stream").contains(ls.get(0))) {

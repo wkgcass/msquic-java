@@ -31,7 +31,7 @@ public class SampleStream extends Stream {
             case QUIC_STREAM_EVENT_START_COMPLETE -> {
                 System.out.println("QUIC_STREAM_EVENT_START_COMPLETE");
                 var data = event.getUnion().getSTART_COMPLETE();
-                if (data.getID() != -1) {
+                if (data.getStatus() == 0) {
                     cli.registerStream(this);
                 }
                 {
