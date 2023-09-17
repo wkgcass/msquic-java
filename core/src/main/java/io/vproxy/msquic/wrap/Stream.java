@@ -34,6 +34,22 @@ public abstract class Stream {
         this.allocator = allocator;
         this.stream = streamSupplier.apply(ref);
 
+        getIdFromStream(stream);
+    }
+
+    public Stream(QuicApiTable apiTable, QuicRegistration registration, QuicConnection connection, Allocator allocator,
+                  QuicStream stream) {
+        this.ref = PNIRef.of(this);
+        this.apiTable = apiTable;
+        this.registration = registration;
+        this.connection = connection;
+        this.allocator = allocator;
+        this.stream = stream;
+
+        getIdFromStream(stream);
+    }
+
+    private void getIdFromStream(QuicStream stream) {
         if (stream != null) {
             try (var tmpAllocator = Allocator.ofConfined()) {
                 var idPtr = new LongArray(tmpAllocator, 1);

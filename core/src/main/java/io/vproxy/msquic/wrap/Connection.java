@@ -39,6 +39,15 @@ public abstract class Connection {
         this.connection = connectionSupplier.apply(ref);
     }
 
+    public Connection(QuicApiTable apiTable, QuicRegistration registration, Allocator allocator,
+                      QuicConnection connection) {
+        this.ref = PNIRef.of(this);
+        this.apiTable = apiTable;
+        this.registration = registration;
+        this.allocator = allocator;
+        this.connection = connection;
+    }
+
     private volatile boolean isClosed = false;
     private volatile boolean connIsClosed = false;
 

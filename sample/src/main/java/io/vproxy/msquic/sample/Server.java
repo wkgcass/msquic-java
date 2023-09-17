@@ -200,10 +200,8 @@ public class Server {
                         conn_.setApi(apiTable.getApi());
                         conn_.setConn(connHQUIC);
                     }
-                    var conn = new SampleConnection(cli, apiTable, registration, connectionAllocator, ref -> {
-                        apiTable.setCallbackHandler(connHQUIC, MsQuicUpcall.connectionCallback, ref.MEMORY);
-                        return conn_;
-                    });
+                    var conn = new SampleConnection(cli, apiTable, registration, connectionAllocator, conn_);
+                    apiTable.setCallbackHandler(connHQUIC, MsQuicUpcall.connectionCallback, conn.ref.MEMORY);
                     var err = conn_.setConfiguration(conf.configuration);
                     if (err != 0) {
                         System.out.println("set configuration to connection failed: " + err);

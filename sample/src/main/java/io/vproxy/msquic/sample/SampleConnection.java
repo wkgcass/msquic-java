@@ -21,6 +21,11 @@ class SampleConnection extends Connection {
         this.cli = cli;
     }
 
+    public SampleConnection(CommandLine cli, QuicApiTable apiTable, QuicRegistration registration, Allocator allocator, QuicConnection connection) {
+        super(apiTable, registration, allocator, connection);
+        this.cli = cli;
+    }
+
     @Override
     public int callback(QuicConnectionEvent event) {
         super.callback(event);
@@ -114,10 +119,8 @@ class SampleConnection extends Connection {
                 var stream_ = new QuicStream(allocator);
                 stream_.setApi(apiTable.getApi());
                 stream_.setStream(streamHQUIC);
-                var stream = new SampleStream(cli, apiTable, registration, connection, allocator, ref -> {
-                    apiTable.setCallbackHandler(streamHQUIC, MsQuicUpcall.streamCallback, ref.MEMORY);
-                    return stream_;
-                });
+                var stream = new SampleStream(cli, apiTable, registration, connection, allocator, stream_);
+                apiTable.setCallbackHandler(streamHQUIC, MsQuicUpcall.streamCallback, stream.ref.MEMORY);
                 cli.registerStream(stream);
                 yield 0;
             }

@@ -17,6 +17,11 @@ public class SampleStream extends Stream {
         this.cli = cli;
     }
 
+    public SampleStream(CommandLine cli, QuicApiTable apiTable, QuicRegistration registration, QuicConnection connection, Allocator allocator, QuicStream stream) {
+        super(apiTable, registration, connection, allocator, stream);
+        this.cli = cli;
+    }
+
     @Override
     public int callback(QuicStreamEvent event) {
         super.callback(event);
