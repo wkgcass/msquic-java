@@ -42,6 +42,10 @@ public abstract class Listener {
         closeListener();
         allocator.close();
         ref.close();
+        close0();
+    }
+
+    protected void close0() {
     }
 
     public void closeListener() {

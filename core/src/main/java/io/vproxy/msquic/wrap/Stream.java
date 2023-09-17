@@ -84,6 +84,10 @@ public abstract class Stream {
         for (var alloc : pendingAllocators) {
             alloc.close();
         }
+        close0();
+    }
+
+    protected void close0() {
     }
 
     public void closeStream() {

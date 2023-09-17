@@ -65,6 +65,10 @@ public abstract class Connection {
         closeConnection();
         allocator.close();
         ref.close();
+        close0();
+    }
+
+    protected void close0() {
     }
 
     public void closeConnection() {
