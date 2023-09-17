@@ -1,5 +1,6 @@
 package io.vproxy.msquic.wrap;
 
+import io.vproxy.base.util.Logger;
 import io.vproxy.msquic.*;
 import io.vproxy.pni.Allocator;
 import io.vproxy.pni.PNIRef;
@@ -157,7 +158,11 @@ public abstract class Stream {
     }
 
     // need to override
-    public int callback(@SuppressWarnings("unused") QuicStreamEvent event) {
+    public int callback(QuicStreamEvent event) {
+        if (requireEventLogging()) {
+            logEvent(event);
+        }
+
         return switch (event.getType()) {
             case QUIC_STREAM_EVENT_START_COMPLETE -> {
                 var data = event.getUnion().getSTART_COMPLETE();
@@ -187,6 +192,94 @@ public abstract class Stream {
             }
             default -> QUIC_STATUS_NOT_SUPPORTED;
         };
+    }
+
+    protected boolean requireEventLogging() {
+        return Logger.debugOn();
+    }
+
+    protected void logEvent(QuicStreamEvent event) {
+        Logger.alert("---------- " + Thread.currentThread() + " ----------");
+        switch (event.getType()) {
+            case QUIC_STREAM_EVENT_START_COMPLETE -> {
+                Logger.alert("QUIC_STREAM_EVENT_START_COMPLETE");
+                var data = event.getUnion().getSTART_COMPLETE();
+                {
+                    Logger.alert("Status: " + data.getStatus());
+                    Logger.alert("ID: " + data.getID());
+                    Logger.alert("PeerAccepted: " + data.getPeerAccepted());
+                }
+            }
+            case QUIC_STREAM_EVENT_RECEIVE -> {
+                Logger.alert("QUIC_STREAM_EVENT_RECEIVE");
+                var data = event.getUnion().getRECEIVE();
+                {
+                    Logger.alert("AbsoluteOffset: " + data.getAbsoluteOffset());
+                    Logger.alert("TotalBufferLength: " + data.getTotalBufferLength());
+                    Logger.alert("Flags: " + data.getFlags());
+                }
+                {
+                    int count = data.getBufferCount();
+                    var bufMem = data.getBuffers().MEMORY;
+                    bufMem = bufMem.reinterpret(QuicBuffer.LAYOUT.byteSize() * count);
+                    var bufs = new QuicBuffer.Array(bufMem);
+                    for (int i = 0; i < count; ++i) {
+                        var buf = bufs.get(i);
+                        var seg = buf.getBuffer().reinterpret(buf.getLength());
+                        Logger.alert("Buffer[" + i + "]");
+                        Utils.hexDump(seg);
+                    }
+                }
+            }
+            case QUIC_STREAM_EVENT_SEND_COMPLETE -> {
+                Logger.alert("QUIC_STREAM_EVENT_SEND_COMPLETE");
+                var data = event.getUnion().getSEND_COMPLETE();
+                {
+                    Logger.alert("Canceled: " + data.getCanceled());
+                    Logger.alert("ClientContext: " + data.getClientContext());
+                }
+            }
+            case QUIC_STREAM_EVENT_PEER_SEND_ABORTED -> {
+                Logger.alert("QUIC_STREAM_EVENT_PEER_SEND_ABORTED");
+                var data = event.getUnion().getPEER_SEND_ABORTED();
+                {
+                    Logger.alert("ErrorCode: " + data.getErrorCode());
+                }
+            }
+            case QUIC_STREAM_EVENT_PEER_RECEIVE_ABORTED -> {
+                Logger.alert("QUIC_STREAM_EVENT_PEER_RECEIVE_ABORTED");
+                var data = event.getUnion().getPEER_RECEIVE_ABORTED();
+                {
+                    Logger.alert("ErrorCode: " + data.getErrorCode());
+                }
+            }
+            case QUIC_STREAM_EVENT_SEND_SHUTDOWN_COMPLETE -> {
+                Logger.alert("QUIC_STREAM_EVENT_SEND_SHUTDOWN_COMPLETE");
+                var data = event.getUnion().getSEND_SHUTDOWN_COMPLETE();
+                {
+                    Logger.alert("Graceful: " + data.getGraceful());
+                }
+            }
+            case QUIC_STREAM_EVENT_SHUTDOWN_COMPLETE -> {
+                Logger.alert("QUIC_STREAM_EVENT_SHUTDOWN_COMPLETE");
+                var data = event.getUnion().getSHUTDOWN_COMPLETE();
+                {
+                    Logger.alert("ConnectionShutdown: " + data.getConnectionShutdown());
+                    Logger.alert("AppCloseInProgress: " + data.getAppCloseInProgress());
+                    Logger.alert("ConnectionShutdownByApp: " + data.getConnectionShutdownByApp());
+                    Logger.alert("ConnectionClosedRemotely: " + data.getConnectionClosedRemotely());
+                    Logger.alert("ConnectionErrorCode: " + data.getConnectionErrorCode());
+                    Logger.alert("ConnectionCloseStatus: " + data.getConnectionCloseStatus());
+                }
+            }
+            case QUIC_STREAM_EVENT_IDEAL_SEND_BUFFER_SIZE -> {
+                Logger.alert("QUIC_STREAM_EVENT_IDEAL_SEND_BUFFER_SIZE");
+                var data = event.getUnion().getIDEAL_SEND_BUFFER_SIZE();
+                {
+                    Logger.alert("ByteCount: " + data.getByteCount());
+                }
+            }
+        }
     }
 
     public String toString() {

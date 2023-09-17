@@ -1,4 +1,4 @@
-package io.vproxy.msquic.sample;
+package io.vproxy.msquic.wrap;
 
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;

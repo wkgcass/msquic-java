@@ -1,12 +1,13 @@
 package io.vproxy.msquic.sample;
 
+import io.vproxy.base.util.LogType;
+import io.vproxy.base.util.Logger;
 import io.vproxy.msquic.*;
 import io.vproxy.msquic.wrap.*;
 import io.vproxy.pni.Allocator;
 import io.vproxy.pni.PNIRef;
 import io.vproxy.pni.PNIString;
 
-import java.lang.foreign.MemorySegment;
 import java.util.function.Function;
 
 import static io.vproxy.msquic.MsQuicConsts.*;
@@ -153,46 +154,15 @@ public class Server {
         }
 
         @Override
+        protected boolean requireEventLogging() {
+            return true;
+        }
+
+        @Override
         public int callback(QuicListenerEvent event) {
             return switch (event.getType()) {
                 case QUIC_LISTENER_EVENT_NEW_CONNECTION -> {
-                    System.out.println("QUIC_LISTENER_EVENT_NEW_CONNECTION");
                     var data = event.getUnion().getNEW_CONNECTION();
-                    var info = data.getInfo();
-                    {
-                        System.out.println("QuicVersion: " + info.getQuicVersion());
-                    }
-                    try (var allocator = Allocator.ofConfined()) {
-                        var addr = new PNIString(allocator.allocate(64));
-                        info.getLocalAddress().toString(addr);
-                        System.out.println("LocalAddress: " + addr);
-                    }
-                    try (var allocator = Allocator.ofConfined()) {
-                        var addr = new PNIString(allocator.allocate(64));
-                        info.getRemoteAddress().toString(addr);
-                        System.out.println("RemoteAddress: " + addr);
-                    }
-                    {
-                        var buffer = info.getCryptoBuffer().reinterpret(info.getCryptoBufferLength());
-                        System.out.println("CryptoBuffer:");
-                        Utils.hexDump(buffer);
-                    }
-                    {
-                        var alpn = info.getClientAlpnList().reinterpret(info.getClientAlpnListLength());
-                        System.out.println("ClientAlpnList:");
-                        Utils.hexDump(alpn);
-                    }
-                    {
-                        var serverName = info.getServerName().MEMORY.reinterpret(info.getServerNameLength());
-                        byte[] bytes = new byte[(int) serverName.byteSize()];
-                        MemorySegment.ofArray(bytes).copyFrom(serverName);
-                        System.out.println("ServerName: " + new String(bytes));
-                    }
-                    {
-                        var negotiatedAlpn = info.getNegotiatedAlpn().reinterpret(info.getNegotiatedAlpnLength());
-                        System.out.println("NegotiatedAlpn:");
-                        Utils.hexDump(negotiatedAlpn);
-                    }
                     var connHQUIC = data.getConnection();
                     var connectionAllocator = Allocator.ofUnsafe();
                     var conn_ = new QuicConnection(connectionAllocator);
@@ -204,20 +174,13 @@ public class Server {
                     apiTable.setCallbackHandler(connHQUIC, MsQuicUpcall.connectionCallback, conn.ref.MEMORY);
                     var err = conn_.setConfiguration(conf.configuration);
                     if (err != 0) {
-                        System.out.println("set configuration to connection failed: " + err);
+                        Logger.error(LogType.ALERT, "set configuration to connection failed: " + err);
                         conn.close();
                         yield err;
                     }
                     yield 0;
                 }
-                case QUIC_LISTENER_EVENT_STOP_COMPLETE -> {
-                    System.out.println("QUIC_LISTENER_EVENT_STOP_COMPLETE");
-                    {
-                        var appCloseInProgress = event.getUnion().getSTOP_COMPLETE().getAppCloseInProgress();
-                        System.out.println("AppCloseInProgress: " + appCloseInProgress);
-                    }
-                    yield 0;
-                }
+                case QUIC_LISTENER_EVENT_STOP_COMPLETE -> 0;
                 default -> QUIC_STATUS_NOT_SUPPORTED;
             };
         }
