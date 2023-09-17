@@ -32,6 +32,15 @@ public interface PNIMsQuicValues {
     @Impl(
         // language="c"
         c = """
+            return QUIC_STATUS_PENDING;
+            """
+    )
+    @Critical
+    int QUIC_STATUS_PENDING();
+
+    @Impl(
+        // language="c"
+        c = """
             return QUIC_ADDRESS_FAMILY_UNSPEC;
             """
     )

@@ -12,6 +12,10 @@ JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_STATUS
     return QUIC_STATUS_NOT_SUPPORTED;
 }
 
+JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_STATUS_PENDING(void) {
+    return QUIC_STATUS_PENDING;
+}
+
 JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_ADDRESS_FAMILY_UNSPEC(void) {
     return QUIC_ADDRESS_FAMILY_UNSPEC;
 }
@@ -28,4 +32,4 @@ JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_ADDRES
 }
 #endif
 // metadata.generator-version: pni 21.0.0.8
-// sha256:7917943bed4fde4b637fc490e628c518e1bc3809b7e239a3ffcf0ac3b1d38fef
+// sha256:7fcd44d352e9d67b131e7e04e23dfba6b537e4f3f02ccf41ddce2bcdb9368af4

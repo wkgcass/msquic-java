@@ -52,6 +52,18 @@ public class MsQuicValues {
         return RESULT;
     }
 
+    private static final MethodHandle QUIC_STATUS_PENDINGMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_STATUS_PENDING");
+
+    public int QUIC_STATUS_PENDING() {
+        int RESULT;
+        try {
+            RESULT = (int) QUIC_STATUS_PENDINGMH.invokeExact();
+        } catch (Throwable THROWABLE) {
+            throw PanamaUtils.convertInvokeExactException(THROWABLE);
+        }
+        return RESULT;
+    }
+
     private static final MethodHandle QUIC_ADDRESS_FAMILY_UNSPECMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_ADDRESS_FAMILY_UNSPEC");
 
     public int QUIC_ADDRESS_FAMILY_UNSPEC() {
@@ -89,4 +101,4 @@ public class MsQuicValues {
     }
 }
 // metadata.generator-version: pni 21.0.0.8
-// sha256:00b2c6b2f9431a9dc82cc278cba8a3207abcc4f5d559155b329f10341c4bd3da
+// sha256:dfab382da65d482eff2fea2b48f9810b173853f1dae4eadf3b153db9eae3e4b1

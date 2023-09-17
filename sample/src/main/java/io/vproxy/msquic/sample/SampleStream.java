@@ -22,6 +22,8 @@ public class SampleStream extends Stream {
         this.cli = cli;
     }
 
+    private int receiveMethodType = 0; // 0: directly receive, 1: delay and receive
+
     @Override
     public int callback(QuicStreamEvent event) {
         super.callback(event);
@@ -59,7 +61,21 @@ public class SampleStream extends Stream {
                         Utils.hexDump(seg);
                     }
                 }
-                yield 0;
+                if ((receiveMethodType++) % 2 == 0) {
+                    yield 0;
+                }
+                var len = data.getTotalBufferLength();
+                new Thread(() -> {
+                    System.out.println("delay for a few seconds before calling StreamReceiveComplete");
+                    try {
+                        Thread.sleep(2_000);
+                    } catch (InterruptedException ignore) {
+                    }
+                    System.out.println("calling StreamReceiveComplete with len " + len);
+                    stream.receiveComplete(len);
+                }).start();
+                data.setTotalBufferLength(0);
+                yield QUIC_STATUS_PENDING;
             }
             case QUIC_STREAM_EVENT_SEND_COMPLETE -> {
                 System.out.println("QUIC_STREAM_EVENT_SEND_COMPLETE");

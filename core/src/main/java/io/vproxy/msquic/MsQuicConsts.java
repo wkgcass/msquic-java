@@ -9,6 +9,7 @@ public class MsQuicConsts {
     public static final int QUIC_API_VERSION_2 = 2;
 
     public static final int QUIC_STATUS_NOT_SUPPORTED = MsQuicValues.get().QUIC_STATUS_NOT_SUPPORTED();
+    public static final int QUIC_STATUS_PENDING = MsQuicValues.get().QUIC_STATUS_PENDING();
 
     public static final int QUIC_EXECUTION_PROFILE_LOW_LATENCY = 0;
     public static final int QUIC_EXECUTION_PROFILE_TYPE_MAX_THROUGHPUT = 1;
