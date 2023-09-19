@@ -86,12 +86,20 @@ public class QuicStreamEventSendComplete {
             super(func);
         }
 
+        private Func(io.vproxy.pni.CallSite<QuicStreamEventSendComplete> func, Options opts) {
+            super(func, opts);
+        }
+
         private Func(MemorySegment MEMORY) {
             super(MEMORY);
         }
 
         public static Func of(io.vproxy.pni.CallSite<QuicStreamEventSendComplete> func) {
             return new Func(func);
+        }
+
+        public static Func of(io.vproxy.pni.CallSite<QuicStreamEventSendComplete> func, Options opts) {
+            return new Func(func, opts);
         }
 
         public static Func of(MemorySegment MEMORY) {
@@ -104,5 +112,5 @@ public class QuicStreamEventSendComplete {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.8
-// sha256:b488ff1479e56083c5bcf384b08d93afdfab1aca02c10c89ff056b0f9ab43f52
+// metadata.generator-version: pni 21.0.0.11
+// sha256:f72d50fc7e518412912ab6b75e0b147dc33afc5c2299ef1f33ae6151444e12f6

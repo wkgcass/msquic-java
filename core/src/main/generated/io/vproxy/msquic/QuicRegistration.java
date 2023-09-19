@@ -149,12 +149,20 @@ public class QuicRegistration {
             super(func);
         }
 
+        private Func(io.vproxy.pni.CallSite<QuicRegistration> func, Options opts) {
+            super(func, opts);
+        }
+
         private Func(MemorySegment MEMORY) {
             super(MEMORY);
         }
 
         public static Func of(io.vproxy.pni.CallSite<QuicRegistration> func) {
             return new Func(func);
+        }
+
+        public static Func of(io.vproxy.pni.CallSite<QuicRegistration> func, Options opts) {
+            return new Func(func, opts);
         }
 
         public static Func of(MemorySegment MEMORY) {
@@ -167,5 +175,5 @@ public class QuicRegistration {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.8
-// sha256:9593618eb64996128277b73099d706850d8fc57e2c5b6ce4ad22b9543fa6d0c9
+// metadata.generator-version: pni 21.0.0.11
+// sha256:712a019b78e5cb209f36026759d5ce4565f1a9c26e14573c69fde2f856c97de0

@@ -64,12 +64,20 @@ public class QuicConnectionEventReliableResetNegotiated {
             super(func);
         }
 
+        private Func(io.vproxy.pni.CallSite<QuicConnectionEventReliableResetNegotiated> func, Options opts) {
+            super(func, opts);
+        }
+
         private Func(MemorySegment MEMORY) {
             super(MEMORY);
         }
 
         public static Func of(io.vproxy.pni.CallSite<QuicConnectionEventReliableResetNegotiated> func) {
             return new Func(func);
+        }
+
+        public static Func of(io.vproxy.pni.CallSite<QuicConnectionEventReliableResetNegotiated> func, Options opts) {
+            return new Func(func, opts);
         }
 
         public static Func of(MemorySegment MEMORY) {
@@ -82,5 +90,5 @@ public class QuicConnectionEventReliableResetNegotiated {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.8
-// sha256:25ac88960b8a94604b511c019756e93ed85dcd41463e2155e115fb43f3e62d51
+// metadata.generator-version: pni 21.0.0.11
+// sha256:347e6db72e42291750a8a3d88e2988698cee0541be63421d6338987705d2dcff

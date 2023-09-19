@@ -150,12 +150,20 @@ public class QuicApiTable {
             super(func);
         }
 
+        private Func(io.vproxy.pni.CallSite<QuicApiTable> func, Options opts) {
+            super(func, opts);
+        }
+
         private Func(MemorySegment MEMORY) {
             super(MEMORY);
         }
 
         public static Func of(io.vproxy.pni.CallSite<QuicApiTable> func) {
             return new Func(func);
+        }
+
+        public static Func of(io.vproxy.pni.CallSite<QuicApiTable> func, Options opts) {
+            return new Func(func, opts);
         }
 
         public static Func of(MemorySegment MEMORY) {
@@ -168,5 +176,5 @@ public class QuicApiTable {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.8
-// sha256:1519e861c9952f1852b6b8465090761a56ac60d8e6672d8c066f9a7cb57cc18a
+// metadata.generator-version: pni 21.0.0.11
+// sha256:537353da9c68e8a42978ce76b5490794583c5487224187842f46fc15057e9ffd

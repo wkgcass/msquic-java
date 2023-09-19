@@ -70,12 +70,20 @@ public class QuicConnectionEventLocalAddressChanged {
             super(func);
         }
 
+        private Func(io.vproxy.pni.CallSite<QuicConnectionEventLocalAddressChanged> func, Options opts) {
+            super(func, opts);
+        }
+
         private Func(MemorySegment MEMORY) {
             super(MEMORY);
         }
 
         public static Func of(io.vproxy.pni.CallSite<QuicConnectionEventLocalAddressChanged> func) {
             return new Func(func);
+        }
+
+        public static Func of(io.vproxy.pni.CallSite<QuicConnectionEventLocalAddressChanged> func, Options opts) {
+            return new Func(func, opts);
         }
 
         public static Func of(MemorySegment MEMORY) {
@@ -88,5 +96,5 @@ public class QuicConnectionEventLocalAddressChanged {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.8
-// sha256:6ccacf4b67dd3035e0b6c498a87465d4e2da2295ea5236788cb9a049e2d57667
+// metadata.generator-version: pni 21.0.0.11
+// sha256:b85cd7cf167035aba80858af5cfaff4a795ccc60ebd109e600ff51fe5f99d32b

@@ -118,12 +118,20 @@ public class QuicConnectionEventPeerCertificateReceived {
             super(func);
         }
 
+        private Func(io.vproxy.pni.CallSite<QuicConnectionEventPeerCertificateReceived> func, Options opts) {
+            super(func, opts);
+        }
+
         private Func(MemorySegment MEMORY) {
             super(MEMORY);
         }
 
         public static Func of(io.vproxy.pni.CallSite<QuicConnectionEventPeerCertificateReceived> func) {
             return new Func(func);
+        }
+
+        public static Func of(io.vproxy.pni.CallSite<QuicConnectionEventPeerCertificateReceived> func, Options opts) {
+            return new Func(func, opts);
         }
 
         public static Func of(MemorySegment MEMORY) {
@@ -136,5 +144,5 @@ public class QuicConnectionEventPeerCertificateReceived {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.8
-// sha256:96632ee43042626b2492f231c83c6336a5f916d46f8fca6cc7832ce29bbe4e20
+// metadata.generator-version: pni 21.0.0.11
+// sha256:1990cb2b4fb9dad3a2fa5346578eb164432217bd645434f5e88092c1db71a4f5

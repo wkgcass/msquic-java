@@ -64,12 +64,20 @@ public class QuicStreamEventIdealSendBufferSize {
             super(func);
         }
 
+        private Func(io.vproxy.pni.CallSite<QuicStreamEventIdealSendBufferSize> func, Options opts) {
+            super(func, opts);
+        }
+
         private Func(MemorySegment MEMORY) {
             super(MEMORY);
         }
 
         public static Func of(io.vproxy.pni.CallSite<QuicStreamEventIdealSendBufferSize> func) {
             return new Func(func);
+        }
+
+        public static Func of(io.vproxy.pni.CallSite<QuicStreamEventIdealSendBufferSize> func, Options opts) {
+            return new Func(func, opts);
         }
 
         public static Func of(MemorySegment MEMORY) {
@@ -82,5 +90,5 @@ public class QuicStreamEventIdealSendBufferSize {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.8
-// sha256:c20d236efb8068c1fd21600de29d80651d67137f0793b75f4ea18e698920f6fd
+// metadata.generator-version: pni 21.0.0.11
+// sha256:08305e4649d43d5a4d10adacf5dbd4ed43d1dbec1556dbc57138d1d7c945a5bf

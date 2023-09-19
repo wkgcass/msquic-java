@@ -64,12 +64,20 @@ public class QuicStreamEventPeerSendAborted {
             super(func);
         }
 
+        private Func(io.vproxy.pni.CallSite<QuicStreamEventPeerSendAborted> func, Options opts) {
+            super(func, opts);
+        }
+
         private Func(MemorySegment MEMORY) {
             super(MEMORY);
         }
 
         public static Func of(io.vproxy.pni.CallSite<QuicStreamEventPeerSendAborted> func) {
             return new Func(func);
+        }
+
+        public static Func of(io.vproxy.pni.CallSite<QuicStreamEventPeerSendAborted> func, Options opts) {
+            return new Func(func, opts);
         }
 
         public static Func of(MemorySegment MEMORY) {
@@ -82,5 +90,5 @@ public class QuicStreamEventPeerSendAborted {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.8
-// sha256:c3f9d105d9fa9323ade828fc36d7491d41e6feff1838b01c475a90dc69879cb1
+// metadata.generator-version: pni 21.0.0.11
+// sha256:4037d9d31f5324e9b80bee490182da9104a7197660352a5a550fdad7671e465b

@@ -64,12 +64,20 @@ public class QuicConnectionEventShutdownInitiatedByPeer {
             super(func);
         }
 
+        private Func(io.vproxy.pni.CallSite<QuicConnectionEventShutdownInitiatedByPeer> func, Options opts) {
+            super(func, opts);
+        }
+
         private Func(MemorySegment MEMORY) {
             super(MEMORY);
         }
 
         public static Func of(io.vproxy.pni.CallSite<QuicConnectionEventShutdownInitiatedByPeer> func) {
             return new Func(func);
+        }
+
+        public static Func of(io.vproxy.pni.CallSite<QuicConnectionEventShutdownInitiatedByPeer> func, Options opts) {
+            return new Func(func, opts);
         }
 
         public static Func of(MemorySegment MEMORY) {
@@ -82,5 +90,5 @@ public class QuicConnectionEventShutdownInitiatedByPeer {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.8
-// sha256:8012937b395c03f637be89e1d002f2e41ff05011900d01c439945d9df44d9f3e
+// metadata.generator-version: pni 21.0.0.11
+// sha256:15506c159468a9bd5f4f3e0ac83842675ffa4362e4f420ec67f32c951c8afa87

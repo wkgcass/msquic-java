@@ -78,12 +78,20 @@ public class QuicListenerEventStopComplete {
             super(func);
         }
 
+        private Func(io.vproxy.pni.CallSite<QuicListenerEventStopComplete> func, Options opts) {
+            super(func, opts);
+        }
+
         private Func(MemorySegment MEMORY) {
             super(MEMORY);
         }
 
         public static Func of(io.vproxy.pni.CallSite<QuicListenerEventStopComplete> func) {
             return new Func(func);
+        }
+
+        public static Func of(io.vproxy.pni.CallSite<QuicListenerEventStopComplete> func, Options opts) {
+            return new Func(func, opts);
         }
 
         public static Func of(MemorySegment MEMORY) {
@@ -96,5 +104,5 @@ public class QuicListenerEventStopComplete {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.8
-// sha256:487dd1dabb5906b27eddc7e20da8ef894076707bf8ae3be3e4f8a3399804d371
+// metadata.generator-version: pni 21.0.0.11
+// sha256:4c7e959b125efcb067ce7e8d10b393c010d0b1c328bd64c0dd94bf3b6ec3d404

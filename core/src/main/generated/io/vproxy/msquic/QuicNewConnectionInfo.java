@@ -248,12 +248,20 @@ public class QuicNewConnectionInfo {
             super(func);
         }
 
+        private Func(io.vproxy.pni.CallSite<QuicNewConnectionInfo> func, Options opts) {
+            super(func, opts);
+        }
+
         private Func(MemorySegment MEMORY) {
             super(MEMORY);
         }
 
         public static Func of(io.vproxy.pni.CallSite<QuicNewConnectionInfo> func) {
             return new Func(func);
+        }
+
+        public static Func of(io.vproxy.pni.CallSite<QuicNewConnectionInfo> func, Options opts) {
+            return new Func(func, opts);
         }
 
         public static Func of(MemorySegment MEMORY) {
@@ -266,5 +274,5 @@ public class QuicNewConnectionInfo {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.8
-// sha256:ddc6cfe03efe5fc0c458a5d1615536ec690ad6161e7f2cf4d7687bac9d7d620f
+// metadata.generator-version: pni 21.0.0.11
+// sha256:331fbdbc061a3598ee111418fca825751d602419864bb8ffac94b6e469ad2402

@@ -86,12 +86,20 @@ public class QuicBuffer {
             super(func);
         }
 
+        private Func(io.vproxy.pni.CallSite<QuicBuffer> func, Options opts) {
+            super(func, opts);
+        }
+
         private Func(MemorySegment MEMORY) {
             super(MEMORY);
         }
 
         public static Func of(io.vproxy.pni.CallSite<QuicBuffer> func) {
             return new Func(func);
+        }
+
+        public static Func of(io.vproxy.pni.CallSite<QuicBuffer> func, Options opts) {
+            return new Func(func, opts);
         }
 
         public static Func of(MemorySegment MEMORY) {
@@ -104,5 +112,5 @@ public class QuicBuffer {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.8
-// sha256:68dfba6e7f54b75b9eee8c40b717fbea6f296f9b9a99b723491feefc8312ffd0
+// metadata.generator-version: pni 21.0.0.11
+// sha256:57af372cb16fb79cb26ec62286e400b11d4439bd000d52058c3554a6b00dd324

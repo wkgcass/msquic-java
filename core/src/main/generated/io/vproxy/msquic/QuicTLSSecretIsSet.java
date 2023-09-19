@@ -148,12 +148,20 @@ public class QuicTLSSecretIsSet {
             super(func);
         }
 
+        private Func(io.vproxy.pni.CallSite<QuicTLSSecretIsSet> func, Options opts) {
+            super(func, opts);
+        }
+
         private Func(MemorySegment MEMORY) {
             super(MEMORY);
         }
 
         public static Func of(io.vproxy.pni.CallSite<QuicTLSSecretIsSet> func) {
             return new Func(func);
+        }
+
+        public static Func of(io.vproxy.pni.CallSite<QuicTLSSecretIsSet> func, Options opts) {
+            return new Func(func, opts);
         }
 
         public static Func of(MemorySegment MEMORY) {
@@ -166,5 +174,5 @@ public class QuicTLSSecretIsSet {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.8
-// sha256:1198bdbaa08ac00215f673b94102f1b36caeac6ab92b5468a759755615a0cb3a
+// metadata.generator-version: pni 21.0.0.11
+// sha256:ceaf60fe20fb585a84e2265d660b63e7e8b84b6b0d3888c7e661066875f41580

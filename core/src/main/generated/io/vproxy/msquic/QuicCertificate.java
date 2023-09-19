@@ -71,12 +71,20 @@ public class QuicCertificate {
             super(func);
         }
 
+        private Func(io.vproxy.pni.CallSite<QuicCertificate> func, Options opts) {
+            super(func, opts);
+        }
+
         private Func(MemorySegment MEMORY) {
             super(MEMORY);
         }
 
         public static Func of(io.vproxy.pni.CallSite<QuicCertificate> func) {
             return new Func(func);
+        }
+
+        public static Func of(io.vproxy.pni.CallSite<QuicCertificate> func, Options opts) {
+            return new Func(func, opts);
         }
 
         public static Func of(MemorySegment MEMORY) {
@@ -89,5 +97,5 @@ public class QuicCertificate {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.8
-// sha256:f9f1b44d014da78d638a3b634128f2ea104e71d7cd0a12c6e18ac0b73cf37b75
+// metadata.generator-version: pni 21.0.0.11
+// sha256:18b89a1ef7c1f6f380dcd09103733347ed381f947afebd3db75e69b4e25a1a69

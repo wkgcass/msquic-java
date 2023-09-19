@@ -70,12 +70,20 @@ public class QuicListenerEventUnion {
             super(func);
         }
 
+        private Func(io.vproxy.pni.CallSite<QuicListenerEventUnion> func, Options opts) {
+            super(func, opts);
+        }
+
         private Func(MemorySegment MEMORY) {
             super(MEMORY);
         }
 
         public static Func of(io.vproxy.pni.CallSite<QuicListenerEventUnion> func) {
             return new Func(func);
+        }
+
+        public static Func of(io.vproxy.pni.CallSite<QuicListenerEventUnion> func, Options opts) {
+            return new Func(func, opts);
         }
 
         public static Func of(MemorySegment MEMORY) {
@@ -88,5 +96,5 @@ public class QuicListenerEventUnion {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.8
-// sha256:166153fb4cc97b185a0979fd03f2564aa52a711ec7b8cb8209a5b458971b059c
+// metadata.generator-version: pni 21.0.0.11
+// sha256:953df9d0a8b476aef2e5e43250099f2b4adec728ec36c6b745d2a93aae40bb6d
