@@ -75,10 +75,6 @@ project(':template') {
     compileJava {
         options.compilerArgs += '-parameters'
     }
-    task pniClean(type: Exec) {
-        workingDir project.rootProject.rootDir.getAbsolutePath() + '/core/src/main/'
-        commandLine 'bash', '-c', 'rm -rf c-generated/* && rm -rf generated/*'
-    }
     task pniGenerate(type: Exec) {
         workingDir project.rootProject.rootDir.getAbsolutePath()
         commandLine('java', '-jar', 'misc/pni.jar',
@@ -86,7 +82,6 @@ project(':template') {
                 '-d', 'core/src/main/generated',
                 '-h', 'core/src/main/c-generated')
 
-        dependsOn pniClean
         dependsOn compileJava
     }
     task pniCompile(type: Exec) {
