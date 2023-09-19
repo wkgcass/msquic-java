@@ -1,13 +1,26 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
-import io.vproxy.pni.array.*;
-import java.lang.foreign.*;
-import java.lang.invoke.*;
-import java.nio.ByteBuffer;
+import io.vproxy.pni.array.RefArray;
+
+import java.lang.foreign.MemoryLayout;
+import java.lang.foreign.MemorySegment;
+import java.lang.invoke.MethodHandle;
 
 public class QuicAddr {
-    public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
+    private static final MethodHandle __getLayoutByteSizeMH = PanamaUtils.lookupPNICriticalFunction(true, long.class, "JavaCritical_io_vproxy_msquic_QuicAddr___getLayoutByteSize");
+
+    private static long __getLayoutByteSize() {
+        long RESULT;
+        try {
+            RESULT = (long) __getLayoutByteSizeMH.invokeExact();
+        } catch (Throwable THROWABLE) {
+            throw PanamaUtils.convertInvokeExactException(THROWABLE);
+        }
+        return RESULT;
+    }
+
+    public static final MemoryLayout LAYOUT = PanamaUtils.padLayout(__getLayoutByteSize(), MemoryLayout::structLayout
 
     );
     public final MemorySegment MEMORY;
@@ -132,4 +145,4 @@ public class QuicAddr {
     }
 }
 // metadata.generator-version: pni 21.0.0.11
-// sha256:9b096e4f74913f24556e52faba9799a6bbe64bf4ec0b402dd0fa8f45b1551966
+// sha256:8859d3677e32b0816be1a4acb579f42cdc34589d90c46be85106684afed9243d

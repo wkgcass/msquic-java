@@ -4,10 +4,6 @@
 extern "C" {
 #endif
 
-JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_MsQuicValues_sizeofQuicAddr(void) {
-    return sizeof(QUIC_ADDR);
-}
-
 JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_STATUS_NOT_SUPPORTED(void) {
     return QUIC_STATUS_NOT_SUPPORTED;
 }
@@ -31,5 +27,5 @@ JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_ADDRES
 #ifdef __cplusplus
 }
 #endif
-// metadata.generator-version: pni 21.0.0.8
-// sha256:7fcd44d352e9d67b131e7e04e23dfba6b537e4f3f02ccf41ddce2bcdb9368af4
+// metadata.generator-version: pni 21.0.0.11
+// sha256:f09637b8e35510443ca0d5d2db6a5db30164aaf66258a884e3bff227bd264802

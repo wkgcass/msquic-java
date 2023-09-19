@@ -137,9 +137,9 @@ public abstract class Connection {
         return switch (event.getType()) {
             case QUIC_CONNECTION_EVENT_CONNECTED -> {
                 try (var allocator = Allocator.ofConfined()) {
-                    var addr = new QuicAddr(allocator.allocate(sizeofQuicAddr));
+                    var addr = new QuicAddr(allocator);
                     var size = new IntArray(allocator, 1);
-                    size.set(0, sizeofQuicAddr);
+                    size.set(0, (int) QuicAddr.LAYOUT.byteSize());
                     var ok = opts.apiTable.opts.apiTableQ.getParam(connectionQ.getConn(), QUIC_PARAM_CONN_LOCAL_ADDRESS, size, addr.MEMORY);
                     if (ok == 0) {
                         var str = new PNIString(allocator.allocate(64));

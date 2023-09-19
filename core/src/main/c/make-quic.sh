@@ -65,4 +65,5 @@ gcc -std=gnu11 -O2 \
     io_vproxy_msquic_MsQuic.c \
     inline.c \
     ../c-generated/io_vproxy_msquic_MsQuicUpcall.c \
+    ../c-generated/io_vproxy_msquic_QuicAddr.extra.c \
     -o "$target"

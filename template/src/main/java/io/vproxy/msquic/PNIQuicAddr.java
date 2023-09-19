@@ -6,6 +6,7 @@ import io.vproxy.pni.annotation.*;
 @Include("msquic.h")
 @Name("QUIC_ADDR")
 @PointerOnly
+@Sizeof("QUIC_ADDR")
 public abstract class PNIQuicAddr {
     @Impl(
         // language="c"

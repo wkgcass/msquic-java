@@ -130,7 +130,7 @@ public class Server {
             alpnBuffers.get(0).setLength(7);
             alpnBuffers.get(1).setBuffer(new PNIString(listenerAllocator, "proto-y").MEMORY);
             alpnBuffers.get(1).setLength(7);
-            var quicAddr = new QuicAddr(listenerAllocator.allocate(sizeofQuicAddr));
+            var quicAddr = new QuicAddr(listenerAllocator);
             MsQuic.get().buildQuicAddr(new PNIString(listenerAllocator, "0.0.0.0"), port, quicAddr);
             var err = lsn.listenerQ.start(alpnBuffers, 2, quicAddr);
             if (err != 0) {

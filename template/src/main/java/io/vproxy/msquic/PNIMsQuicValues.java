@@ -14,15 +14,6 @@ public interface PNIMsQuicValues {
     @Impl(
         // language="c"
         c = """
-            return sizeof(QUIC_ADDR);
-            """
-    )
-    @Critical
-    int sizeofQuicAddr();
-
-    @Impl(
-        // language="c"
-        c = """
             return QUIC_STATUS_NOT_SUPPORTED;
             """
     )

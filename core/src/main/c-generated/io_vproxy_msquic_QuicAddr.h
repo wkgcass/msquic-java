@@ -20,6 +20,8 @@ extern "C" {
 
 PNIEnvExpand(QUIC_ADDR, QUIC_ADDR *)
 
+JNIEXPORT size_t JNICALL JavaCritical_io_vproxy_msquic_QuicAddr___getLayoutByteSize();
+
 JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_QuicAddr_getFamily(QUIC_ADDR * self);
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicAddr_setFamily(QUIC_ADDR * self, int32_t family);
 JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_QuicAddr_getPort(QUIC_ADDR * self);
@@ -30,5 +32,5 @@ JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicAddr_toString(QUIC_ADDR
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicAddr
-// metadata.generator-version: pni 21.0.0.8
-// sha256:d9b4e99053ba526b9e899c9a9697682054eeabba8281a4502add2c6799855ea8
+// metadata.generator-version: pni 21.0.0.11
+// sha256:ef6e436954c24c4e9e1b5a978c8e66f13814f1d7e4b356d3cbeb8602169ef62c

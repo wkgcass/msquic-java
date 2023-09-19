@@ -19,7 +19,6 @@ extern "C" {
 #endif
 
 JNIEXPORT char * JNICALL JavaCritical_io_vproxy_msquic_MsQuicValues_QuicStatusString(int32_t status);
-JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_MsQuicValues_sizeofQuicAddr(void);
 JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_STATUS_NOT_SUPPORTED(void);
 JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_STATUS_PENDING(void);
 JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_ADDRESS_FAMILY_UNSPEC(void);
@@ -30,5 +29,5 @@ JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_ADDRES
 }
 #endif
 #endif // _Included_io_vproxy_msquic_MsQuicValues
-// metadata.generator-version: pni 21.0.0.8
-// sha256:0667a9ee92e531facfdc7a462cc6ff773266d8c84a8aee33b1eba5e76f8d6566
+// metadata.generator-version: pni 21.0.0.11
+// sha256:e7b6272391eac42a904cd2545ce7ca841929635524a385265b9059fce05b4992

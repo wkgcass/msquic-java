@@ -4,8 +4,6 @@ public class MsQuicConsts {
     private MsQuicConsts() {
     }
 
-    public static final int sizeofQuicAddr = MsQuicValues.get().sizeofQuicAddr();
-
     public static final int QUIC_API_VERSION_2 = 2;
 
     public static final int QUIC_STATUS_NOT_SUPPORTED = MsQuicValues.get().QUIC_STATUS_NOT_SUPPORTED();

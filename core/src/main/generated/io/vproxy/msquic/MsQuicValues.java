@@ -28,18 +28,6 @@ public class MsQuicValues {
         return RESULT.address() == 0 ? null : new PNIString(RESULT);
     }
 
-    private static final MethodHandle sizeofQuicAddrMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_MsQuicValues_sizeofQuicAddr");
-
-    public int sizeofQuicAddr() {
-        int RESULT;
-        try {
-            RESULT = (int) sizeofQuicAddrMH.invokeExact();
-        } catch (Throwable THROWABLE) {
-            throw PanamaUtils.convertInvokeExactException(THROWABLE);
-        }
-        return RESULT;
-    }
-
     private static final MethodHandle QUIC_STATUS_NOT_SUPPORTEDMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_STATUS_NOT_SUPPORTED");
 
     public int QUIC_STATUS_NOT_SUPPORTED() {
@@ -100,5 +88,5 @@ public class MsQuicValues {
         return RESULT;
     }
 }
-// metadata.generator-version: pni 21.0.0.8
-// sha256:dfab382da65d482eff2fea2b48f9810b173853f1dae4eadf3b153db9eae3e4b1
+// metadata.generator-version: pni 21.0.0.11
+// sha256:c71dfd09159dd87ba22813697cd8741cd0ba8aaa2d1be799a772241951f2fde3
