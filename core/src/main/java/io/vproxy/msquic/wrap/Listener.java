@@ -14,37 +14,57 @@ import static io.vproxy.msquic.MsQuicConsts.QUIC_LISTENER_EVENT_STOP_COMPLETE;
 
 public abstract class Listener {
     public final PNIRef<Listener> ref;
-    public final QuicApiTable apiTable;
-    public final QuicRegistration registration;
-    private final Allocator allocator;
-    public final QuicListener listener;
+    public final Options opts;
+    public final QuicListener listenerQ;
 
-    public Listener(QuicApiTable apiTable, QuicRegistration registration,
-                    Allocator allocator,
-                    Function<PNIRef<Listener>, QuicListener> listenerSupplier) {
+    public Listener(Options opts) {
         this.ref = PNIRef.of(this);
-        this.apiTable = apiTable;
-        this.registration = registration;
-        this.allocator = allocator;
-        this.listener = listenerSupplier.apply(ref);
+        this.opts = opts;
+        this.listenerQ = opts.listenerSupplier.apply(ref);
+        opts.listenerSupplier = null; // gc
     }
 
-    private volatile boolean isClosed = false;
+    public static class OptionsBase extends Registration.OptionsBase {
+        public final Registration registration;
+
+        public OptionsBase(Registration registration) {
+            super(registration.opts);
+            this.registration = registration;
+        }
+    }
+
+    public static class Options extends OptionsBase {
+        private final Allocator allocator;
+        private Function<PNIRef<Listener>, QuicListener> listenerSupplier;
+
+        public Options(Registration registration, Allocator allocator,
+                       Function<PNIRef<Listener>, QuicListener> listenerSupplier) {
+            super(registration);
+            this.allocator = allocator;
+            this.listenerSupplier = listenerSupplier;
+        }
+    }
+
+    private volatile boolean closed = false;
     private volatile boolean lsnIsClosed = false;
 
+    public boolean isClosed() {
+        return closed;
+    }
+
     public void close() {
-        if (isClosed) {
+        if (closed) {
             return;
         }
         synchronized (this) {
-            if (isClosed) {
+            if (closed) {
                 return;
             }
-            isClosed = true;
+            closed = true;
         }
 
         closeListener();
-        allocator.close();
+        opts.allocator.close();
         ref.close();
         close0();
     }
@@ -62,8 +82,8 @@ public abstract class Listener {
             }
             lsnIsClosed = true;
         }
-        if (listener != null) {
-            listener.close();
+        if (listenerQ != null) {
+            listenerQ.close();
         }
     }
 
@@ -140,6 +160,7 @@ public abstract class Listener {
                     Logger.alert("AppCloseInProgress: " + appCloseInProgress);
                 }
             }
+            default -> Logger.alert("UNKNOWN LISTENER EVENT: " + event.getType());
         }
     }
 }

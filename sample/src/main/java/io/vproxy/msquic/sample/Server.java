@@ -5,10 +5,7 @@ import io.vproxy.base.util.Logger;
 import io.vproxy.msquic.*;
 import io.vproxy.msquic.wrap.*;
 import io.vproxy.pni.Allocator;
-import io.vproxy.pni.PNIRef;
 import io.vproxy.pni.PNIString;
-
-import java.util.function.Function;
 
 import static io.vproxy.msquic.MsQuicConsts.*;
 
@@ -65,11 +62,11 @@ public class Server {
             var config = new QuicRegistrationConfig(regAllocator);
             config.setAppName("sample:server", regAllocator);
             config.setExecutionProfile(QUIC_EXECUTION_PROFILE_LOW_LATENCY);
-            var reg_ = api.apiTable.openRegistration(config, null, regAllocator);
+            var reg_ = api.opts.apiTableQ.openRegistration(config, null, regAllocator);
             if (reg_ == null) {
                 throw new RuntimeException("RegistrationOpen failed");
             }
-            reg = new Registration(api.apiTable, reg_, regAllocator);
+            reg = new Registration(new Registration.Options(api, reg_, regAllocator));
         }
         System.out.println("Init Registration done");
 
@@ -94,11 +91,11 @@ public class Server {
                 alpnBuffers.get(1).setBuffer(new PNIString(confAllocator, "proto-y").MEMORY);
                 alpnBuffers.get(1).setLength(7);
             }
-            var conf_ = reg.registration.openConfiguration(alpnBuffers, 2, settings, null, null, confAllocator);
+            var conf_ = reg.opts.registrationQ.openConfiguration(alpnBuffers, 2, settings, null, null, confAllocator);
             if (conf_ == null) {
                 throw new RuntimeException("ConfigurationOpen failed");
             }
-            conf = new Configuration(api.apiTable, reg.registration, conf_, confAllocator);
+            conf = new Configuration(new Configuration.Options(reg, conf_, confAllocator));
             var cred = new QuicCredentialConfig(confAllocator);
             {
                 cred.setType(QUIC_CREDENTIAL_TYPE_CERTIFICATE_FILE);
@@ -109,7 +106,7 @@ public class Server {
                 cred.getCertificate().setCertificateFile(cf);
                 cred.setAllowedCipherSuites(QUIC_ALLOWED_CIPHER_SUITE_AES_256_GCM_SHA384);
             }
-            int err = conf.configuration.loadCredential(cred);
+            int err = conf.opts.configurationQ.loadCredential(cred);
             if (err != 0) {
                 conf.close();
                 throw new RuntimeException("ConfigurationLoadCredential failed");
@@ -117,14 +114,14 @@ public class Server {
         }
         System.out.println("Init Configuration done");
 
-        var cli = new CommandLine(false, conf, null);
+        var cli = new CommandLine(false, reg, conf, null);
 
         System.out.println("Init Listener begin ...");
         {
             var listenerAllocator = Allocator.ofUnsafe();
-            lsn = new ServerListener(cli, api.apiTable, reg.registration, listenerAllocator, ref ->
-                reg.registration.openListener(MsQuicUpcall.listenerCallback, ref.MEMORY, null, listenerAllocator));
-            if (lsn.listener == null) {
+            lsn = new ServerListener(cli, new Listener.Options(reg, listenerAllocator, ref ->
+                reg.opts.registrationQ.openListener(MsQuicUpcall.listenerCallback, ref.MEMORY, null, listenerAllocator)));
+            if (lsn.listenerQ == null) {
                 lsn.close();
                 throw new RuntimeException("failed creating listener");
             }
@@ -135,7 +132,7 @@ public class Server {
             alpnBuffers.get(1).setLength(7);
             var quicAddr = new QuicAddr(listenerAllocator.allocate(sizeofQuicAddr));
             MsQuic.get().buildQuicAddr(new PNIString(listenerAllocator, "0.0.0.0"), port, quicAddr);
-            var err = lsn.listener.start(alpnBuffers, 2, quicAddr);
+            var err = lsn.listenerQ.start(alpnBuffers, 2, quicAddr);
             if (err != 0) {
                 throw new RuntimeException("ListenerStart failed");
             }
@@ -148,8 +145,8 @@ public class Server {
     private static class ServerListener extends Listener {
         private final CommandLine cli;
 
-        public ServerListener(CommandLine cli, QuicApiTable table, QuicRegistration reg, Allocator allocator, Function<PNIRef<Listener>, QuicListener> listenerSupplier) {
-            super(table, reg, allocator, listenerSupplier);
+        public ServerListener(CommandLine cli, Listener.Options opts) {
+            super(opts);
             this.cli = cli;
         }
 
@@ -167,12 +164,12 @@ public class Server {
                     var connectionAllocator = Allocator.ofUnsafe();
                     var conn_ = new QuicConnection(connectionAllocator);
                     {
-                        conn_.setApi(apiTable.getApi());
+                        conn_.setApi(opts.apiTableQ.getApi());
                         conn_.setConn(connHQUIC);
                     }
-                    var conn = new SampleConnection(cli, apiTable, registration, connectionAllocator, conn_);
-                    apiTable.setCallbackHandler(connHQUIC, MsQuicUpcall.connectionCallback, conn.ref.MEMORY);
-                    var err = conn_.setConfiguration(conf.configuration);
+                    var conn = new SampleConnection(cli, new Connection.Options(this, connectionAllocator, conn_));
+                    opts.apiTableQ.setCallbackHandler(connHQUIC, MsQuicUpcall.connectionCallback, conn.ref.MEMORY);
+                    var err = conn_.setConfiguration(conf.opts.configurationQ);
                     if (err != 0) {
                         Logger.error(LogType.ALERT, "set configuration to connection failed: " + err);
                         conn.close();

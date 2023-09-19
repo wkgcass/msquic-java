@@ -20,7 +20,7 @@ public class ApiTables {
             if (v2 == null) {
                 throw new RuntimeException("failed to init V2 api: " + ret.get(0));
             }
-            V2 = new ApiTable(v2, null);
+            V2 = new ApiTable(new ApiTable.Options(v2, null));
         }
     }
 }

@@ -20,10 +20,8 @@ import static io.vproxy.msquic.MsQuicConsts.*;
 
 public abstract class Connection {
     public final PNIRef<Connection> ref;
-    public final QuicApiTable apiTable;
-    public final QuicRegistration registration;
-    private final Allocator allocator;
-    public final QuicConnection connection;
+    public final Options opts;
+    public final QuicConnection connectionQ;
 
     private IPPort remoteAddress;
     private IPPort localAddress;
@@ -37,40 +35,77 @@ public abstract class Connection {
         return localAddress;
     }
 
-    public Connection(QuicApiTable apiTable, QuicRegistration registration, Allocator allocator,
-                      Function<PNIRef<Connection>, QuicConnection> connectionSupplier) {
+    public Connection(Options opts) {
         this.ref = PNIRef.of(this);
-        this.apiTable = apiTable;
-        this.registration = registration;
-        this.allocator = allocator;
-        this.connection = connectionSupplier.apply(ref);
+        this.opts = opts;
+        if (opts.connectionQ != null) {
+            this.connectionQ = opts.connectionQ;
+        } else {
+            this.connectionQ = opts.connectionSupplier.apply(ref);
+        }
+        opts.connectionSupplier = null; // gc
     }
 
-    public Connection(QuicApiTable apiTable, QuicRegistration registration, Allocator allocator,
-                      QuicConnection connection) {
-        this.ref = PNIRef.of(this);
-        this.apiTable = apiTable;
-        this.registration = registration;
-        this.allocator = allocator;
-        this.connection = connection;
+    public static class OptionsBase extends Registration.OptionsBase {
+        public final Listener listener;
+        protected final QuicConnection connectionQ;
+
+        public OptionsBase(Registration registration) {
+            super(registration.opts);
+            this.listener = null;
+            this.connectionQ = null;
+        }
+
+        public OptionsBase(Listener listener, QuicConnection connectionQ) {
+            super(listener.opts);
+            this.listener = listener;
+            this.connectionQ = connectionQ;
+        }
+
+        public OptionsBase(OptionsBase opts) {
+            super(opts);
+            this.listener = opts.listener;
+            this.connectionQ = opts.connectionQ;
+        }
     }
 
-    private volatile boolean isClosed = false;
+    public static class Options extends OptionsBase {
+        public final Allocator allocator;
+        private Function<PNIRef<Connection>, QuicConnection> connectionSupplier;
+
+        public Options(Registration registration, Allocator allocator, Function<PNIRef<Connection>, QuicConnection> connectionSupplier) {
+            super(registration);
+            this.allocator = allocator;
+            this.connectionSupplier = connectionSupplier;
+        }
+
+        public Options(Listener listener, Allocator allocator, QuicConnection connectionQ) {
+            super(listener, connectionQ);
+            this.allocator = allocator;
+            this.connectionSupplier = null;
+        }
+    }
+
+    private volatile boolean closed = false;
     private volatile boolean connIsClosed = false;
 
+    public boolean isClosed() {
+        return closed;
+    }
+
     public void close() {
-        if (isClosed) {
+        if (closed) {
             return;
         }
         synchronized (this) {
-            if (isClosed) {
+            if (closed) {
                 return;
             }
-            isClosed = true;
+            closed = true;
         }
 
         closeConnection();
-        allocator.close();
+        opts.allocator.close();
         ref.close();
         close0();
     }
@@ -88,8 +123,8 @@ public abstract class Connection {
             }
             connIsClosed = true;
         }
-        if (connection != null) {
-            connection.close();
+        if (connectionQ != null) {
+            connectionQ.close();
         }
     }
 
@@ -105,21 +140,21 @@ public abstract class Connection {
                     var addr = new QuicAddr(allocator.allocate(sizeofQuicAddr));
                     var size = new IntArray(allocator, 1);
                     size.set(0, sizeofQuicAddr);
-                    var ok = apiTable.getParam(connection.getConn(), QUIC_PARAM_CONN_LOCAL_ADDRESS, size, addr.MEMORY);
+                    var ok = opts.apiTable.opts.apiTableQ.getParam(connectionQ.getConn(), QUIC_PARAM_CONN_LOCAL_ADDRESS, size, addr.MEMORY);
                     if (ok == 0) {
                         var str = new PNIString(allocator.allocate(64));
                         addr.toString(str);
                         localAddress = new IPPort(str.toString());
                     } else {
-                        Logger.alert("[MsQuicJava][ERROR] failed to retrieve local address from connection " + connection.getConn().address());
+                        Logger.alert("[MsQuicJava][ERROR] failed to retrieve local address from connection " + connectionQ.getConn().address());
                     }
-                    ok = apiTable.getParam(connection.getConn(), QUIC_PARAM_CONN_REMOTE_ADDRESS, size, addr.MEMORY);
+                    ok = opts.apiTable.opts.apiTableQ.getParam(connectionQ.getConn(), QUIC_PARAM_CONN_REMOTE_ADDRESS, size, addr.MEMORY);
                     if (ok == 0) {
                         var str = new PNIString(allocator.allocate(64));
                         addr.toString(str);
                         remoteAddress = new IPPort(str.toString());
                     } else {
-                        Logger.alert("[MsQuicJava][ERROR] failed to retrieve remote address from connection " + connection.getConn().address());
+                        Logger.alert("[MsQuicJava][ERROR] failed to retrieve remote address from connection " + connectionQ.getConn().address());
                     }
                 }
                 yield 0;
@@ -324,12 +359,13 @@ public abstract class Connection {
                     Logger.alert("IsNegotiated: " + data.getIsNegotiated());
                 }
             }
+            default -> Logger.alert("UNKNOWN CONNECTION EVENT: " + event.getType());
         }
     }
 
     public int enableTlsSecretDebug() {
-        quicTLSSecret = new QuicTLSSecret(allocator.allocate(QuicTLSSecret.LAYOUT.byteSize()));
-        return apiTable.setParam(connection.getConn(), QUIC_PARAM_CONN_TLS_SECRETS,
+        quicTLSSecret = new QuicTLSSecret(opts.allocator.allocate(QuicTLSSecret.LAYOUT.byteSize()));
+        return opts.apiTable.opts.apiTableQ.setParam(connectionQ.getConn(), QUIC_PARAM_CONN_TLS_SECRETS,
             (int) QuicTLSSecret.LAYOUT.byteSize(), quicTLSSecret.MEMORY);
     }
 
@@ -341,6 +377,7 @@ public abstract class Connection {
     public String toString() {
         return "Connection[local=" + (localAddress == null ? "null" : localAddress.formatToIPPortString())
                + " remote=" + (remoteAddress == null ? "null" : remoteAddress.formatToIPPortString())
-               + "]@" + Long.toString(connection.getConn().address(), 16);
+               + "]@" + Long.toString(connectionQ.getConn().address(), 16)
+               + (isClosed() ? "[closed]" : "[open]");
     }
 }

@@ -16,40 +16,62 @@ import static io.vproxy.msquic.MsQuicConsts.*;
 
 public abstract class Stream {
     public final PNIRef<Stream> ref;
-    public final QuicApiTable apiTable;
-    public final QuicRegistration registration;
-    public final QuicConnection connection;
-    private final Allocator allocator;
-    public final QuicStream stream;
+    public final Options opts;
+    public final QuicStream streamQ;
 
-    protected final Set<Allocator> pendingAllocators = new HashSet<>();
+    protected final Set<SendContext> pendingSendContexts = new HashSet<>();
 
     private long id;
 
-    public Stream(QuicApiTable apiTable, QuicRegistration registration, QuicConnection connection, Allocator allocator,
-                  Function<PNIRef<Stream>, QuicStream> streamSupplier) {
+    public Stream(Options opts) {
         this.ref = PNIRef.of(this);
-        this.apiTable = apiTable;
-        this.registration = registration;
-        this.connection = connection;
-        this.allocator = allocator;
-        this.stream = streamSupplier.apply(ref);
+        this.opts = opts;
+        if (opts.streamQ != null) {
+            this.streamQ = opts.streamQ;
+        } else {
+            this.streamQ = opts.streamSupplier.apply(ref);
+        }
+        opts.streamSupplier = null; // gc
 
-        getIdFromStream(stream);
+        if (opts.streamQ != null) {
+            this.canCallClose = false;
+        }
+
+        getIdFromStream(streamQ);
     }
 
-    public Stream(QuicApiTable apiTable, QuicRegistration registration, QuicConnection connection, Allocator allocator,
-                  QuicStream stream) {
-        this.ref = PNIRef.of(this);
-        this.apiTable = apiTable;
-        this.registration = registration;
-        this.connection = connection;
-        this.allocator = allocator;
-        this.stream = stream;
+    public static class OptionsBase extends Connection.OptionsBase {
+        public final Connection connection;
+        protected final QuicStream streamQ;
 
-        this.canCallClose = false;
+        public OptionsBase(Connection connection) {
+            super(connection.opts);
+            this.connection = connection;
+            this.streamQ = null;
+        }
 
-        getIdFromStream(stream);
+        public OptionsBase(Connection connection, QuicStream streamQ) {
+            super(connection.opts);
+            this.connection = connection;
+            this.streamQ = streamQ;
+        }
+    }
+
+    public static class Options extends OptionsBase {
+        private final Allocator allocator;
+        private Function<PNIRef<Stream>, QuicStream> streamSupplier;
+
+        public Options(Connection connection, Allocator allocator, QuicStream streamQ) {
+            super(connection, streamQ);
+            this.allocator = allocator;
+            this.streamSupplier = null;
+        }
+
+        public Options(Connection connection, Allocator allocator, Function<PNIRef<Stream>, QuicStream> streamSupplier) {
+            super(connection);
+            this.allocator = allocator;
+            this.streamSupplier = streamSupplier;
+        }
     }
 
     private void getIdFromStream(QuicStream stream) {
@@ -57,20 +79,24 @@ public abstract class Stream {
             try (var tmpAllocator = Allocator.ofConfined()) {
                 var idPtr = new LongArray(tmpAllocator, 1);
                 var lenPtr = new IntArray(tmpAllocator, 1);
-                apiTable.getParam(stream.getStream(), QUIC_PARAM_STREAM_ID, lenPtr, idPtr.MEMORY);
+                opts.apiTable.opts.apiTableQ.getParam(stream.getStream(), QUIC_PARAM_STREAM_ID, lenPtr, idPtr.MEMORY);
                 id = idPtr.get(0);
             }
         }
     }
 
-    public Set<Allocator> getPendingAllocators() {
-        return pendingAllocators;
+    public Set<SendContext> getPendingSendContexts() {
+        return pendingSendContexts;
     }
 
     private volatile boolean closed = false;
     private volatile boolean streamIsClosed = false;
     private volatile boolean streamIsShutdown = false;
     private volatile boolean canCallClose = true;
+
+    public boolean isClosed() {
+        return closed;
+    }
 
     public void close() {
         if (closed) {
@@ -84,12 +110,17 @@ public abstract class Stream {
         }
 
         closeStream();
-        allocator.close();
+        opts.allocator.close();
         ref.close();
-        for (var alloc : pendingAllocators) {
-            alloc.close();
+        for (var ctx : pendingSendContexts) {
+            finish(ctx, false);
         }
         close0();
+    }
+
+    private void finish(SendContext ctx, boolean succeeded) {
+        pendingSendContexts.remove(ctx);
+        ctx.onSendComplete.onSendComplete(ctx, succeeded);
     }
 
     protected void close0() {
@@ -115,8 +146,8 @@ public abstract class Stream {
             }
         }
         if (canCallClose) {
-            if (stream != null) {
-                stream.close();
+            if (streamQ != null) {
+                streamQ.close();
             }
             return;
         }
@@ -129,8 +160,8 @@ public abstract class Stream {
             }
             streamIsShutdown = true;
         }
-        stream.shutdown(QUIC_STREAM_SHUTDOWN_FLAG_ABORT_RECEIVE |
-                        QUIC_STREAM_SHUTDOWN_FLAG_ABORT_SEND, 0);
+        streamQ.shutdown(QUIC_STREAM_SHUTDOWN_FLAG_ABORT_RECEIVE |
+                         QUIC_STREAM_SHUTDOWN_FLAG_ABORT_SEND, 0);
     }
 
     public int send(Allocator allocator, MemorySegment... dataArray) {
@@ -138,22 +169,26 @@ public abstract class Stream {
     }
 
     public int send(int flags, Allocator allocator, MemorySegment... dataArray) {
+        return send(flags, new SendContext(allocator, (ctx, ok) -> ctx.allocator.close()), dataArray);
+    }
+
+    public int send(int flags, SendContext ctx, MemorySegment... dataArray) {
         if (dataArray.length == 0)
             return 0;
-        var qbufArray = new QuicBuffer.Array(allocator, dataArray.length);
+        var qbufArray = new QuicBuffer.Array(ctx.allocator, dataArray.length);
         for (int i = 0; i < dataArray.length; ++i) {
             var qbuf = qbufArray.get(i);
             var data = dataArray[i];
             qbuf.setLength((int) data.byteSize());
             qbuf.setBuffer(data);
         }
-        int res = stream.send(qbufArray.get(0) /*address*/, dataArray.length, flags, PNIRef.of(allocator).MEMORY);
+        int res = streamQ.send(qbufArray.get(0) /*address*/, dataArray.length, flags, PNIRef.of(ctx).MEMORY);
         if (res == 0) {
-            pendingAllocators.add(allocator);
+            pendingSendContexts.add(ctx);
             return 0;
         }
         // failed
-        allocator.close();
+        finish(ctx, false);
         return res;
     }
 
@@ -178,10 +213,10 @@ public abstract class Stream {
                 var data = event.getUnion().getSEND_COMPLETE();
                 var context = data.getClientContext();
                 if (context != null) {
-                    var allocatorRef = PNIRef.<Allocator>of(context);
-                    var allocator = allocatorRef.getRef();
-                    allocator.close();
-                    pendingAllocators.remove(allocator);
+                    var ctxRef = PNIRef.<SendContext>of(context);
+                    var ctx = ctxRef.getRef();
+                    ctxRef.close();
+                    finish(ctx, !data.getCanceled());
                 }
                 yield 0;
             }
@@ -239,6 +274,13 @@ public abstract class Stream {
                     Logger.alert("ClientContext: " + data.getClientContext());
                 }
             }
+            case QUIC_STREAM_EVENT_PEER_SEND_SHUTDOWN -> {
+                Logger.alert("QUIC_STREAM_EVENT_PEER_SEND_SHUTDOWN");
+                var data = event.getUnion().getPEER_SEND_ABORTED();
+                {
+                    Logger.alert("ErrorCode: " + data.getErrorCode());
+                }
+            }
             case QUIC_STREAM_EVENT_PEER_SEND_ABORTED -> {
                 Logger.alert("QUIC_STREAM_EVENT_PEER_SEND_ABORTED");
                 var data = event.getUnion().getPEER_SEND_ABORTED();
@@ -279,12 +321,14 @@ public abstract class Stream {
                     Logger.alert("ByteCount: " + data.getByteCount());
                 }
             }
+            default -> Logger.alert("UNKNOWN STREAM EVENT: " + event.getType());
         }
     }
 
     public String toString() {
         return "Stream[id=" + id
-               + " conn=" + Long.toString(connection.getConn().address(), 16)
-               + "]@" + Long.toString(stream.getStream().address(), 16);
+               + " conn=" + opts.connection
+               + "]@" + Long.toString(streamQ.getStream().address(), 16)
+               + (isClosed() ? "[closed]" : "[open]");
     }
 }

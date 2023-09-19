@@ -1,25 +1,21 @@
 package io.vproxy.msquic.sample;
 
-import io.vproxy.msquic.*;
+import io.vproxy.msquic.MsQuicUpcall;
+import io.vproxy.msquic.QuicConnectionEvent;
+import io.vproxy.msquic.QuicStream;
 import io.vproxy.msquic.wrap.Connection;
+import io.vproxy.msquic.wrap.Stream;
 import io.vproxy.pni.Allocator;
-import io.vproxy.pni.PNIRef;
 
 import java.nio.file.Path;
-import java.util.function.Function;
 
 import static io.vproxy.msquic.MsQuicConsts.*;
 
 class SampleConnection extends Connection {
     private final CommandLine cli;
 
-    public SampleConnection(CommandLine cli, QuicApiTable table, QuicRegistration reg, Allocator allocator, Function<PNIRef<Connection>, QuicConnection> connectionSupplier) {
-        super(table, reg, allocator, connectionSupplier);
-        this.cli = cli;
-    }
-
-    public SampleConnection(CommandLine cli, QuicApiTable apiTable, QuicRegistration registration, Allocator allocator, QuicConnection connection) {
-        super(apiTable, registration, allocator, connection);
+    public SampleConnection(CommandLine cli, Options opts) {
+        super(opts);
         this.cli = cli;
     }
 
@@ -55,10 +51,10 @@ class SampleConnection extends Connection {
                 var streamHQUIC = data.getStream();
                 var allocator = Allocator.ofUnsafe();
                 var stream_ = new QuicStream(allocator);
-                stream_.setApi(apiTable.getApi());
+                stream_.setApi(opts.apiTableQ.getApi());
                 stream_.setStream(streamHQUIC);
-                var stream = new SampleStream(cli, apiTable, registration, connection, allocator, stream_);
-                apiTable.setCallbackHandler(streamHQUIC, MsQuicUpcall.streamCallback, stream.ref.MEMORY);
+                var stream = new SampleStream(cli, new Stream.Options(this, allocator, stream_));
+                opts.apiTableQ.setCallbackHandler(streamHQUIC, MsQuicUpcall.streamCallback, stream.ref.MEMORY);
                 cli.registerStream(stream);
                 yield 0;
             }

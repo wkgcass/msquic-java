@@ -3,6 +3,7 @@ package io.vproxy.msquic.sample;
 import io.vproxy.msquic.MsQuicUpcall;
 import io.vproxy.msquic.wrap.Configuration;
 import io.vproxy.msquic.wrap.Connection;
+import io.vproxy.msquic.wrap.Registration;
 import io.vproxy.msquic.wrap.Stream;
 import io.vproxy.pni.Allocator;
 import io.vproxy.pni.PNIString;
@@ -18,6 +19,7 @@ import static io.vproxy.msquic.MsQuicConsts.*;
 
 public class CommandLine {
     private final boolean isClient;
+    private final Registration registration;
     private final Configuration configuration;
     public final Path quicTlsSecretLogFilePath;
     private final List<Connection> connections = new ArrayList<>();
@@ -27,8 +29,9 @@ public class CommandLine {
     private record ResumptionTicket(byte[] ticket, String remote) {
     }
 
-    public CommandLine(boolean isClient, Configuration configuration, Path quicTlsSecretLogFilePath) {
+    public CommandLine(boolean isClient, Registration registration, Configuration configuration, Path quicTlsSecretLogFilePath) {
         this.isClient = isClient;
+        this.registration = registration;
         this.configuration = configuration;
         this.quicTlsSecretLogFilePath = quicTlsSecretLogFilePath;
     }
@@ -212,7 +215,7 @@ public class CommandLine {
                 }
                 int streamIndex = Integer.parseInt(ls.get(0));
                 var stream = getStream(streamIndex);
-                stream.stream.send(null, 0, QUIC_SEND_FLAG_FIN, null);
+                stream.streamQ.send(null, 0, QUIC_SEND_FLAG_FIN, null);
             }
             case "close" -> {
                 if (ls.size() != 2 || !List.of("conn", "stream").contains(ls.get(0))) {
@@ -277,9 +280,9 @@ public class CommandLine {
 
     private void newConn(String host, int port, ResumptionTicket ticket, String zrttData) {
         var allocator = Allocator.ofUnsafe();
-        var conn = new SampleConnection(this, configuration.apiTable, configuration.registration, allocator, ref ->
-            configuration.registration.openConnection(MsQuicUpcall.connectionCallback, ref.MEMORY, null, allocator));
-        if (conn.connection == null) {
+        var conn = new SampleConnection(this, new Connection.Options(registration, allocator, ref ->
+            registration.opts.registrationQ.openConnection(MsQuicUpcall.connectionCallback, ref.MEMORY, null, allocator)));
+        if (conn.connectionQ == null) {
             conn.close();
             throw new RuntimeException("ConnectionOpen failed");
         }
@@ -290,7 +293,7 @@ public class CommandLine {
         if (ticket != null) {
             var t = allocator.allocate(ticket.ticket.length);
             t.copyFrom(MemorySegment.ofArray(ticket.ticket));
-            err = conn.apiTable.setParam(conn.connection.getConn(), QUIC_PARAM_CONN_RESUMPTION_TICKET,
+            err = conn.opts.apiTableQ.setParam(conn.connectionQ.getConn(), QUIC_PARAM_CONN_RESUMPTION_TICKET,
                 ticket.ticket.length, t);
             if (err != 0) {
                 conn.close();
@@ -305,7 +308,7 @@ public class CommandLine {
                 str.MEMORY.reinterpret(str.MEMORY.byteSize() - 1));
         }
         var host_ = new PNIString(allocator, host);
-        err = conn.connection.start(configuration.configuration, QUIC_ADDRESS_FAMILY_INET, host_, port);
+        err = conn.connectionQ.start(configuration.opts.configurationQ, QUIC_ADDRESS_FAMILY_INET, host_, port);
         if (err != 0) {
             conn.close();
             throw new RuntimeException("ConnectionStart failed");
@@ -314,9 +317,9 @@ public class CommandLine {
 
     private Stream newStream(Connection conn, boolean immediate, boolean zrtt) {
         var allocator = Allocator.ofUnsafe();
-        var stream = new SampleStream(this, conn.apiTable, conn.registration, conn.connection, allocator, ref ->
-            conn.connection.openStream(QUIC_STREAM_OPEN_FLAG_NONE, MsQuicUpcall.streamCallback, ref.MEMORY, null, allocator));
-        if (stream.stream == null) {
+        var stream = new SampleStream(this, new Stream.Options(conn, allocator, ref ->
+            conn.connectionQ.openStream(QUIC_STREAM_OPEN_FLAG_NONE, MsQuicUpcall.streamCallback, ref.MEMORY, null, allocator)));
+        if (stream.streamQ == null) {
             stream.close();
             throw new RuntimeException("StreamOpen failed");
         }
@@ -327,7 +330,7 @@ public class CommandLine {
         if (zrtt) {
             flags |= QUIC_STREAM_OPEN_FLAG_0_RTT;
         }
-        var err = stream.stream.start(flags);
+        var err = stream.streamQ.start(flags);
         if (err != 0) {
             stream.close();
             throw new RuntimeException("StreamStart failed");
@@ -377,7 +380,7 @@ public class CommandLine {
     }
 
     private void shutdownConn(Connection connection, long errorCode) {
-        connection.connection.shutdown(QUIC_CONNECTION_SHUTDOWN_FLAG_NONE, errorCode);
+        connection.connectionQ.shutdown(QUIC_CONNECTION_SHUTDOWN_FLAG_NONE, errorCode);
     }
 
     private void shutdownStream(Stream stream, long errorCode, boolean r, boolean w) {
@@ -388,11 +391,11 @@ public class CommandLine {
         if (w) {
             flags |= QUIC_STREAM_SHUTDOWN_FLAG_ABORT_SEND;
         }
-        stream.stream.shutdown(flags, errorCode);
+        stream.streamQ.shutdown(flags, errorCode);
     }
 
     private void sendResumptionTicket(Connection connection) {
-        int err = connection.connection.sendResumptionTicket(
+        int err = connection.connectionQ.sendResumptionTicket(
             QUIC_SEND_RESUMPTION_FLAG_NONE,
             0, null);
         if (err != 0) {

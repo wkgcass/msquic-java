@@ -1,10 +1,7 @@
 package io.vproxy.msquic.sample;
 
 import io.vproxy.msquic.*;
-import io.vproxy.msquic.wrap.ApiTable;
-import io.vproxy.msquic.wrap.ApiTables;
-import io.vproxy.msquic.wrap.Configuration;
-import io.vproxy.msquic.wrap.Registration;
+import io.vproxy.msquic.wrap.*;
 import io.vproxy.pni.Allocator;
 import io.vproxy.pni.PNIString;
 
@@ -82,11 +79,11 @@ public class Client {
             var config = new QuicRegistrationConfig(regAllocator);
             config.setAppName("sample:client", regAllocator);
             config.setExecutionProfile(QUIC_EXECUTION_PROFILE_LOW_LATENCY);
-            var reg_ = api.apiTable.openRegistration(config, null, regAllocator);
+            var reg_ = api.opts.apiTableQ.openRegistration(config, null, regAllocator);
             if (reg_ == null) {
                 throw new RuntimeException("RegistrationOpen failed");
             }
-            reg = new Registration(api.apiTable, reg_, regAllocator);
+            reg = new Registration(new Registration.Options(api, reg_, regAllocator));
         }
         System.out.println("Init Registration done");
 
@@ -105,11 +102,11 @@ public class Client {
             var buffers = new QuicBuffer.Array(confAllocator, 1);
             buffers.get(0).setBuffer(new PNIString(confAllocator, alpn).MEMORY);
             buffers.get(0).setLength(alpn.length());
-            var conf_ = reg.registration.openConfiguration(buffers, 1, settings, null, null, confAllocator);
+            var conf_ = reg.opts.registrationQ.openConfiguration(buffers, 1, settings, null, null, confAllocator);
             if (conf_ == null) {
                 throw new RuntimeException("ConfigurationOpen failed");
             }
-            conf = new Configuration(api.apiTable, reg.registration, conf_, confAllocator);
+            conf = new Configuration(new Configuration.Options(reg, conf_, confAllocator));
             var cred = new QuicCredentialConfig(confAllocator);
             cred.setType(QUIC_CREDENTIAL_TYPE_NONE);
             int flags = QUIC_CREDENTIAL_FLAG_CLIENT;
@@ -124,7 +121,7 @@ public class Client {
             if (caCertFile != null && !insecure) {
                 cred.setCaCertificateFile(caCertFile, confAllocator);
             }
-            var err = conf.configuration.loadCredential(cred);
+            var err = conf.opts.configurationQ.loadCredential(cred);
             if (err != 0) {
                 throw new RuntimeException("ConfigurationLoadCredential failed");
             }
@@ -154,14 +151,14 @@ public class Client {
             }
         }
         System.out.println("SSLKEYLOGFILE for current process: " + path);
-        var cli = new CommandLine(true, conf, path);
+        var cli = new CommandLine(true, reg, conf, path);
 
         System.out.println("Init Connection begin ...");
         {
             var connAllocator = Allocator.ofUnsafe();
-            var conn = new SampleConnection(cli, api.apiTable, reg.registration, connAllocator, ref ->
-                reg.registration.openConnection(MsQuicUpcall.connectionCallback, ref.MEMORY, null, connAllocator));
-            if (conn.connection == null) {
+            var conn = new SampleConnection(cli, new Connection.Options(reg, connAllocator, ref ->
+                reg.opts.registrationQ.openConnection(MsQuicUpcall.connectionCallback, ref.MEMORY, null, connAllocator)));
+            if (conn.connectionQ == null) {
                 conn.close();
                 throw new RuntimeException("ConnectionOpen failed");
             }
@@ -169,7 +166,7 @@ public class Client {
             if (err != 0) {
                 System.out.println("failed to set QuicTlsSecret for debugging");
             }
-            err = conn.connection.start(conf.configuration, QUIC_ADDRESS_FAMILY_INET, new PNIString(connAllocator, host), port);
+            err = conn.connectionQ.start(conf.opts.configurationQ, QUIC_ADDRESS_FAMILY_INET, new PNIString(connAllocator, host), port);
             if (err != 0) {
                 conn.close();
                 throw new RuntimeException("ConnectionStart failed");

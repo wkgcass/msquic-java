@@ -1,24 +1,40 @@
 package io.vproxy.msquic.wrap;
 
-import io.vproxy.msquic.QuicApiTable;
 import io.vproxy.msquic.QuicConfiguration;
-import io.vproxy.msquic.QuicRegistration;
 import io.vproxy.pni.Allocator;
 
 public class Configuration {
-    public final QuicApiTable apiTable;
-    public final QuicRegistration registration;
-    public final QuicConfiguration configuration;
-    private final Allocator allocator;
+    public final Options opts;
 
-    public Configuration(QuicApiTable apiTable, QuicRegistration registration, QuicConfiguration configuration, Allocator allocator) {
-        this.apiTable = apiTable;
-        this.registration = registration;
-        this.configuration = configuration;
-        this.allocator = allocator;
+    public Configuration(Options opts) {
+        this.opts = opts;
+    }
+
+    public static class OptionsBase extends Registration.OptionsBase {
+        public final Registration registration;
+        public final QuicConfiguration configurationQ;
+
+        public OptionsBase(Registration registration, QuicConfiguration configurationQ) {
+            super(registration.opts);
+            this.registration = registration;
+            this.configurationQ = configurationQ;
+        }
+    }
+
+    public static class Options extends OptionsBase {
+        private final Allocator allocator;
+
+        public Options(Registration registration, QuicConfiguration configurationQ, Allocator allocator) {
+            super(registration, configurationQ);
+            this.allocator = allocator;
+        }
     }
 
     private volatile boolean closed = false;
+
+    public boolean isClosed() {
+        return closed;
+    }
 
     public void close() {
         if (closed) {
@@ -31,7 +47,7 @@ public class Configuration {
             closed = true;
         }
 
-        configuration.close();
-        allocator.close();
+        opts.configurationQ.close();
+        opts.allocator.close();
     }
 }
