@@ -3,6 +3,7 @@ package io.vproxy.msquic;
 import io.vproxy.pni.annotation.*;
 
 @Struct(skip = true)
+@AlwaysAligned
 @Include("msquic.h")
 @Name("QUIC_TLS_SECRETS")
 public class PNIQuicTLSSecret {
@@ -17,6 +18,7 @@ public class PNIQuicTLSSecret {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 class PNIQuicTLSSecretIsSet {
     @BitField(

@@ -5,6 +5,7 @@ import io.vproxy.pni.annotation.*;
 import java.lang.foreign.MemorySegment;
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 public abstract class PNIQuicApiTable {
     MemorySegment Api; // QUIC_API_TABLE
@@ -98,6 +99,7 @@ public abstract class PNIQuicApiTable {
 }
 
 @Struct(skip = true)
+@AlwaysAligned
 @Include("msquic.h")
 @Name("QUIC_REGISTRATION_CONFIG")
 abstract class PNIQuicRegistrationConfig {

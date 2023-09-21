@@ -5,6 +5,7 @@ import io.vproxy.pni.annotation.*;
 import java.lang.foreign.MemorySegment;
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 public abstract class PNIQuicConnection {
     MemorySegment Api; // QUIC_API_TABLE
@@ -156,6 +157,7 @@ public abstract class PNIQuicConnection {
 }
 
 @Struct(skip = true)
+@AlwaysAligned
 @Include("msquic.h")
 @Name("QUIC_CONNECTION_EVENT")
 abstract class PNIQuicConnectionEvent {
@@ -164,6 +166,7 @@ abstract class PNIQuicConnectionEvent {
 }
 
 @Union(embedded = true)
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicConnectionEventUnion {
     PNIQuicConnectionEventConnected CONNECTED;
@@ -186,6 +189,7 @@ abstract class PNIQuicConnectionEventUnion {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicConnectionEventConnected {
     boolean SessionResumed;
@@ -194,6 +198,7 @@ abstract class PNIQuicConnectionEventConnected {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicConnectionEventShutdownInitiatedByTransport {
     int Status; // QUIC_STATUS
@@ -201,12 +206,14 @@ abstract class PNIQuicConnectionEventShutdownInitiatedByTransport {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicConnectionEventShutdownInitiatedByPeer {
     long ErrorCode;
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicConnectionEventConnectionShutdownComplete {
     @BitField(
@@ -217,18 +224,21 @@ abstract class PNIQuicConnectionEventConnectionShutdownComplete {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicConnectionEventLocalAddressChanged {
     @Pointer PNIQuicAddr Address;
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicConnectionEventPeerAddressChanged {
     @Pointer PNIQuicAddr Address;
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicConnectionEventPeerStreamStarted {
     MemorySegment Stream; // HQUIC
@@ -236,6 +246,7 @@ abstract class PNIQuicConnectionEventPeerStreamStarted {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicConnectionEventStreamsAvailable {
     @Unsigned short BidirectionalCount;
@@ -243,12 +254,14 @@ abstract class PNIQuicConnectionEventStreamsAvailable {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicConnectionEventPeerNeedsStreams {
     boolean Bidirectional;
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicConnectionEventIdealProcessorChanged {
     @Unsigned short IdealProcessor;
@@ -256,6 +269,7 @@ abstract class PNIQuicConnectionEventIdealProcessorChanged {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicConnectionEventDatagramStateChanged {
     boolean SendEnabled;
@@ -263,6 +277,7 @@ abstract class PNIQuicConnectionEventDatagramStateChanged {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicConnectionEventDatagramReceived {
     PNIQuicBuffer Buffer;
@@ -270,6 +285,7 @@ abstract class PNIQuicConnectionEventDatagramReceived {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicConnectionEventDatagramSendStateChanged {
     MemorySegment ClientContext;
@@ -277,6 +293,7 @@ abstract class PNIQuicConnectionEventDatagramSendStateChanged {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicConnectionEventResumed {
     @Unsigned short ResumptionStateLength;
@@ -284,6 +301,7 @@ abstract class PNIQuicConnectionEventResumed {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicConnectionEventResumptionTicketReceived {
     @Unsigned int ResumptionTicketLength;
@@ -291,6 +309,7 @@ abstract class PNIQuicConnectionEventResumptionTicketReceived {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicConnectionEventPeerCertificateReceived {
     MemorySegment Certificate;
@@ -300,6 +319,7 @@ abstract class PNIQuicConnectionEventPeerCertificateReceived {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicConnectionEventReliableResetNegotiated {
     boolean IsNegotiated;

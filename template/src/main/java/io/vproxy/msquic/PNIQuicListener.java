@@ -5,6 +5,7 @@ import io.vproxy.pni.annotation.*;
 import java.lang.foreign.MemorySegment;
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 public abstract class PNIQuicListener {
     MemorySegment Api; // QUIC_API_TABLE
@@ -50,6 +51,7 @@ public abstract class PNIQuicListener {
 }
 
 @Struct(skip = true)
+@AlwaysAligned
 @Include("msquic.h")
 @Name("QUIC_LISTENER_EVENT")
 abstract class PNIQuicListenerEvent {
@@ -58,6 +60,7 @@ abstract class PNIQuicListenerEvent {
 }
 
 @Union(embedded = true)
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicListenerEventUnion {
     PNIQuicListenerEventNewConnection NEW_CONNECTION;
@@ -65,6 +68,7 @@ abstract class PNIQuicListenerEventUnion {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicListenerEventNewConnection {
     @Pointer PNIQuicNewConnectionInfo Info;
@@ -72,6 +76,7 @@ abstract class PNIQuicListenerEventNewConnection {
 }
 
 @Struct(skip = true)
+@AlwaysAligned
 @Include("msquic.h")
 @Name("QUIC_NEW_CONNECTION_INFO")
 abstract class PNIQuicNewConnectionInfo {
@@ -89,6 +94,7 @@ abstract class PNIQuicNewConnectionInfo {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicListenerEventStopComplete {
     @BitField(

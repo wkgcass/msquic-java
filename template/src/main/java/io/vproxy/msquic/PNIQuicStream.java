@@ -5,6 +5,7 @@ import io.vproxy.pni.annotation.*;
 import java.lang.foreign.MemorySegment;
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 public abstract class PNIQuicStream {
     MemorySegment Api; // QUIC_API_TABLE
@@ -98,6 +99,7 @@ public abstract class PNIQuicStream {
 }
 
 @Struct(skip = true)
+@AlwaysAligned
 @Include("msquic.h")
 @Name("QUIC_STREAM_EVENT")
 abstract class PNIQuicStreamEvent {
@@ -106,6 +108,7 @@ abstract class PNIQuicStreamEvent {
 }
 
 @Union(embedded = true)
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicStreamEventUnion {
     PNIQuicStreamEventStartComplete START_COMPLETE;
@@ -119,6 +122,7 @@ abstract class PNIQuicStreamEventUnion {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicStreamEventStartComplete {
     int Status; // QUIC_STATUS
@@ -131,6 +135,7 @@ abstract class PNIQuicStreamEventStartComplete {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicStreamEventReceive {
     @Unsigned long AbsoluteOffset;
@@ -141,6 +146,7 @@ abstract class PNIQuicStreamEventReceive {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicStreamEventSendComplete {
     boolean Canceled;
@@ -148,24 +154,28 @@ abstract class PNIQuicStreamEventSendComplete {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicStreamEventPeerSendAborted {
     long ErrorCode;
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicStreamEventPeerReceiveAborted {
     long ErrorCode;
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicStreamEventSendShutdownComplete {
     boolean Graceful;
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicStreamEventShutdownComplete {
     boolean ConnectionShutdown;
@@ -179,6 +189,7 @@ abstract class PNIQuicStreamEventShutdownComplete {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicStreamEventIdealSendBufferSize {
     @Unsigned long ByteCount;

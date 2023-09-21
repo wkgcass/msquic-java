@@ -5,6 +5,7 @@ import io.vproxy.pni.annotation.*;
 import java.lang.foreign.MemorySegment;
 
 @Struct
+@AlwaysAligned
 @Include({
     "msquic.h",
     "io_vproxy_msquic_MsQuicUpcall.h",
@@ -110,6 +111,7 @@ public abstract class PNIQuicRegistration {
 }
 
 @Struct(skip = true)
+@AlwaysAligned
 @Include("msquic.h")
 @Name("QUIC_SETTINGS")
 abstract class PNIQuicSettings {
@@ -161,6 +163,7 @@ abstract class PNIQuicSettings {
 }
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicSettingsIsSet {
     @BitField(

@@ -5,6 +5,7 @@ import io.vproxy.pni.annotation.*;
 import java.lang.foreign.MemorySegment;
 
 @Struct
+@AlwaysAligned
 @Include("msquic.h")
 public abstract class PNIQuicConfiguration {
     MemorySegment Api; // QUIC_API_TABLE
@@ -39,6 +40,7 @@ public abstract class PNIQuicConfiguration {
 }
 
 @Struct(skip = true)
+@AlwaysAligned
 @Include("msquic.h")
 @Name("QUIC_CREDENTIAL_CONFIG")
 abstract class PNIQuicCredentialConfig {
@@ -53,12 +55,14 @@ abstract class PNIQuicCredentialConfig {
 }
 
 @Union(embedded = true)
+@AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicCertificate {
     @Pointer PNIQuicCertificateFile CertificateFile;
 }
 
 @Struct(skip = true)
+@AlwaysAligned
 @Include("msquic.h")
 @Name("QUIC_CERTIFICATE_FILE")
 abstract class PNIQuicCertificateFile {
