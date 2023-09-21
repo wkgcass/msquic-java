@@ -22,15 +22,16 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicConnectionEventResumptionTicketReceived, QuicConnectionEventResumptionTicketReceived *)
+PNIBufExpand(QuicConnectionEventResumptionTicketReceived, QuicConnectionEventResumptionTicketReceived, 16)
 
-PNI_PACK(struct, QuicConnectionEventResumptionTicketReceived, {
-    uint32_t ResumptionTicketLength; /* padding */ uint64_t :32;
+struct QuicConnectionEventResumptionTicketReceived {
+    uint32_t ResumptionTicketLength;
     void * ResumptionTicket;
-});
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicConnectionEventResumptionTicketReceived
-// metadata.generator-version: pni 21.0.0.8
-// sha256:9b1bb9f75d13326f1905e725869a25f36eb4d3751e1666fb3183a8fcf7556527
+// metadata.generator-version: pni 21.0.0.13
+// sha256:07c1c6eff3b9b163d144cc28be435f0ce75ebda8c0548a67d52e11bb9dc74561

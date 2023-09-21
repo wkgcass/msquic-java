@@ -22,14 +22,15 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicConnectionEventPeerNeedsStreams, QuicConnectionEventPeerNeedsStreams *)
+PNIBufExpand(QuicConnectionEventPeerNeedsStreams, QuicConnectionEventPeerNeedsStreams, 1)
 
-PNI_PACK(struct, QuicConnectionEventPeerNeedsStreams, {
+struct QuicConnectionEventPeerNeedsStreams {
     uint8_t Bidirectional;
-});
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicConnectionEventPeerNeedsStreams
-// metadata.generator-version: pni 21.0.0.8
-// sha256:7e08975a4b09cec0bc14235a35876a0792e246377c4a7ceb5cf53e26efd69cec
+// metadata.generator-version: pni 21.0.0.13
+// sha256:35b1ac0fce307eccbcf24192042d083f66d54e3aae157a51d6fa2de1a1d2e0cd

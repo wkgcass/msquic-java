@@ -23,11 +23,12 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicConfiguration, QuicConfiguration *)
+PNIBufExpand(QuicConfiguration, QuicConfiguration, 16)
 
-PNI_PACK(struct, QuicConfiguration, {
+struct QuicConfiguration {
     void * Api;
     void * Conf;
-});
+};
 
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicConfiguration_close(QuicConfiguration * self);
 JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_QuicConfiguration_loadCredential(QuicConfiguration * self, QUIC_CREDENTIAL_CONFIG * CredConfig);
@@ -36,5 +37,5 @@ JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_QuicConfiguration_loadCr
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicConfiguration
-// metadata.generator-version: pni 21.0.0.8
-// sha256:09a7bde8c0270a664fc9c45cbb5e01d77815c5d36a0c62a62799eb4262ebfa52
+// metadata.generator-version: pni 21.0.0.13
+// sha256:3ca9e3152a54f385d357aa7304087ff1acdc6397c849e048543f5b9f43d59f06

@@ -6,13 +6,18 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicListenerEvent {
+public class QuicListenerEvent extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.JAVA_INT_UNALIGNED.withName("Type"),
+        ValueLayout.JAVA_INT.withName("Type"),
         MemoryLayout.sequenceLayout(4L, ValueLayout.JAVA_BYTE) /* padding */,
         io.vproxy.msquic.QuicListenerEventUnion.LAYOUT.withName("Union")
-    );
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle TypeVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("Type")
@@ -43,7 +48,27 @@ public class QuicListenerEvent {
     }
 
     public QuicListenerEvent(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicListenerEvent{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Type => ");
+            SB.append(getType());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Union => ");
+            PanamaUtils.nativeObjectToString(getUnion(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicListenerEvent> {
@@ -52,11 +77,21 @@ public class QuicListenerEvent {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicListenerEvent.LAYOUT.byteSize() * len));
+            super(allocator, QuicListenerEvent.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicListenerEvent.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicListenerEvent ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicListenerEvent.Array";
         }
 
         @Override
@@ -96,10 +131,15 @@ public class QuicListenerEvent {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicListenerEvent.Func";
+        }
+
+        @Override
         protected QuicListenerEvent construct(MemorySegment seg) {
             return new QuicListenerEvent(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:c6dfcc234303e0821ed9107f4372554f5cbea43edea9f2ac55ea5b0e3c187be4
+// metadata.generator-version: pni 21.0.0.15
+// sha256:18d16ca2a66ba0268a147aa2a7f01e9f154bfa49806cf5ef482ef7a8e282d964

@@ -6,12 +6,17 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicListener {
+public class QuicListener extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.ADDRESS_UNALIGNED.withName("Api"),
-        ValueLayout.ADDRESS_UNALIGNED.withName("Lsn")
-    );
+        ValueLayout.ADDRESS.withName("Api"),
+        ValueLayout.ADDRESS.withName("Lsn")
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle ApiVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("Api")
@@ -58,7 +63,7 @@ public class QuicListener {
     }
 
     public QuicListener(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
     }
 
     private static final MethodHandle closeMH = PanamaUtils.lookupPNICriticalFunction(false, void.class, "JavaCritical_io_vproxy_msquic_QuicListener_close", MemorySegment.class /* self */);
@@ -93,17 +98,47 @@ public class QuicListener {
         }
     }
 
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicListener{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Api => ");
+            SB.append(PanamaUtils.memorySegmentToString(getApi()));
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Lsn => ");
+            SB.append(PanamaUtils.memorySegmentToString(getLsn()));
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
+    }
+
     public static class Array extends RefArray<QuicListener> {
         public Array(MemorySegment buf) {
             super(buf, QuicListener.LAYOUT);
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicListener.LAYOUT.byteSize() * len));
+            super(allocator, QuicListener.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicListener.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicListener ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicListener.Array";
         }
 
         @Override
@@ -143,10 +178,15 @@ public class QuicListener {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicListener.Func";
+        }
+
+        @Override
         protected QuicListener construct(MemorySegment seg) {
             return new QuicListener(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:70da52ab8ee59c39b1a5d0b8ec13e72de79f1e19e86f5b6a7d5f2caa0bfe7535
+// metadata.generator-version: pni 21.0.0.15
+// sha256:1a7d42ee3a26fd09ff0c87c467c637abe8cd7b10a2212899abe41109fdd0c740

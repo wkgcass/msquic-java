@@ -6,12 +6,17 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicListenerEventNewConnection {
+public class QuicListenerEventNewConnection extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.ADDRESS_UNALIGNED.withName("Info"),
-        ValueLayout.ADDRESS_UNALIGNED.withName("Connection")
-    );
+        ValueLayout.ADDRESS.withName("Info"),
+        ValueLayout.ADDRESS.withName("Connection")
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle InfoVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("Info")
@@ -58,7 +63,28 @@ public class QuicListenerEventNewConnection {
     }
 
     public QuicListenerEventNewConnection(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicListenerEventNewConnection{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Info => ");
+            if (CORRUPTED_MEMORY) SB.append("<?>");
+            else PanamaUtils.nativeObjectToString(getInfo(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Connection => ");
+            SB.append(PanamaUtils.memorySegmentToString(getConnection()));
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicListenerEventNewConnection> {
@@ -67,11 +93,21 @@ public class QuicListenerEventNewConnection {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicListenerEventNewConnection.LAYOUT.byteSize() * len));
+            super(allocator, QuicListenerEventNewConnection.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicListenerEventNewConnection.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicListenerEventNewConnection ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicListenerEventNewConnection.Array";
         }
 
         @Override
@@ -111,10 +147,15 @@ public class QuicListenerEventNewConnection {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicListenerEventNewConnection.Func";
+        }
+
+        @Override
         protected QuicListenerEventNewConnection construct(MemorySegment seg) {
             return new QuicListenerEventNewConnection(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:f4d7b760e031fd4aad969319ccb89235b649effa42a82529d216b6b8c708ba6d
+// metadata.generator-version: pni 21.0.0.15
+// sha256:4ed9be3ab660042fc74195fdf6534e513984940077cc3e9395b3215ccae378ed

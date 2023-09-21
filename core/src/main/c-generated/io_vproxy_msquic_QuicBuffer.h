@@ -19,10 +19,11 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QUIC_BUFFER, QUIC_BUFFER *)
+PNIBufExpand(QUIC_BUFFER, QUIC_BUFFER, 16)
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicBuffer
-// metadata.generator-version: pni 21.0.0.8
-// sha256:b4a6c495efd46266b41a20aec52c862f61a11f5db8b856a011d1451afbc38d3f
+// metadata.generator-version: pni 21.0.0.12
+// sha256:d671b66f1d0b3e09f7c0b9f39d42c9305d1d5db5c25791ee006b775cca4da76e

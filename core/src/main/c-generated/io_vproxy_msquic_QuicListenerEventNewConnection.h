@@ -23,15 +23,16 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicListenerEventNewConnection, QuicListenerEventNewConnection *)
+PNIBufExpand(QuicListenerEventNewConnection, QuicListenerEventNewConnection, 16)
 
-PNI_PACK(struct, QuicListenerEventNewConnection, {
+struct QuicListenerEventNewConnection {
     QUIC_NEW_CONNECTION_INFO * Info;
     void * Connection;
-});
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicListenerEventNewConnection
-// metadata.generator-version: pni 21.0.0.8
-// sha256:6b93cd892d657506b37778b482610d9fcc0a3da5b7cb63cf1d25193dd8332ed6
+// metadata.generator-version: pni 21.0.0.13
+// sha256:913f6e9659008b700985a0f929862ecbf187ded9e2285d67b4c9a5be8c1a78cd

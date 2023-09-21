@@ -25,11 +25,12 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicConnection, QuicConnection *)
+PNIBufExpand(QuicConnection, QuicConnection, 16)
 
-PNI_PACK(struct, QuicConnection, {
+struct QuicConnection {
     void * Api;
     void * Conn;
-});
+};
 
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicConnection_close(QuicConnection * self);
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicConnection_shutdown(QuicConnection * self, int32_t Flags, int64_t ErrorCode);
@@ -45,5 +46,5 @@ JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_QuicConnection_certifica
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicConnection
-// metadata.generator-version: pni 21.0.0.8
-// sha256:6ea2b4d0ef6cd72d8925b398fa7567643e23bd701fad83f364b1411c634897c7
+// metadata.generator-version: pni 21.0.0.13
+// sha256:f630ad8c0057554059b5776451e114aac81ef428da700ecd79d940e47cdc74e7

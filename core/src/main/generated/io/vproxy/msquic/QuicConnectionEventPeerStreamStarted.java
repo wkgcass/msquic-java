@@ -6,13 +6,18 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicConnectionEventPeerStreamStarted {
+public class QuicConnectionEventPeerStreamStarted extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.ADDRESS_UNALIGNED.withName("Stream"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("Flags"),
+        ValueLayout.ADDRESS.withName("Stream"),
+        ValueLayout.JAVA_INT.withName("Flags"),
         MemoryLayout.sequenceLayout(4L, ValueLayout.JAVA_BYTE) /* padding */
-    );
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle StreamVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("Stream")
@@ -54,7 +59,27 @@ public class QuicConnectionEventPeerStreamStarted {
     }
 
     public QuicConnectionEventPeerStreamStarted(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicConnectionEventPeerStreamStarted{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Stream => ");
+            SB.append(PanamaUtils.memorySegmentToString(getStream()));
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Flags => ");
+            SB.append(getFlags());
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicConnectionEventPeerStreamStarted> {
@@ -63,11 +88,21 @@ public class QuicConnectionEventPeerStreamStarted {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicConnectionEventPeerStreamStarted.LAYOUT.byteSize() * len));
+            super(allocator, QuicConnectionEventPeerStreamStarted.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicConnectionEventPeerStreamStarted.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicConnectionEventPeerStreamStarted ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicConnectionEventPeerStreamStarted.Array";
         }
 
         @Override
@@ -107,10 +142,15 @@ public class QuicConnectionEventPeerStreamStarted {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicConnectionEventPeerStreamStarted.Func";
+        }
+
+        @Override
         protected QuicConnectionEventPeerStreamStarted construct(MemorySegment seg) {
             return new QuicConnectionEventPeerStreamStarted(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:b4cab4f7048a56a0a3a34b05faff54fe9d79a190c81cc9e4a4e98a16c50c2061
+// metadata.generator-version: pni 21.0.0.15
+// sha256:591faf1343d4454a5c9596a2e323289d36d444c0f620ca309f133a3066984425

@@ -6,11 +6,16 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicApiTable {
+public class QuicApiTable extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.ADDRESS_UNALIGNED.withName("Api")
-    );
+        ValueLayout.ADDRESS.withName("Api")
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle ApiVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("Api")
@@ -38,7 +43,7 @@ public class QuicApiTable {
     }
 
     public QuicApiTable(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
     }
 
     private static final MethodHandle closeMH = PanamaUtils.lookupPNICriticalFunction(false, void.class, "JavaCritical_io_vproxy_msquic_QuicApiTable_close", MemorySegment.class /* self */);
@@ -113,12 +118,27 @@ public class QuicApiTable {
     public io.vproxy.msquic.QuicRegistration openRegistration(io.vproxy.msquic.QuicRegistrationConfig Config, IntArray returnStatus, Allocator ALLOCATOR) {
         MemorySegment RESULT;
         try {
-            RESULT = (MemorySegment) openRegistrationMH.invokeExact(MEMORY, (MemorySegment) (Config == null ? MemorySegment.NULL : Config.MEMORY), (MemorySegment) (returnStatus == null ? MemorySegment.NULL : returnStatus.MEMORY), ALLOCATOR.allocate(io.vproxy.msquic.QuicRegistration.LAYOUT.byteSize()));
+            RESULT = (MemorySegment) openRegistrationMH.invokeExact(MEMORY, (MemorySegment) (Config == null ? MemorySegment.NULL : Config.MEMORY), (MemorySegment) (returnStatus == null ? MemorySegment.NULL : returnStatus.MEMORY), ALLOCATOR.allocate(io.vproxy.msquic.QuicRegistration.LAYOUT));
         } catch (Throwable THROWABLE) {
             throw PanamaUtils.convertInvokeExactException(THROWABLE);
         }
         if (RESULT.address() == 0) return null;
         return RESULT == null ? null : new io.vproxy.msquic.QuicRegistration(RESULT);
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicApiTable{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Api => ");
+            SB.append(PanamaUtils.memorySegmentToString(getApi()));
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicApiTable> {
@@ -127,11 +147,21 @@ public class QuicApiTable {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicApiTable.LAYOUT.byteSize() * len));
+            super(allocator, QuicApiTable.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicApiTable.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicApiTable ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicApiTable.Array";
         }
 
         @Override
@@ -171,10 +201,15 @@ public class QuicApiTable {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicApiTable.Func";
+        }
+
+        @Override
         protected QuicApiTable construct(MemorySegment seg) {
             return new QuicApiTable(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:537353da9c68e8a42978ce76b5490794583c5487224187842f46fc15057e9ffd
+// metadata.generator-version: pni 21.0.0.15
+// sha256:d2d70f5d012845cd68fb33eb3f14a3e4e7209bd12117d401b977d81b1532fc7f

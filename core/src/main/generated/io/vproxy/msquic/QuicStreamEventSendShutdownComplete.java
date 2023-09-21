@@ -6,11 +6,16 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicStreamEventSendShutdownComplete {
+public class QuicStreamEventSendShutdownComplete extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
         ValueLayout.JAVA_BOOLEAN.withName("Graceful")
     );
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle GracefulVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("Graceful")
@@ -32,7 +37,22 @@ public class QuicStreamEventSendShutdownComplete {
     }
 
     public QuicStreamEventSendShutdownComplete(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicStreamEventSendShutdownComplete{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Graceful => ");
+            SB.append(getGraceful());
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicStreamEventSendShutdownComplete> {
@@ -41,11 +61,21 @@ public class QuicStreamEventSendShutdownComplete {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicStreamEventSendShutdownComplete.LAYOUT.byteSize() * len));
+            super(allocator, QuicStreamEventSendShutdownComplete.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicStreamEventSendShutdownComplete.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicStreamEventSendShutdownComplete ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicStreamEventSendShutdownComplete.Array";
         }
 
         @Override
@@ -85,10 +115,15 @@ public class QuicStreamEventSendShutdownComplete {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicStreamEventSendShutdownComplete.Func";
+        }
+
+        @Override
         protected QuicStreamEventSendShutdownComplete construct(MemorySegment seg) {
             return new QuicStreamEventSendShutdownComplete(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:81cda9e9c6a826f6aae0f941b9e517eacdfbc3f71b1d66c3695068dbc46c8b52
+// metadata.generator-version: pni 21.0.0.15
+// sha256:6dfb71f997b1a425b750c52e7a492041105e899efbd5cb3d9e0c9c66d05a1de0

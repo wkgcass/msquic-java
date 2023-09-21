@@ -6,11 +6,16 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicSettingsIsSet {
+public class QuicSettingsIsSet extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.JAVA_LONG_UNALIGNED.withName("IsSetFlags")
-    );
+        ValueLayout.JAVA_LONG.withName("IsSetFlags")
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle IsSetFlagsVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("IsSetFlags")
@@ -550,7 +555,98 @@ public class QuicSettingsIsSet {
     }
 
     public QuicSettingsIsSet(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicSettingsIsSet{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("IsSetFlags => ");
+            SB.append(getIsSetFlags());
+            SB.append(" {\n");
+            SB.append(" ".repeat(INDENT + 8)).append("MaxBytesPerKey:1 => ").append(getMaxBytesPerKey());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("HandshakeIdleTimeoutMs:1 => ").append(getHandshakeIdleTimeoutMs());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("IdleTimeoutMs:1 => ").append(getIdleTimeoutMs());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("MtuDiscoverySearchCompleteTimeoutUs:1 => ").append(getMtuDiscoverySearchCompleteTimeoutUs());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("TlsClientMaxSendBuffer:1 => ").append(getTlsClientMaxSendBuffer());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("TlsServerMaxSendBuffer:1 => ").append(getTlsServerMaxSendBuffer());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("StreamRecvWindowDefault:1 => ").append(getStreamRecvWindowDefault());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("StreamRecvBufferDefault:1 => ").append(getStreamRecvBufferDefault());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("ConnFlowControlWindow:1 => ").append(getConnFlowControlWindow());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("MaxWorkerQueueDelayUs:1 => ").append(getMaxWorkerQueueDelayUs());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("MaxStatelessOperations:1 => ").append(getMaxStatelessOperations());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("InitialWindowPackets:1 => ").append(getInitialWindowPackets());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("SendIdleTimeoutMs:1 => ").append(getSendIdleTimeoutMs());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("InitialRttMs:1 => ").append(getInitialRttMs());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("MaxAckDelayMs:1 => ").append(getMaxAckDelayMs());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("DisconnectTimeoutMs:1 => ").append(getDisconnectTimeoutMs());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("KeepAliveIntervalMs:1 => ").append(getKeepAliveIntervalMs());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("CongestionControlAlgorithm:1 => ").append(getCongestionControlAlgorithm());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("PeerBidiStreamCount:1 => ").append(getPeerBidiStreamCount());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("PeerUnidiStreamCount:1 => ").append(getPeerUnidiStreamCount());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("MaxBindingStatelessOperations:1 => ").append(getMaxBindingStatelessOperations());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("StatelessOperationExpirationMs:1 => ").append(getStatelessOperationExpirationMs());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("MinimumMtu:1 => ").append(getMinimumMtu());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("MaximumMtu:1 => ").append(getMaximumMtu());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("SendBufferingEnabled:1 => ").append(getSendBufferingEnabled());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("PacingEnabled:1 => ").append(getPacingEnabled());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("MigrationEnabled:1 => ").append(getMigrationEnabled());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("DatagramReceiveEnabled:1 => ").append(getDatagramReceiveEnabled());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("ServerResumptionLevel:1 => ").append(getServerResumptionLevel());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("MaxOperationsPerDrain:1 => ").append(getMaxOperationsPerDrain());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("MtuDiscoveryMissingProbeCount:1 => ").append(getMtuDiscoveryMissingProbeCount());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("DestCidUpdateIdleTimeoutMs:1 => ").append(getDestCidUpdateIdleTimeoutMs());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("GreaseQuicBitEnabled:1 => ").append(getGreaseQuicBitEnabled());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("EcnEnabled:1 => ").append(getEcnEnabled());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("HyStartEnabled:1 => ").append(getHyStartEnabled());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("EncryptionOffloadAllowed:1 => ").append(getEncryptionOffloadAllowed());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("ReliableResetEnabled:1 => ").append(getReliableResetEnabled());
+            SB.append("\n");
+            SB.append(" ".repeat(INDENT + 4)).append("}");
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicSettingsIsSet> {
@@ -559,11 +655,21 @@ public class QuicSettingsIsSet {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicSettingsIsSet.LAYOUT.byteSize() * len));
+            super(allocator, QuicSettingsIsSet.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicSettingsIsSet.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicSettingsIsSet ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicSettingsIsSet.Array";
         }
 
         @Override
@@ -603,10 +709,15 @@ public class QuicSettingsIsSet {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicSettingsIsSet.Func";
+        }
+
+        @Override
         protected QuicSettingsIsSet construct(MemorySegment seg) {
             return new QuicSettingsIsSet(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:54657dcc8002448c8059508210ea45b07d6e2899ee904fbbeda1777699a43a38
+// metadata.generator-version: pni 21.0.0.15
+// sha256:ff0588d143b2a77082ab8a07afa6d8be2930e3866838367bb85f3362edd5bc89

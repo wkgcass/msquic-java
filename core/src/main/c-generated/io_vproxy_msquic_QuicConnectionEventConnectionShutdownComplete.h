@@ -22,18 +22,19 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicConnectionEventConnectionShutdownComplete, QuicConnectionEventConnectionShutdownComplete *)
+PNIBufExpand(QuicConnectionEventConnectionShutdownComplete, QuicConnectionEventConnectionShutdownComplete, 1)
 
-PNI_PACK(struct, QuicConnectionEventConnectionShutdownComplete, {
+struct QuicConnectionEventConnectionShutdownComplete {
     uint8_t HandshakeCompleted : 1;
     uint8_t PeerAcknowledgedShutdown : 1;
     uint8_t AppCloseInProgress : 1;
     uint8_t : 5;
 
-});
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicConnectionEventConnectionShutdownComplete
-// metadata.generator-version: pni 21.0.0.8
-// sha256:90992244478bbf5e34ab45103803738943ffdc60ce48876daf039e2e8c14a2ea
+// metadata.generator-version: pni 21.0.0.13
+// sha256:9d6ee096840f897117207516aedbd52141fc0494e6c16bd7b3cf89279aef3d85

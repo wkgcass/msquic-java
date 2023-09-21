@@ -6,42 +6,47 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicSettings {
+public class QuicSettings extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
         io.vproxy.msquic.QuicSettingsIsSet.LAYOUT.withName("IsSet"),
-        ValueLayout.JAVA_LONG_UNALIGNED.withName("MaxBytesPerKey"),
-        ValueLayout.JAVA_LONG_UNALIGNED.withName("HandshakeIdleTimeoutMs"),
-        ValueLayout.JAVA_LONG_UNALIGNED.withName("IdleTimeoutMs"),
-        ValueLayout.JAVA_LONG_UNALIGNED.withName("MtuDiscoverySearchCompleteTimeoutUs"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("TlsClientMaxSendBuffer"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("TlsServerMaxSendBuffer"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("StreamRecvWindowDefault"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("StreamRecvBufferDefault"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("ConnFlowControlWindow"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("MaxWorkerQueueDelayUs"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("MaxStatelessOperations"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("InitialWindowPackets"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("SendIdleTimeoutMs"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("InitialRttMs"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("MaxAckDelayMs"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("DisconnectTimeoutMs"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("KeepAliveIntervalMs"),
-        ValueLayout.JAVA_SHORT_UNALIGNED.withName("CongestionControlAlgorithm"),
-        ValueLayout.JAVA_SHORT_UNALIGNED.withName("PeerBidiStreamCount"),
-        ValueLayout.JAVA_SHORT_UNALIGNED.withName("PeerUnidiStreamCount"),
-        ValueLayout.JAVA_SHORT_UNALIGNED.withName("MaxBindingStatelessOperations"),
-        ValueLayout.JAVA_SHORT_UNALIGNED.withName("StatelessOperationExpirationMs"),
-        ValueLayout.JAVA_SHORT_UNALIGNED.withName("MinimumMtu"),
-        ValueLayout.JAVA_SHORT_UNALIGNED.withName("MaximumMtu"),
+        ValueLayout.JAVA_LONG.withName("MaxBytesPerKey"),
+        ValueLayout.JAVA_LONG.withName("HandshakeIdleTimeoutMs"),
+        ValueLayout.JAVA_LONG.withName("IdleTimeoutMs"),
+        ValueLayout.JAVA_LONG.withName("MtuDiscoverySearchCompleteTimeoutUs"),
+        ValueLayout.JAVA_INT.withName("TlsClientMaxSendBuffer"),
+        ValueLayout.JAVA_INT.withName("TlsServerMaxSendBuffer"),
+        ValueLayout.JAVA_INT.withName("StreamRecvWindowDefault"),
+        ValueLayout.JAVA_INT.withName("StreamRecvBufferDefault"),
+        ValueLayout.JAVA_INT.withName("ConnFlowControlWindow"),
+        ValueLayout.JAVA_INT.withName("MaxWorkerQueueDelayUs"),
+        ValueLayout.JAVA_INT.withName("MaxStatelessOperations"),
+        ValueLayout.JAVA_INT.withName("InitialWindowPackets"),
+        ValueLayout.JAVA_INT.withName("SendIdleTimeoutMs"),
+        ValueLayout.JAVA_INT.withName("InitialRttMs"),
+        ValueLayout.JAVA_INT.withName("MaxAckDelayMs"),
+        ValueLayout.JAVA_INT.withName("DisconnectTimeoutMs"),
+        ValueLayout.JAVA_INT.withName("KeepAliveIntervalMs"),
+        ValueLayout.JAVA_SHORT.withName("CongestionControlAlgorithm"),
+        ValueLayout.JAVA_SHORT.withName("PeerBidiStreamCount"),
+        ValueLayout.JAVA_SHORT.withName("PeerUnidiStreamCount"),
+        ValueLayout.JAVA_SHORT.withName("MaxBindingStatelessOperations"),
+        ValueLayout.JAVA_SHORT.withName("StatelessOperationExpirationMs"),
+        ValueLayout.JAVA_SHORT.withName("MinimumMtu"),
+        ValueLayout.JAVA_SHORT.withName("MaximumMtu"),
         ValueLayout.JAVA_BYTE.withName("Field01"),
         ValueLayout.JAVA_BYTE.withName("MaxOperationsPerDrain"),
         ValueLayout.JAVA_BYTE.withName("MtuDiscoveryMissingProbeCount"),
         MemoryLayout.sequenceLayout(3L, ValueLayout.JAVA_BYTE) /* padding */,
-        ValueLayout.JAVA_INT_UNALIGNED.withName("DestCidUpdateIdleTimeoutMs"),
+        ValueLayout.JAVA_INT.withName("DestCidUpdateIdleTimeoutMs"),
         MemoryLayout.sequenceLayout(4L, ValueLayout.JAVA_BYTE) /* padding */,
-        ValueLayout.JAVA_LONG_UNALIGNED.withName("Flags")
-    );
+        ValueLayout.JAVA_LONG.withName("Flags")
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private final io.vproxy.msquic.QuicSettingsIsSet IsSet;
 
@@ -577,7 +582,191 @@ public class QuicSettings {
     }
 
     public QuicSettings(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicSettings{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("IsSet => ");
+            PanamaUtils.nativeObjectToString(getIsSet(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("MaxBytesPerKey => ");
+            SB.append(getMaxBytesPerKey());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("HandshakeIdleTimeoutMs => ");
+            SB.append(getHandshakeIdleTimeoutMs());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("IdleTimeoutMs => ");
+            SB.append(getIdleTimeoutMs());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("MtuDiscoverySearchCompleteTimeoutUs => ");
+            SB.append(getMtuDiscoverySearchCompleteTimeoutUs());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("TlsClientMaxSendBuffer => ");
+            SB.append(getTlsClientMaxSendBuffer());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("TlsServerMaxSendBuffer => ");
+            SB.append(getTlsServerMaxSendBuffer());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("StreamRecvWindowDefault => ");
+            SB.append(getStreamRecvWindowDefault());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("StreamRecvBufferDefault => ");
+            SB.append(getStreamRecvBufferDefault());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("ConnFlowControlWindow => ");
+            SB.append(getConnFlowControlWindow());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("MaxWorkerQueueDelayUs => ");
+            SB.append(getMaxWorkerQueueDelayUs());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("MaxStatelessOperations => ");
+            SB.append(getMaxStatelessOperations());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("InitialWindowPackets => ");
+            SB.append(getInitialWindowPackets());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("SendIdleTimeoutMs => ");
+            SB.append(getSendIdleTimeoutMs());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("InitialRttMs => ");
+            SB.append(getInitialRttMs());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("MaxAckDelayMs => ");
+            SB.append(getMaxAckDelayMs());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("DisconnectTimeoutMs => ");
+            SB.append(getDisconnectTimeoutMs());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("KeepAliveIntervalMs => ");
+            SB.append(getKeepAliveIntervalMs());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("CongestionControlAlgorithm => ");
+            SB.append(getCongestionControlAlgorithm());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("PeerBidiStreamCount => ");
+            SB.append(getPeerBidiStreamCount());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("PeerUnidiStreamCount => ");
+            SB.append(getPeerUnidiStreamCount());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("MaxBindingStatelessOperations => ");
+            SB.append(getMaxBindingStatelessOperations());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("StatelessOperationExpirationMs => ");
+            SB.append(getStatelessOperationExpirationMs());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("MinimumMtu => ");
+            SB.append(getMinimumMtu());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("MaximumMtu => ");
+            SB.append(getMaximumMtu());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Field01 => ");
+            SB.append(getField01());
+            SB.append(" {\n");
+            SB.append(" ".repeat(INDENT + 8)).append("SendBufferingEnabled:1 => ").append(getSendBufferingEnabled());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("PacingEnabled:1 => ").append(getPacingEnabled());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("MigrationEnabled:1 => ").append(getMigrationEnabled());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("DatagramReceiveEnabled:1 => ").append(getDatagramReceiveEnabled());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("ServerResumptionLevel:2 => ").append(getServerResumptionLevel());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("GreaseQuicBitEnabled:1 => ").append(getGreaseQuicBitEnabled());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("EcnEnabled:1 => ").append(getEcnEnabled());
+            SB.append("\n");
+            SB.append(" ".repeat(INDENT + 4)).append("}");
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("MaxOperationsPerDrain => ");
+            SB.append(getMaxOperationsPerDrain());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("MtuDiscoveryMissingProbeCount => ");
+            SB.append(getMtuDiscoveryMissingProbeCount());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("DestCidUpdateIdleTimeoutMs => ");
+            SB.append(getDestCidUpdateIdleTimeoutMs());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Flags => ");
+            SB.append(getFlags());
+            SB.append(" {\n");
+            SB.append(" ".repeat(INDENT + 8)).append("HyStartEnabled:1 => ").append(getHyStartEnabled());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("EncryptionOffloadAllowed:1 => ").append(getEncryptionOffloadAllowed());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("ReliableResetEnabled:1 => ").append(getReliableResetEnabled());
+            SB.append("\n");
+            SB.append(" ".repeat(INDENT + 4)).append("}");
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicSettings> {
@@ -586,11 +775,21 @@ public class QuicSettings {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicSettings.LAYOUT.byteSize() * len));
+            super(allocator, QuicSettings.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicSettings.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicSettings ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicSettings.Array";
         }
 
         @Override
@@ -630,10 +829,15 @@ public class QuicSettings {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicSettings.Func";
+        }
+
+        @Override
         protected QuicSettings construct(MemorySegment seg) {
             return new QuicSettings(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:ac4c7efdc1599f1c0a6fac6a08a1692213c0f93c537426440b2a12ab033cd56b
+// metadata.generator-version: pni 21.0.0.15
+// sha256:2d4eaff407a8d1440f7a8bfc1918f14ba2e7f4faf30dcbf50393f66b61cc0174

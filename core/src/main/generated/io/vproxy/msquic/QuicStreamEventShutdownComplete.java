@@ -6,16 +6,21 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicStreamEventShutdownComplete {
+public class QuicStreamEventShutdownComplete extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
         ValueLayout.JAVA_BOOLEAN.withName("ConnectionShutdown"),
         ValueLayout.JAVA_BYTE.withName("Field01"),
         MemoryLayout.sequenceLayout(6L, ValueLayout.JAVA_BYTE) /* padding */,
-        ValueLayout.JAVA_LONG_UNALIGNED.withName("ConnectionErrorCode"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("ConnectionCloseStatus"),
+        ValueLayout.JAVA_LONG.withName("ConnectionErrorCode"),
+        ValueLayout.JAVA_INT.withName("ConnectionCloseStatus"),
         MemoryLayout.sequenceLayout(4L, ValueLayout.JAVA_BYTE) /* padding */
-    );
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle ConnectionShutdownVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("ConnectionShutdown")
@@ -120,7 +125,45 @@ public class QuicStreamEventShutdownComplete {
     }
 
     public QuicStreamEventShutdownComplete(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicStreamEventShutdownComplete{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("ConnectionShutdown => ");
+            SB.append(getConnectionShutdown());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Field01 => ");
+            SB.append(getField01());
+            SB.append(" {\n");
+            SB.append(" ".repeat(INDENT + 8)).append("AppCloseInProgress:1 => ").append(getAppCloseInProgress());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("ConnectionShutdownByApp:1 => ").append(getConnectionShutdownByApp());
+            SB.append(",\n");
+            SB.append(" ".repeat(INDENT + 8)).append("ConnectionClosedRemotely:1 => ").append(getConnectionClosedRemotely());
+            SB.append("\n");
+            SB.append(" ".repeat(INDENT + 4)).append("}");
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("ConnectionErrorCode => ");
+            SB.append(getConnectionErrorCode());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("ConnectionCloseStatus => ");
+            SB.append(getConnectionCloseStatus());
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicStreamEventShutdownComplete> {
@@ -129,11 +172,21 @@ public class QuicStreamEventShutdownComplete {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicStreamEventShutdownComplete.LAYOUT.byteSize() * len));
+            super(allocator, QuicStreamEventShutdownComplete.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicStreamEventShutdownComplete.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicStreamEventShutdownComplete ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicStreamEventShutdownComplete.Array";
         }
 
         @Override
@@ -173,10 +226,15 @@ public class QuicStreamEventShutdownComplete {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicStreamEventShutdownComplete.Func";
+        }
+
+        @Override
         protected QuicStreamEventShutdownComplete construct(MemorySegment seg) {
             return new QuicStreamEventShutdownComplete(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:b1676ec1869974e6b7e0c97bd71e777f458ba90a6b0640bfa84a45d675649d1d
+// metadata.generator-version: pni 21.0.0.15
+// sha256:d3409096c15e3fe6b9d2be4b98b66149b468b7dd40498f25c4df2151742df25a

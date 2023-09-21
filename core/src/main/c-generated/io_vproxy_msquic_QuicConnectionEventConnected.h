@@ -22,16 +22,17 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicConnectionEventConnected, QuicConnectionEventConnected *)
+PNIBufExpand(QuicConnectionEventConnected, QuicConnectionEventConnected, 16)
 
-PNI_PACK(struct, QuicConnectionEventConnected, {
+struct QuicConnectionEventConnected {
     uint8_t SessionResumed;
-    uint8_t NegotiatedAlpnLength; /* padding */ uint64_t :48;
+    uint8_t NegotiatedAlpnLength;
     void * NegotiatedAlpn;
-});
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicConnectionEventConnected
-// metadata.generator-version: pni 21.0.0.8
-// sha256:7760d4268817e638e78db9945d9035c55efb1ed929a24ceff67310d7ad206ca7
+// metadata.generator-version: pni 21.0.0.13
+// sha256:3ace30ff4a8a396e6e986f161b83e56b13d31c542ea0194e0113e704b08197e7

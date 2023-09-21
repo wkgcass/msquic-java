@@ -6,15 +6,20 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicStreamEventReceive {
+public class QuicStreamEventReceive extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.JAVA_LONG_UNALIGNED.withName("AbsoluteOffset"),
-        ValueLayout.JAVA_LONG_UNALIGNED.withName("TotalBufferLength"),
-        ValueLayout.ADDRESS_UNALIGNED.withName("Buffers"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("BufferCount"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("Flags")
-    );
+        ValueLayout.JAVA_LONG.withName("AbsoluteOffset"),
+        ValueLayout.JAVA_LONG.withName("TotalBufferLength"),
+        ValueLayout.ADDRESS.withName("Buffers"),
+        ValueLayout.JAVA_INT.withName("BufferCount"),
+        ValueLayout.JAVA_INT.withName("Flags")
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle AbsoluteOffsetVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("AbsoluteOffset")
@@ -94,7 +99,43 @@ public class QuicStreamEventReceive {
     }
 
     public QuicStreamEventReceive(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicStreamEventReceive{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("AbsoluteOffset => ");
+            SB.append(getAbsoluteOffset());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("TotalBufferLength => ");
+            SB.append(getTotalBufferLength());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Buffers => ");
+            if (CORRUPTED_MEMORY) SB.append("<?>");
+            else PanamaUtils.nativeObjectToString(getBuffers(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("BufferCount => ");
+            SB.append(getBufferCount());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Flags => ");
+            SB.append(getFlags());
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicStreamEventReceive> {
@@ -103,11 +144,21 @@ public class QuicStreamEventReceive {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicStreamEventReceive.LAYOUT.byteSize() * len));
+            super(allocator, QuicStreamEventReceive.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicStreamEventReceive.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicStreamEventReceive ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicStreamEventReceive.Array";
         }
 
         @Override
@@ -147,10 +198,15 @@ public class QuicStreamEventReceive {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicStreamEventReceive.Func";
+        }
+
+        @Override
         protected QuicStreamEventReceive construct(MemorySegment seg) {
             return new QuicStreamEventReceive(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:24ae55512ca4fce56889c6ae8360ae59489cd68dbac862970fd8b649ba7c9c83
+// metadata.generator-version: pni 21.0.0.15
+// sha256:e16a97349aa2a474bd287a75927db8558a3a473a92c95f82e78effe1596176a6

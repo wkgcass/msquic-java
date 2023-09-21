@@ -24,10 +24,11 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicApiTable, QuicApiTable *)
+PNIBufExpand(QuicApiTable, QuicApiTable, 8)
 
-PNI_PACK(struct, QuicApiTable, {
+struct QuicApiTable {
     void * Api;
-});
+};
 
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicApiTable_close(QuicApiTable * self);
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicApiTable_setContext(QuicApiTable * self, void * Handle, void * Context);
@@ -41,5 +42,5 @@ JNIEXPORT QuicRegistration * JNICALL JavaCritical_io_vproxy_msquic_QuicApiTable_
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicApiTable
-// metadata.generator-version: pni 21.0.0.8
-// sha256:b54b937eff15689d1652c9ba3624b0526e5ea23d192d464283b6723e3d77d024
+// metadata.generator-version: pni 21.0.0.13
+// sha256:d39985ad330bdf597693314d559b81ff0750ca6b4f7906f35b87fbdf8af1e570

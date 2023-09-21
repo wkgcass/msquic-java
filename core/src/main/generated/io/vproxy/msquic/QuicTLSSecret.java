@@ -6,7 +6,7 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicTLSSecret {
+public class QuicTLSSecret extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
         ValueLayout.JAVA_BYTE.withName("SecretLength"),
         io.vproxy.msquic.QuicTLSSecretIsSet.LAYOUT.withName("IsSet"),
@@ -18,6 +18,11 @@ public class QuicTLSSecret {
         MemoryLayout.sequenceLayout(64L, ValueLayout.JAVA_BYTE).withName("ServerTrafficSecret0")
     );
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle SecretLengthVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("SecretLength")
@@ -95,7 +100,63 @@ public class QuicTLSSecret {
     }
 
     public QuicTLSSecret(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicTLSSecret{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("SecretLength => ");
+            SB.append(getSecretLength());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("IsSet => ");
+            PanamaUtils.nativeObjectToString(getIsSet(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("ClientRandom => ");
+            if (CORRUPTED_MEMORY) SB.append("<?>");
+            else SB.append(PanamaUtils.memorySegmentToString(getClientRandom()));
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("ClientEarlyTrafficSecret => ");
+            if (CORRUPTED_MEMORY) SB.append("<?>");
+            else SB.append(PanamaUtils.memorySegmentToString(getClientEarlyTrafficSecret()));
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("ClientHandshakeTrafficSecret => ");
+            if (CORRUPTED_MEMORY) SB.append("<?>");
+            else SB.append(PanamaUtils.memorySegmentToString(getClientHandshakeTrafficSecret()));
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("ServerHandshakeTrafficSecret => ");
+            if (CORRUPTED_MEMORY) SB.append("<?>");
+            else SB.append(PanamaUtils.memorySegmentToString(getServerHandshakeTrafficSecret()));
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("ClientTrafficSecret0 => ");
+            if (CORRUPTED_MEMORY) SB.append("<?>");
+            else SB.append(PanamaUtils.memorySegmentToString(getClientTrafficSecret0()));
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("ServerTrafficSecret0 => ");
+            if (CORRUPTED_MEMORY) SB.append("<?>");
+            else SB.append(PanamaUtils.memorySegmentToString(getServerTrafficSecret0()));
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicTLSSecret> {
@@ -104,11 +165,21 @@ public class QuicTLSSecret {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicTLSSecret.LAYOUT.byteSize() * len));
+            super(allocator, QuicTLSSecret.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicTLSSecret.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicTLSSecret ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicTLSSecret.Array";
         }
 
         @Override
@@ -148,10 +219,15 @@ public class QuicTLSSecret {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicTLSSecret.Func";
+        }
+
+        @Override
         protected QuicTLSSecret construct(MemorySegment seg) {
             return new QuicTLSSecret(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:04722530f9c679fa136f826405b5a08437bb3ed76cf49e6ca6ef59f74dc9b0f3
+// metadata.generator-version: pni 21.0.0.15
+// sha256:f878621f1cdf7362a2878279baa2623a5df6a7062b9c513318fb38906471e4fb

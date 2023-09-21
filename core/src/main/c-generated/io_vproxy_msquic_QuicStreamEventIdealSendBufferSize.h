@@ -22,14 +22,15 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicStreamEventIdealSendBufferSize, QuicStreamEventIdealSendBufferSize *)
+PNIBufExpand(QuicStreamEventIdealSendBufferSize, QuicStreamEventIdealSendBufferSize, 8)
 
-PNI_PACK(struct, QuicStreamEventIdealSendBufferSize, {
+struct QuicStreamEventIdealSendBufferSize {
     uint64_t ByteCount;
-});
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicStreamEventIdealSendBufferSize
-// metadata.generator-version: pni 21.0.0.8
-// sha256:88cecd6cc5887f485e69716843ecb9674a64f7648ec0e858e7839a6888323536
+// metadata.generator-version: pni 21.0.0.13
+// sha256:5d0f9600bc3eafca269a9559327286d82378a21d9b23b39c905ed81a26536568

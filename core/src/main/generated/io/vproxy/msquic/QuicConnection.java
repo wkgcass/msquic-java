@@ -6,12 +6,17 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicConnection {
+public class QuicConnection extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.ADDRESS_UNALIGNED.withName("Api"),
-        ValueLayout.ADDRESS_UNALIGNED.withName("Conn")
-    );
+        ValueLayout.ADDRESS.withName("Api"),
+        ValueLayout.ADDRESS.withName("Conn")
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle ApiVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("Api")
@@ -58,7 +63,7 @@ public class QuicConnection {
     }
 
     public QuicConnection(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
     }
 
     private static final MethodHandle closeMH = PanamaUtils.lookupPNICriticalFunction(false, void.class, "JavaCritical_io_vproxy_msquic_QuicConnection_close", MemorySegment.class /* self */);
@@ -122,7 +127,7 @@ public class QuicConnection {
     public io.vproxy.msquic.QuicStream openStream(int Flags, MemorySegment Handler, MemorySegment Context, IntArray returnStatus, Allocator ALLOCATOR) {
         MemorySegment RESULT;
         try {
-            RESULT = (MemorySegment) openStreamMH.invokeExact(MEMORY, Flags, (MemorySegment) (Handler == null ? MemorySegment.NULL : Handler), (MemorySegment) (Context == null ? MemorySegment.NULL : Context), (MemorySegment) (returnStatus == null ? MemorySegment.NULL : returnStatus.MEMORY), ALLOCATOR.allocate(io.vproxy.msquic.QuicStream.LAYOUT.byteSize()));
+            RESULT = (MemorySegment) openStreamMH.invokeExact(MEMORY, Flags, (MemorySegment) (Handler == null ? MemorySegment.NULL : Handler), (MemorySegment) (Context == null ? MemorySegment.NULL : Context), (MemorySegment) (returnStatus == null ? MemorySegment.NULL : returnStatus.MEMORY), ALLOCATOR.allocate(io.vproxy.msquic.QuicStream.LAYOUT));
         } catch (Throwable THROWABLE) {
             throw PanamaUtils.convertInvokeExactException(THROWABLE);
         }
@@ -166,17 +171,47 @@ public class QuicConnection {
         return RESULT;
     }
 
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicConnection{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Api => ");
+            SB.append(PanamaUtils.memorySegmentToString(getApi()));
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Conn => ");
+            SB.append(PanamaUtils.memorySegmentToString(getConn()));
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
+    }
+
     public static class Array extends RefArray<QuicConnection> {
         public Array(MemorySegment buf) {
             super(buf, QuicConnection.LAYOUT);
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicConnection.LAYOUT.byteSize() * len));
+            super(allocator, QuicConnection.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicConnection.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicConnection ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicConnection.Array";
         }
 
         @Override
@@ -216,10 +251,15 @@ public class QuicConnection {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicConnection.Func";
+        }
+
+        @Override
         protected QuicConnection construct(MemorySegment seg) {
             return new QuicConnection(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:542c4569df9f3b46014ac4d8983a48f6612db45c47a0366d06a3e7548bd27144
+// metadata.generator-version: pni 21.0.0.15
+// sha256:a3bf6957cb1a2c008a5cfb4036ce2118cd41a1bf2d2147b334aa247d915d062d

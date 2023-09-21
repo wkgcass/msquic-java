@@ -6,12 +6,17 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicConfiguration {
+public class QuicConfiguration extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.ADDRESS_UNALIGNED.withName("Api"),
-        ValueLayout.ADDRESS_UNALIGNED.withName("Conf")
-    );
+        ValueLayout.ADDRESS.withName("Api"),
+        ValueLayout.ADDRESS.withName("Conf")
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle ApiVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("Api")
@@ -58,7 +63,7 @@ public class QuicConfiguration {
     }
 
     public QuicConfiguration(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
     }
 
     private static final MethodHandle closeMH = PanamaUtils.lookupPNICriticalFunction(false, void.class, "JavaCritical_io_vproxy_msquic_QuicConfiguration_close", MemorySegment.class /* self */);
@@ -83,17 +88,47 @@ public class QuicConfiguration {
         return RESULT;
     }
 
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicConfiguration{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Api => ");
+            SB.append(PanamaUtils.memorySegmentToString(getApi()));
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Conf => ");
+            SB.append(PanamaUtils.memorySegmentToString(getConf()));
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
+    }
+
     public static class Array extends RefArray<QuicConfiguration> {
         public Array(MemorySegment buf) {
             super(buf, QuicConfiguration.LAYOUT);
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicConfiguration.LAYOUT.byteSize() * len));
+            super(allocator, QuicConfiguration.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicConfiguration.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicConfiguration ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicConfiguration.Array";
         }
 
         @Override
@@ -133,10 +168,15 @@ public class QuicConfiguration {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicConfiguration.Func";
+        }
+
+        @Override
         protected QuicConfiguration construct(MemorySegment seg) {
             return new QuicConfiguration(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:c752896733daee9ad78b5c4a3158cde7231219677f011edb01660fe2c1b79ef8
+// metadata.generator-version: pni 21.0.0.15
+// sha256:977ed74debb6d0c009f90123d2d479fef100d08a220b86d9ee4bb22644794389

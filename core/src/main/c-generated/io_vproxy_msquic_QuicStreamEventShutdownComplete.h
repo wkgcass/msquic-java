@@ -22,21 +22,22 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicStreamEventShutdownComplete, QuicStreamEventShutdownComplete *)
+PNIBufExpand(QuicStreamEventShutdownComplete, QuicStreamEventShutdownComplete, 24)
 
-PNI_PACK(struct, QuicStreamEventShutdownComplete, {
+struct QuicStreamEventShutdownComplete {
     uint8_t ConnectionShutdown;
     uint8_t AppCloseInProgress : 1;
     uint8_t ConnectionShutdownByApp : 1;
     uint8_t ConnectionClosedRemotely : 1;
     uint8_t : 5;
-     /* padding */ uint64_t :48;
+
     int64_t ConnectionErrorCode;
-    int32_t ConnectionCloseStatus; /* padding */ uint64_t :32;
-});
+    int32_t ConnectionCloseStatus;
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicStreamEventShutdownComplete
-// metadata.generator-version: pni 21.0.0.8
-// sha256:5ac943cca945e3f0fb010acb008eb246c5bdedf6c6e982858c32cc2ee863944e
+// metadata.generator-version: pni 21.0.0.13
+// sha256:2b5e9b6e869c3af51c69d86b926203e6bb932e3bd52de7885106933f05f16b84

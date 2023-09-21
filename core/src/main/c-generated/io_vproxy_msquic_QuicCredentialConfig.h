@@ -20,10 +20,11 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QUIC_CREDENTIAL_CONFIG, QUIC_CREDENTIAL_CONFIG *)
+PNIBufExpand(QUIC_CREDENTIAL_CONFIG, QUIC_CREDENTIAL_CONFIG, 56)
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicCredentialConfig
-// metadata.generator-version: pni 21.0.0.8
-// sha256:4f9cd1336b0e6c579ec72a5cbf3f65a85f1335a97c75e835ef0737c5690dc519
+// metadata.generator-version: pni 21.0.0.12
+// sha256:b4c78ff7e7054fc120645204841be1bb26eb53c93b787564af8d51969e822313

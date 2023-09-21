@@ -6,15 +6,20 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicStreamEventStartComplete {
+public class QuicStreamEventStartComplete extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.JAVA_INT_UNALIGNED.withName("Status"),
+        ValueLayout.JAVA_INT.withName("Status"),
         MemoryLayout.sequenceLayout(4L, ValueLayout.JAVA_BYTE) /* padding */,
-        ValueLayout.JAVA_LONG_UNALIGNED.withName("ID"),
+        ValueLayout.JAVA_LONG.withName("ID"),
         ValueLayout.JAVA_BYTE.withName("Field01"),
         MemoryLayout.sequenceLayout(7L, ValueLayout.JAVA_BYTE) /* padding */
-    );
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle StatusVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("Status")
@@ -78,7 +83,36 @@ public class QuicStreamEventStartComplete {
     }
 
     public QuicStreamEventStartComplete(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicStreamEventStartComplete{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Status => ");
+            SB.append(getStatus());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("ID => ");
+            SB.append(getID());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Field01 => ");
+            SB.append(getField01());
+            SB.append(" {\n");
+            SB.append(" ".repeat(INDENT + 8)).append("PeerAccepted:1 => ").append(getPeerAccepted());
+            SB.append("\n");
+            SB.append(" ".repeat(INDENT + 4)).append("}");
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicStreamEventStartComplete> {
@@ -87,11 +121,21 @@ public class QuicStreamEventStartComplete {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicStreamEventStartComplete.LAYOUT.byteSize() * len));
+            super(allocator, QuicStreamEventStartComplete.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicStreamEventStartComplete.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicStreamEventStartComplete ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicStreamEventStartComplete.Array";
         }
 
         @Override
@@ -131,10 +175,15 @@ public class QuicStreamEventStartComplete {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicStreamEventStartComplete.Func";
+        }
+
+        @Override
         protected QuicStreamEventStartComplete construct(MemorySegment seg) {
             return new QuicStreamEventStartComplete(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:0e8db7d2c66f65f9ca9b2f9384f7a76d867beed74ad145cf3e09d1f6452e2728
+// metadata.generator-version: pni 21.0.0.15
+// sha256:3dd2a41626a15d3da1d32dacaacc4e3c3d338fcf7986ab3109c78370be0a6201

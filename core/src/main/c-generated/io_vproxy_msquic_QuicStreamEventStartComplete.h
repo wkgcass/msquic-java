@@ -22,18 +22,19 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicStreamEventStartComplete, QuicStreamEventStartComplete *)
+PNIBufExpand(QuicStreamEventStartComplete, QuicStreamEventStartComplete, 24)
 
-PNI_PACK(struct, QuicStreamEventStartComplete, {
-    int32_t Status; /* padding */ uint64_t :32;
+struct QuicStreamEventStartComplete {
+    int32_t Status;
     int64_t ID;
     uint8_t PeerAccepted : 1;
     uint8_t : 7;
-     /* padding */ uint64_t :56;
-});
+
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicStreamEventStartComplete
-// metadata.generator-version: pni 21.0.0.8
-// sha256:0520ffb4054276db54573767f4d9d2ca5997775471ce68cc1c1607368501df21
+// metadata.generator-version: pni 21.0.0.13
+// sha256:5a919550da4428f5c6558010e63912e2812066985017445c966cf0687fc774ae

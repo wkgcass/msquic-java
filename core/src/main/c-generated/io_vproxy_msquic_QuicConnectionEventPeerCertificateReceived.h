@@ -22,17 +22,18 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicConnectionEventPeerCertificateReceived, QuicConnectionEventPeerCertificateReceived *)
+PNIBufExpand(QuicConnectionEventPeerCertificateReceived, QuicConnectionEventPeerCertificateReceived, 24)
 
-PNI_PACK(struct, QuicConnectionEventPeerCertificateReceived, {
+struct QuicConnectionEventPeerCertificateReceived {
     void * Certificate;
     uint32_t DeferredErrorFlags;
     int32_t DeferredStatus;
     void * Chain;
-});
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicConnectionEventPeerCertificateReceived
-// metadata.generator-version: pni 21.0.0.8
-// sha256:d48a5ed43d86b0d10817f319e1155efa395db80c0279d6d82657a7cda19e5486
+// metadata.generator-version: pni 21.0.0.13
+// sha256:de4be49e89e23fd57db6d02f3be66a4a8bdfe36b80f6cfc718501b1f7a8f5cde

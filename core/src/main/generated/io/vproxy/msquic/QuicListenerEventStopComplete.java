@@ -6,11 +6,16 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicListenerEventStopComplete {
+public class QuicListenerEventStopComplete extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
         ValueLayout.JAVA_BYTE.withName("Field01")
     );
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle Field01VH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("Field01")
@@ -46,7 +51,26 @@ public class QuicListenerEventStopComplete {
     }
 
     public QuicListenerEventStopComplete(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicListenerEventStopComplete{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Field01 => ");
+            SB.append(getField01());
+            SB.append(" {\n");
+            SB.append(" ".repeat(INDENT + 8)).append("AppCloseInProgress:1 => ").append(getAppCloseInProgress());
+            SB.append("\n");
+            SB.append(" ".repeat(INDENT + 4)).append("}");
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicListenerEventStopComplete> {
@@ -55,11 +79,21 @@ public class QuicListenerEventStopComplete {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicListenerEventStopComplete.LAYOUT.byteSize() * len));
+            super(allocator, QuicListenerEventStopComplete.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicListenerEventStopComplete.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicListenerEventStopComplete ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicListenerEventStopComplete.Array";
         }
 
         @Override
@@ -99,10 +133,15 @@ public class QuicListenerEventStopComplete {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicListenerEventStopComplete.Func";
+        }
+
+        @Override
         protected QuicListenerEventStopComplete construct(MemorySegment seg) {
             return new QuicListenerEventStopComplete(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:4c7e959b125efcb067ce7e8d10b393c010d0b1c328bd64c0dd94bf3b6ec3d404
+// metadata.generator-version: pni 21.0.0.15
+// sha256:708d5ca6fd871e994481c44fcfd56d3a8ea505e4184b2aed2e4012069a872d6f

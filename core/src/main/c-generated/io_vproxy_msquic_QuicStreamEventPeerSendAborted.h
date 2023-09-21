@@ -22,14 +22,15 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicStreamEventPeerSendAborted, QuicStreamEventPeerSendAborted *)
+PNIBufExpand(QuicStreamEventPeerSendAborted, QuicStreamEventPeerSendAborted, 8)
 
-PNI_PACK(struct, QuicStreamEventPeerSendAborted, {
+struct QuicStreamEventPeerSendAborted {
     int64_t ErrorCode;
-});
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicStreamEventPeerSendAborted
-// metadata.generator-version: pni 21.0.0.8
-// sha256:409da8a82e245f6496c4433f9dfa24feb26c212e3698e29778b5971ee03624aa
+// metadata.generator-version: pni 21.0.0.13
+// sha256:491e5b15632a030ab5e7a008fe78a10cf7133f2ec27f7a0c953acefdb4fbd5e4

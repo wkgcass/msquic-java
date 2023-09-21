@@ -20,10 +20,11 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QUIC_STREAM_EVENT, QUIC_STREAM_EVENT *)
+PNIBufExpand(QUIC_STREAM_EVENT, QUIC_STREAM_EVENT, 40)
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicStreamEvent
-// metadata.generator-version: pni 21.0.0.8
-// sha256:fe70c389f8dcba32f839c530401118ffc0b8146750591723fe98f84cf1120b79
+// metadata.generator-version: pni 21.0.0.12
+// sha256:078d15ef419e1faaa8ad06c40739e62a54552b696232573c34af2e1da79349ef

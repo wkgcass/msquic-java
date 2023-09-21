@@ -6,11 +6,16 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicStreamEventPeerSendAborted {
+public class QuicStreamEventPeerSendAborted extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.JAVA_LONG_UNALIGNED.withName("ErrorCode")
-    );
+        ValueLayout.JAVA_LONG.withName("ErrorCode")
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle ErrorCodeVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("ErrorCode")
@@ -32,7 +37,22 @@ public class QuicStreamEventPeerSendAborted {
     }
 
     public QuicStreamEventPeerSendAborted(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicStreamEventPeerSendAborted{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("ErrorCode => ");
+            SB.append(getErrorCode());
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicStreamEventPeerSendAborted> {
@@ -41,11 +61,21 @@ public class QuicStreamEventPeerSendAborted {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicStreamEventPeerSendAborted.LAYOUT.byteSize() * len));
+            super(allocator, QuicStreamEventPeerSendAborted.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicStreamEventPeerSendAborted.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicStreamEventPeerSendAborted ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicStreamEventPeerSendAborted.Array";
         }
 
         @Override
@@ -85,10 +115,15 @@ public class QuicStreamEventPeerSendAborted {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicStreamEventPeerSendAborted.Func";
+        }
+
+        @Override
         protected QuicStreamEventPeerSendAborted construct(MemorySegment seg) {
             return new QuicStreamEventPeerSendAborted(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:4037d9d31f5324e9b80bee490182da9104a7197660352a5a550fdad7671e465b
+// metadata.generator-version: pni 21.0.0.15
+// sha256:c5c097ab483f2f201e2f85446440c005ce331910137ef2a4e72517c5c85fc25f

@@ -22,8 +22,9 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicTLSSecretIsSet, QuicTLSSecretIsSet *)
+PNIBufExpand(QuicTLSSecretIsSet, QuicTLSSecretIsSet, 1)
 
-PNI_PACK(struct, QuicTLSSecretIsSet, {
+struct QuicTLSSecretIsSet {
     uint8_t ClientRandom : 1;
     uint8_t ClientEarlyTrafficSecret : 1;
     uint8_t ClientHandshakeTrafficSecret : 1;
@@ -32,11 +33,11 @@ PNI_PACK(struct, QuicTLSSecretIsSet, {
     uint8_t ServerTrafficSecret0 : 1;
     uint8_t : 2;
 
-});
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicTLSSecretIsSet
-// metadata.generator-version: pni 21.0.0.8
-// sha256:d6a29a82ac4034062621327eff601559789894509eb59257376a8c3a3a8c1601
+// metadata.generator-version: pni 21.0.0.13
+// sha256:f3a594e1f75523e2d93b8a53a72a4878d9bec4cbb8a1757aad53029a52c20176

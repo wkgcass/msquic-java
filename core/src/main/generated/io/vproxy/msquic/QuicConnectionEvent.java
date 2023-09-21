@@ -6,13 +6,18 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicConnectionEvent {
+public class QuicConnectionEvent extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.JAVA_INT_UNALIGNED.withName("Type"),
+        ValueLayout.JAVA_INT.withName("Type"),
         MemoryLayout.sequenceLayout(4L, ValueLayout.JAVA_BYTE) /* padding */,
         io.vproxy.msquic.QuicConnectionEventUnion.LAYOUT.withName("Union")
-    );
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle TypeVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("Type")
@@ -43,7 +48,27 @@ public class QuicConnectionEvent {
     }
 
     public QuicConnectionEvent(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicConnectionEvent{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Type => ");
+            SB.append(getType());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Union => ");
+            PanamaUtils.nativeObjectToString(getUnion(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicConnectionEvent> {
@@ -52,11 +77,21 @@ public class QuicConnectionEvent {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicConnectionEvent.LAYOUT.byteSize() * len));
+            super(allocator, QuicConnectionEvent.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicConnectionEvent.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicConnectionEvent ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicConnectionEvent.Array";
         }
 
         @Override
@@ -96,10 +131,15 @@ public class QuicConnectionEvent {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicConnectionEvent.Func";
+        }
+
+        @Override
         protected QuicConnectionEvent construct(MemorySegment seg) {
             return new QuicConnectionEvent(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:b3111ee5ca964d45bd8d88df7c3b694e766eef65391e63192cf29ff8a35bee4f
+// metadata.generator-version: pni 21.0.0.15
+// sha256:169da903e6010bf0288587693664ea1c6a43b3a22e799dc78ea12bc3f4d9f87c

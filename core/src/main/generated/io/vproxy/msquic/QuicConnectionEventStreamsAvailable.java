@@ -6,12 +6,17 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicConnectionEventStreamsAvailable {
+public class QuicConnectionEventStreamsAvailable extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.JAVA_SHORT_UNALIGNED.withName("BidirectionalCount"),
-        ValueLayout.JAVA_SHORT_UNALIGNED.withName("UnidirectionalCount")
-    );
+        ValueLayout.JAVA_SHORT.withName("BidirectionalCount"),
+        ValueLayout.JAVA_SHORT.withName("UnidirectionalCount")
+    ).withByteAlignment(2);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle BidirectionalCountVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("BidirectionalCount")
@@ -46,7 +51,27 @@ public class QuicConnectionEventStreamsAvailable {
     }
 
     public QuicConnectionEventStreamsAvailable(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicConnectionEventStreamsAvailable{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("BidirectionalCount => ");
+            SB.append(getBidirectionalCount());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("UnidirectionalCount => ");
+            SB.append(getUnidirectionalCount());
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicConnectionEventStreamsAvailable> {
@@ -55,11 +80,21 @@ public class QuicConnectionEventStreamsAvailable {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicConnectionEventStreamsAvailable.LAYOUT.byteSize() * len));
+            super(allocator, QuicConnectionEventStreamsAvailable.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicConnectionEventStreamsAvailable.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicConnectionEventStreamsAvailable ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicConnectionEventStreamsAvailable.Array";
         }
 
         @Override
@@ -99,10 +134,15 @@ public class QuicConnectionEventStreamsAvailable {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicConnectionEventStreamsAvailable.Func";
+        }
+
+        @Override
         protected QuicConnectionEventStreamsAvailable construct(MemorySegment seg) {
             return new QuicConnectionEventStreamsAvailable(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:29b6df98fd194f94f57f51802ef31f66f02b6b2b83518aeaad6bb2a55f8b9616
+// metadata.generator-version: pni 21.0.0.15
+// sha256:d803021bdc1dceadd4de68c2f7e08c2e03cbf4b5e199d1d8a9ab29fbf1952c3c

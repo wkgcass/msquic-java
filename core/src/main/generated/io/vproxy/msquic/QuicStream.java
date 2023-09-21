@@ -6,12 +6,17 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicStream {
+public class QuicStream extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.ADDRESS_UNALIGNED.withName("Api"),
-        ValueLayout.ADDRESS_UNALIGNED.withName("Stream")
-    );
+        ValueLayout.ADDRESS.withName("Api"),
+        ValueLayout.ADDRESS.withName("Stream")
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle ApiVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("Api")
@@ -58,7 +63,7 @@ public class QuicStream {
     }
 
     public QuicStream(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
     }
 
     private static final MethodHandle closeMH = PanamaUtils.lookupPNICriticalFunction(false, void.class, "JavaCritical_io_vproxy_msquic_QuicStream_close", MemorySegment.class /* self */);
@@ -129,17 +134,47 @@ public class QuicStream {
         return RESULT;
     }
 
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicStream{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Api => ");
+            SB.append(PanamaUtils.memorySegmentToString(getApi()));
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Stream => ");
+            SB.append(PanamaUtils.memorySegmentToString(getStream()));
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
+    }
+
     public static class Array extends RefArray<QuicStream> {
         public Array(MemorySegment buf) {
             super(buf, QuicStream.LAYOUT);
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicStream.LAYOUT.byteSize() * len));
+            super(allocator, QuicStream.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicStream.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicStream ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicStream.Array";
         }
 
         @Override
@@ -179,10 +214,15 @@ public class QuicStream {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicStream.Func";
+        }
+
+        @Override
         protected QuicStream construct(MemorySegment seg) {
             return new QuicStream(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:b6079f0298b3ab38a2c96dbca111e442c2288cd1d6f1b85eb60abd1387c47a8b
+// metadata.generator-version: pni 21.0.0.15
+// sha256:8bbb994f58394963a1d8f79d76eef4be813c4429ca6665628709910e1041c76c

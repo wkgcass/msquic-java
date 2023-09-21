@@ -20,10 +20,11 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QUIC_LISTENER_EVENT, QUIC_LISTENER_EVENT *)
+PNIBufExpand(QUIC_LISTENER_EVENT, QUIC_LISTENER_EVENT, 24)
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicListenerEvent
-// metadata.generator-version: pni 21.0.0.8
-// sha256:0917e15728dcc2bae3a521b1d611e7db725c7d2fa3d58e4bb65b0ce210e0fc94
+// metadata.generator-version: pni 21.0.0.12
+// sha256:4f60c5c9b1a88368af12610ce938aa5ea477251bf8d0b493b711e6828ca7468c

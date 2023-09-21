@@ -6,13 +6,18 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicBuffer {
+public class QuicBuffer extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.JAVA_INT_UNALIGNED.withName("Length"),
+        ValueLayout.JAVA_INT.withName("Length"),
         MemoryLayout.sequenceLayout(4L, ValueLayout.JAVA_BYTE) /* padding */,
-        ValueLayout.ADDRESS_UNALIGNED.withName("Buffer")
-    );
+        ValueLayout.ADDRESS.withName("Buffer")
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle LengthVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("Length")
@@ -54,7 +59,27 @@ public class QuicBuffer {
     }
 
     public QuicBuffer(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicBuffer{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Length => ");
+            SB.append(getLength());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Buffer => ");
+            SB.append(PanamaUtils.memorySegmentToString(getBuffer()));
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicBuffer> {
@@ -63,11 +88,21 @@ public class QuicBuffer {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicBuffer.LAYOUT.byteSize() * len));
+            super(allocator, QuicBuffer.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicBuffer.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicBuffer ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicBuffer.Array";
         }
 
         @Override
@@ -107,10 +142,15 @@ public class QuicBuffer {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicBuffer.Func";
+        }
+
+        @Override
         protected QuicBuffer construct(MemorySegment seg) {
             return new QuicBuffer(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:57af372cb16fb79cb26ec62286e400b11d4439bd000d52058c3554a6b00dd324
+// metadata.generator-version: pni 21.0.0.15
+// sha256:c22033e0fbedccd2215906ae197962d20571dce8b47ae975c4eab18fe4f0a9f2

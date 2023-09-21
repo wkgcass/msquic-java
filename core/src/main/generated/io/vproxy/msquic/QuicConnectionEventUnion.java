@@ -6,7 +6,7 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicConnectionEventUnion {
+public class QuicConnectionEventUnion extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.unionLayout(
         io.vproxy.msquic.QuicConnectionEventConnected.LAYOUT.withName("CONNECTED"),
         io.vproxy.msquic.QuicConnectionEventShutdownInitiatedByTransport.LAYOUT.withName("SHUTDOWN_INITIATED_BY_TRANSPORT"),
@@ -25,8 +25,13 @@ public class QuicConnectionEventUnion {
         io.vproxy.msquic.QuicConnectionEventResumptionTicketReceived.LAYOUT.withName("RESUMPTION_TICKET_RECEIVED"),
         io.vproxy.msquic.QuicConnectionEventPeerCertificateReceived.LAYOUT.withName("PEER_CERTIFICATE_RECEIVED"),
         io.vproxy.msquic.QuicConnectionEventReliableResetNegotiated.LAYOUT.withName("RELIABLE_RESET_NEGOTIATED")
-    );
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private final io.vproxy.msquic.QuicConnectionEventConnected CONNECTED;
 
@@ -188,7 +193,103 @@ public class QuicConnectionEventUnion {
     }
 
     public QuicConnectionEventUnion(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        CORRUPTED_MEMORY = true;
+        SB.append("QuicConnectionEventUnion(\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("CONNECTED => ");
+            PanamaUtils.nativeObjectToString(getCONNECTED(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("SHUTDOWN_INITIATED_BY_TRANSPORT => ");
+            PanamaUtils.nativeObjectToString(getSHUTDOWN_INITIATED_BY_TRANSPORT(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("SHUTDOWN_INITIATED_BY_PEER => ");
+            PanamaUtils.nativeObjectToString(getSHUTDOWN_INITIATED_BY_PEER(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("SHUTDOWN_COMPLETE => ");
+            PanamaUtils.nativeObjectToString(getSHUTDOWN_COMPLETE(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("LOCAL_ADDRESS_CHANGED => ");
+            PanamaUtils.nativeObjectToString(getLOCAL_ADDRESS_CHANGED(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("PEER_ADDRESS_CHANGED => ");
+            PanamaUtils.nativeObjectToString(getPEER_ADDRESS_CHANGED(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("PEER_STREAM_STARTED => ");
+            PanamaUtils.nativeObjectToString(getPEER_STREAM_STARTED(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("STREAMS_AVAILABLE => ");
+            PanamaUtils.nativeObjectToString(getSTREAMS_AVAILABLE(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("PEER_NEEDS_STREAMS => ");
+            PanamaUtils.nativeObjectToString(getPEER_NEEDS_STREAMS(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("IDEAL_PROCESSOR_CHANGED => ");
+            PanamaUtils.nativeObjectToString(getIDEAL_PROCESSOR_CHANGED(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("DATAGRAM_STATE_CHANGED => ");
+            PanamaUtils.nativeObjectToString(getDATAGRAM_STATE_CHANGED(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("DATAGRAM_RECEIVED => ");
+            PanamaUtils.nativeObjectToString(getDATAGRAM_RECEIVED(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("DATAGRAM_SEND_STATE_CHANGED => ");
+            PanamaUtils.nativeObjectToString(getDATAGRAM_SEND_STATE_CHANGED(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("RESUMED => ");
+            PanamaUtils.nativeObjectToString(getRESUMED(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("RESUMPTION_TICKET_RECEIVED => ");
+            PanamaUtils.nativeObjectToString(getRESUMPTION_TICKET_RECEIVED(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("PEER_CERTIFICATE_RECEIVED => ");
+            PanamaUtils.nativeObjectToString(getPEER_CERTIFICATE_RECEIVED(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("RELIABLE_RESET_NEGOTIATED => ");
+            PanamaUtils.nativeObjectToString(getRELIABLE_RESET_NEGOTIATED(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append(")@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicConnectionEventUnion> {
@@ -197,11 +298,21 @@ public class QuicConnectionEventUnion {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicConnectionEventUnion.LAYOUT.byteSize() * len));
+            super(allocator, QuicConnectionEventUnion.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicConnectionEventUnion.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicConnectionEventUnion ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicConnectionEventUnion.Array";
         }
 
         @Override
@@ -241,10 +352,15 @@ public class QuicConnectionEventUnion {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicConnectionEventUnion.Func";
+        }
+
+        @Override
         protected QuicConnectionEventUnion construct(MemorySegment seg) {
             return new QuicConnectionEventUnion(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:119be2a8c5d19ee78a34edff72c6450db8eacafb0705d4e4b104fcfec0f20b30
+// metadata.generator-version: pni 21.0.0.15
+// sha256:4f999aee2d63dedf009ffafc28bf4177bbe04840ed7e7e5fc4064947ccbd9c3b

@@ -6,11 +6,16 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicCertificate {
+public class QuicCertificate extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.unionLayout(
-        ValueLayout.ADDRESS_UNALIGNED.withName("CertificateFile")
-    );
+        ValueLayout.ADDRESS.withName("CertificateFile")
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle CertificateFileVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("CertificateFile")
@@ -39,7 +44,24 @@ public class QuicCertificate {
     }
 
     public QuicCertificate(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        CORRUPTED_MEMORY = true;
+        SB.append("QuicCertificate(\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("CertificateFile => ");
+            if (CORRUPTED_MEMORY) SB.append("<?>");
+            else PanamaUtils.nativeObjectToString(getCertificateFile(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append(")@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicCertificate> {
@@ -48,11 +70,21 @@ public class QuicCertificate {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicCertificate.LAYOUT.byteSize() * len));
+            super(allocator, QuicCertificate.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicCertificate.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicCertificate ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicCertificate.Array";
         }
 
         @Override
@@ -92,10 +124,15 @@ public class QuicCertificate {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicCertificate.Func";
+        }
+
+        @Override
         protected QuicCertificate construct(MemorySegment seg) {
             return new QuicCertificate(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:18b89a1ef7c1f6f380dcd09103733347ed381f947afebd3db75e69b4e25a1a69
+// metadata.generator-version: pni 21.0.0.15
+// sha256:fd547a05ae909911cb69a76e46e355387951173d3de9f68266f9f44a7a677a2a

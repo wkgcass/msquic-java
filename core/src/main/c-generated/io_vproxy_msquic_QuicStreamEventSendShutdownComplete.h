@@ -22,14 +22,15 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicStreamEventSendShutdownComplete, QuicStreamEventSendShutdownComplete *)
+PNIBufExpand(QuicStreamEventSendShutdownComplete, QuicStreamEventSendShutdownComplete, 1)
 
-PNI_PACK(struct, QuicStreamEventSendShutdownComplete, {
+struct QuicStreamEventSendShutdownComplete {
     uint8_t Graceful;
-});
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicStreamEventSendShutdownComplete
-// metadata.generator-version: pni 21.0.0.8
-// sha256:5c0af27ea8db734f74ebf2f5092eb2e6051c4834d3f1b7359cc41987ee932eb8
+// metadata.generator-version: pni 21.0.0.13
+// sha256:98c7e012d783050d4a714e7d0d86f7fc49d2fdfff57fe44d89d65c9d4c0de637

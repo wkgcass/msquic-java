@@ -20,10 +20,11 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QUIC_TLS_SECRETS, QUIC_TLS_SECRETS *)
+PNIBufExpand(QUIC_TLS_SECRETS, QUIC_TLS_SECRETS, 354)
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicTLSSecret
-// metadata.generator-version: pni 21.0.0.8
-// sha256:ca31837c759ae040f40f6cc47b1de6fe26b039598559cc6c68e5aa697a1267c8
+// metadata.generator-version: pni 21.0.0.12
+// sha256:1d1a4df7b9f974cea7be1c856bfd37247a72636c38a86759ac0b77e1e94048e7

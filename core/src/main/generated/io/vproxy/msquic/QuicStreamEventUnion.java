@@ -6,7 +6,7 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicStreamEventUnion {
+public class QuicStreamEventUnion extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.unionLayout(
         io.vproxy.msquic.QuicStreamEventStartComplete.LAYOUT.withName("START_COMPLETE"),
         io.vproxy.msquic.QuicStreamEventReceive.LAYOUT.withName("RECEIVE"),
@@ -16,8 +16,13 @@ public class QuicStreamEventUnion {
         io.vproxy.msquic.QuicStreamEventSendShutdownComplete.LAYOUT.withName("SEND_SHUTDOWN_COMPLETE"),
         io.vproxy.msquic.QuicStreamEventShutdownComplete.LAYOUT.withName("SHUTDOWN_COMPLETE"),
         io.vproxy.msquic.QuicStreamEventIdealSendBufferSize.LAYOUT.withName("IDEAL_SEND_BUFFER_SIZE")
-    );
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private final io.vproxy.msquic.QuicStreamEventStartComplete START_COMPLETE;
 
@@ -98,7 +103,58 @@ public class QuicStreamEventUnion {
     }
 
     public QuicStreamEventUnion(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        CORRUPTED_MEMORY = true;
+        SB.append("QuicStreamEventUnion(\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("START_COMPLETE => ");
+            PanamaUtils.nativeObjectToString(getSTART_COMPLETE(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("RECEIVE => ");
+            PanamaUtils.nativeObjectToString(getRECEIVE(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("SEND_COMPLETE => ");
+            PanamaUtils.nativeObjectToString(getSEND_COMPLETE(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("PEER_SEND_ABORTED => ");
+            PanamaUtils.nativeObjectToString(getPEER_SEND_ABORTED(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("PEER_RECEIVE_ABORTED => ");
+            PanamaUtils.nativeObjectToString(getPEER_RECEIVE_ABORTED(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("SEND_SHUTDOWN_COMPLETE => ");
+            PanamaUtils.nativeObjectToString(getSEND_SHUTDOWN_COMPLETE(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("SHUTDOWN_COMPLETE => ");
+            PanamaUtils.nativeObjectToString(getSHUTDOWN_COMPLETE(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("IDEAL_SEND_BUFFER_SIZE => ");
+            PanamaUtils.nativeObjectToString(getIDEAL_SEND_BUFFER_SIZE(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append(")@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicStreamEventUnion> {
@@ -107,11 +163,21 @@ public class QuicStreamEventUnion {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicStreamEventUnion.LAYOUT.byteSize() * len));
+            super(allocator, QuicStreamEventUnion.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicStreamEventUnion.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicStreamEventUnion ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicStreamEventUnion.Array";
         }
 
         @Override
@@ -151,10 +217,15 @@ public class QuicStreamEventUnion {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicStreamEventUnion.Func";
+        }
+
+        @Override
         protected QuicStreamEventUnion construct(MemorySegment seg) {
             return new QuicStreamEventUnion(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:5d6d3534f541bbd8713e02c37b8fa0e163bdff78d4ab72c80a5d33ce98fe33f6
+// metadata.generator-version: pni 21.0.0.15
+// sha256:b8b9abad7014768be77043bad7a3bb250bd126b6afff2819dcdbd55a50b31657

@@ -28,11 +28,12 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicRegistration, QuicRegistration *)
+PNIBufExpand(QuicRegistration, QuicRegistration, 16)
 
-PNI_PACK(struct, QuicRegistration, {
+struct QuicRegistration {
     void * Api;
     void * Reg;
-});
+};
 
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicRegistration_close(QuicRegistration * self);
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicRegistration_shutdown(QuicRegistration * self, int32_t Flags, int64_t ErrorCode);
@@ -44,5 +45,5 @@ JNIEXPORT QuicConnection * JNICALL JavaCritical_io_vproxy_msquic_QuicRegistratio
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicRegistration
-// metadata.generator-version: pni 21.0.0.8
-// sha256:b4b5422d7104883809ca48a5d63375b73e821a772b0e0e97fc5748605a00510f
+// metadata.generator-version: pni 21.0.0.13
+// sha256:0e9573032806503e4a2bf99bb2b43b6faba1d22104c6daf4a8e5ab3249d37524

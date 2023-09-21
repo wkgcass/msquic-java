@@ -24,11 +24,12 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicListener, QuicListener *)
+PNIBufExpand(QuicListener, QuicListener, 16)
 
-PNI_PACK(struct, QuicListener, {
+struct QuicListener {
     void * Api;
     void * Lsn;
-});
+};
 
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicListener_close(QuicListener * self);
 JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_QuicListener_start(QuicListener * self, QUIC_BUFFER * AlpnBuffers, int32_t AlpnBufferCount, QUIC_ADDR * Addr);
@@ -38,5 +39,5 @@ JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicListener_stop(QuicListe
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicListener
-// metadata.generator-version: pni 21.0.0.8
-// sha256:c8e015964b0ddb2e879cdc66ddd6f8699a9138542fc65cad365edc759d6b9ca1
+// metadata.generator-version: pni 21.0.0.13
+// sha256:a6421de0c2214d38d04b12300c9dc36d661abf48635fdb0d728047a205ec6c0d

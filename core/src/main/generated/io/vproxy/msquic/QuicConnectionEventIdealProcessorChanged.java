@@ -6,12 +6,17 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicConnectionEventIdealProcessorChanged {
+public class QuicConnectionEventIdealProcessorChanged extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.JAVA_SHORT_UNALIGNED.withName("IdealProcessor"),
-        ValueLayout.JAVA_SHORT_UNALIGNED.withName("PartitionIndex")
-    );
+        ValueLayout.JAVA_SHORT.withName("IdealProcessor"),
+        ValueLayout.JAVA_SHORT.withName("PartitionIndex")
+    ).withByteAlignment(2);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle IdealProcessorVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("IdealProcessor")
@@ -46,7 +51,27 @@ public class QuicConnectionEventIdealProcessorChanged {
     }
 
     public QuicConnectionEventIdealProcessorChanged(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicConnectionEventIdealProcessorChanged{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("IdealProcessor => ");
+            SB.append(getIdealProcessor());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("PartitionIndex => ");
+            SB.append(getPartitionIndex());
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicConnectionEventIdealProcessorChanged> {
@@ -55,11 +80,21 @@ public class QuicConnectionEventIdealProcessorChanged {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicConnectionEventIdealProcessorChanged.LAYOUT.byteSize() * len));
+            super(allocator, QuicConnectionEventIdealProcessorChanged.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicConnectionEventIdealProcessorChanged.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicConnectionEventIdealProcessorChanged ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicConnectionEventIdealProcessorChanged.Array";
         }
 
         @Override
@@ -99,10 +134,15 @@ public class QuicConnectionEventIdealProcessorChanged {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicConnectionEventIdealProcessorChanged.Func";
+        }
+
+        @Override
         protected QuicConnectionEventIdealProcessorChanged construct(MemorySegment seg) {
             return new QuicConnectionEventIdealProcessorChanged(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:9c68bd89ada6689ea5e7b1d4535f0a6e8f7aa08c1e8155339d140470b55cd1be
+// metadata.generator-version: pni 21.0.0.15
+// sha256:ce0b4f07e24ffedc91db9949fd83c681d285fc354499c98676e55683a1cafbaa

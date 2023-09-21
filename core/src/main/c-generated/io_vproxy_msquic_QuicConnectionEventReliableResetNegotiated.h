@@ -22,14 +22,15 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicConnectionEventReliableResetNegotiated, QuicConnectionEventReliableResetNegotiated *)
+PNIBufExpand(QuicConnectionEventReliableResetNegotiated, QuicConnectionEventReliableResetNegotiated, 1)
 
-PNI_PACK(struct, QuicConnectionEventReliableResetNegotiated, {
+struct QuicConnectionEventReliableResetNegotiated {
     uint8_t IsNegotiated;
-});
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicConnectionEventReliableResetNegotiated
-// metadata.generator-version: pni 21.0.0.8
-// sha256:f79a8a3317036425993674fa1a8306ca330351f3778ca984e977e8daca825b7b
+// metadata.generator-version: pni 21.0.0.13
+// sha256:14d7500f94caec3006198d83c8321d2ec6d465c45e64dd772893f2ddc5516b09

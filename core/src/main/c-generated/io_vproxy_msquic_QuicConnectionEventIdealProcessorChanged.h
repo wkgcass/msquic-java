@@ -22,15 +22,16 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicConnectionEventIdealProcessorChanged, QuicConnectionEventIdealProcessorChanged *)
+PNIBufExpand(QuicConnectionEventIdealProcessorChanged, QuicConnectionEventIdealProcessorChanged, 4)
 
-PNI_PACK(struct, QuicConnectionEventIdealProcessorChanged, {
+struct QuicConnectionEventIdealProcessorChanged {
     uint16_t IdealProcessor;
     uint16_t PartitionIndex;
-});
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicConnectionEventIdealProcessorChanged
-// metadata.generator-version: pni 21.0.0.8
-// sha256:ec3e8c876915f65e53fa73a383c42373a2866cd3ccfe8dfc8c302c9ae21e3b5f
+// metadata.generator-version: pni 21.0.0.13
+// sha256:074ba5d8b8f9c3fcaace868bc6e7108ec03b46ff6e4a9cb67849bb3dce104435

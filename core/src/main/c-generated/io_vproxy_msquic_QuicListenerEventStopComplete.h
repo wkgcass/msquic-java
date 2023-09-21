@@ -22,16 +22,17 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicListenerEventStopComplete, QuicListenerEventStopComplete *)
+PNIBufExpand(QuicListenerEventStopComplete, QuicListenerEventStopComplete, 1)
 
-PNI_PACK(struct, QuicListenerEventStopComplete, {
+struct QuicListenerEventStopComplete {
     uint8_t AppCloseInProgress : 1;
     uint8_t : 7;
 
-});
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicListenerEventStopComplete
-// metadata.generator-version: pni 21.0.0.8
-// sha256:6cfe28293f30678d23b067903b76eeb9420e8a04ec8b7e4477f5f62c935801c5
+// metadata.generator-version: pni 21.0.0.13
+// sha256:8d5536fe145fbcf4b953575672a3b0523d479b22a59a76c267fd26abd6240aca

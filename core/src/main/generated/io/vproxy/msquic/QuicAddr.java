@@ -1,13 +1,12 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
-import io.vproxy.pni.array.RefArray;
+import io.vproxy.pni.array.*;
+import java.lang.foreign.*;
+import java.lang.invoke.*;
+import java.nio.ByteBuffer;
 
-import java.lang.foreign.MemoryLayout;
-import java.lang.foreign.MemorySegment;
-import java.lang.invoke.MethodHandle;
-
-public class QuicAddr {
+public class QuicAddr extends AbstractNativeObject implements NativeObject {
     private static final MethodHandle __getLayoutByteSizeMH = PanamaUtils.lookupPNICriticalFunction(true, long.class, "JavaCritical_io_vproxy_msquic_QuicAddr___getLayoutByteSize");
 
     private static long __getLayoutByteSize() {
@@ -25,6 +24,11 @@ public class QuicAddr {
     );
     public final MemorySegment MEMORY;
 
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
+
     public QuicAddr(MemorySegment MEMORY) {
         MEMORY = MEMORY.reinterpret(LAYOUT.byteSize());
         this.MEMORY = MEMORY;
@@ -32,7 +36,7 @@ public class QuicAddr {
     }
 
     public QuicAddr(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
     }
 
     private static final MethodHandle getFamilyMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_QuicAddr_getFamily", MemorySegment.class /* self */);
@@ -89,17 +93,37 @@ public class QuicAddr {
         }
     }
 
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicAddr{\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
+    }
+
     public static class Array extends RefArray<QuicAddr> {
         public Array(MemorySegment buf) {
             super(buf, QuicAddr.LAYOUT);
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicAddr.LAYOUT.byteSize() * len));
+            super(allocator, QuicAddr.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicAddr.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicAddr ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicAddr.Array";
         }
 
         @Override
@@ -139,10 +163,15 @@ public class QuicAddr {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicAddr.Func";
+        }
+
+        @Override
         protected QuicAddr construct(MemorySegment seg) {
             return new QuicAddr(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:8859d3677e32b0816be1a4acb579f42cdc34589d90c46be85106684afed9243d
+// metadata.generator-version: pni 21.0.0.15
+// sha256:45b1e4c8ef888246629edfa38fc9b2b73b8341c4573587bdcbc1e220da14655a

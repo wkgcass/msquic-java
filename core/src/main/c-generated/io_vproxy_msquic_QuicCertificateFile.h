@@ -19,10 +19,11 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QUIC_CERTIFICATE_FILE, QUIC_CERTIFICATE_FILE *)
+PNIBufExpand(QUIC_CERTIFICATE_FILE, QUIC_CERTIFICATE_FILE, 16)
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicCertificateFile
-// metadata.generator-version: pni 21.0.0.8
-// sha256:7ca97a099e77d7b60ab1c4f4832dda4c9a2185304e5810e5820b1acde28e3975
+// metadata.generator-version: pni 21.0.0.12
+// sha256:998d4920d1a9dca147693174416ea167a3ad73b82eafed66b08d78b11254bff8

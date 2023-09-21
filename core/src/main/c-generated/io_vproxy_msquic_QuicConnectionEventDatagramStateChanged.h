@@ -22,15 +22,16 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicConnectionEventDatagramStateChanged, QuicConnectionEventDatagramStateChanged *)
+PNIBufExpand(QuicConnectionEventDatagramStateChanged, QuicConnectionEventDatagramStateChanged, 4)
 
-PNI_PACK(struct, QuicConnectionEventDatagramStateChanged, {
-    uint8_t SendEnabled; /* padding */ uint64_t :8;
+struct QuicConnectionEventDatagramStateChanged {
+    uint8_t SendEnabled;
     uint16_t MaxSendLength;
-});
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicConnectionEventDatagramStateChanged
-// metadata.generator-version: pni 21.0.0.8
-// sha256:f75d37c8b8acf41cc982acb5afea4d8e1b431bbc67e9e81d05e0f7d10ba4fd23
+// metadata.generator-version: pni 21.0.0.13
+// sha256:1d05fb066f27f2b7a898dd7cd1b92c622319569208b8059a8b926c72ff4ddbbd

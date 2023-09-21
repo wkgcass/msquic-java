@@ -22,14 +22,15 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicConnectionEventShutdownInitiatedByPeer, QuicConnectionEventShutdownInitiatedByPeer *)
+PNIBufExpand(QuicConnectionEventShutdownInitiatedByPeer, QuicConnectionEventShutdownInitiatedByPeer, 8)
 
-PNI_PACK(struct, QuicConnectionEventShutdownInitiatedByPeer, {
+struct QuicConnectionEventShutdownInitiatedByPeer {
     int64_t ErrorCode;
-});
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicConnectionEventShutdownInitiatedByPeer
-// metadata.generator-version: pni 21.0.0.8
-// sha256:69fd960999dd23214756ceb17066664506c58491f75791f94ba5279c7fdd5556
+// metadata.generator-version: pni 21.0.0.13
+// sha256:f1ba149f445caa3d10d8137a9bb674a9af3b45b2cf233bb06aba03876cd1ba57

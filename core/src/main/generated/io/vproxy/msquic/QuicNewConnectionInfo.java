@@ -6,23 +6,28 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicNewConnectionInfo {
+public class QuicNewConnectionInfo extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.JAVA_INT_UNALIGNED.withName("QuicVersion"),
+        ValueLayout.JAVA_INT.withName("QuicVersion"),
         MemoryLayout.sequenceLayout(4L, ValueLayout.JAVA_BYTE) /* padding */,
-        ValueLayout.ADDRESS_UNALIGNED.withName("LocalAddress"),
-        ValueLayout.ADDRESS_UNALIGNED.withName("RemoteAddress"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("CryptoBufferLength"),
-        ValueLayout.JAVA_SHORT_UNALIGNED.withName("ClientAlpnListLength"),
-        ValueLayout.JAVA_SHORT_UNALIGNED.withName("ServerNameLength"),
+        ValueLayout.ADDRESS.withName("LocalAddress"),
+        ValueLayout.ADDRESS.withName("RemoteAddress"),
+        ValueLayout.JAVA_INT.withName("CryptoBufferLength"),
+        ValueLayout.JAVA_SHORT.withName("ClientAlpnListLength"),
+        ValueLayout.JAVA_SHORT.withName("ServerNameLength"),
         ValueLayout.JAVA_BYTE.withName("NegotiatedAlpnLength"),
         MemoryLayout.sequenceLayout(7L, ValueLayout.JAVA_BYTE) /* padding */,
-        ValueLayout.ADDRESS_UNALIGNED.withName("CryptoBuffer"),
-        ValueLayout.ADDRESS_UNALIGNED.withName("ClientAlpnList"),
-        ValueLayout.ADDRESS_UNALIGNED.withName("NegotiatedAlpn"),
-        ValueLayout.ADDRESS_UNALIGNED.withName("ServerName")
-    );
+        ValueLayout.ADDRESS.withName("CryptoBuffer"),
+        ValueLayout.ADDRESS.withName("ClientAlpnList"),
+        ValueLayout.ADDRESS.withName("NegotiatedAlpn"),
+        ValueLayout.ADDRESS.withName("ServerName")
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle QuicVersionVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("QuicVersion")
@@ -216,7 +221,75 @@ public class QuicNewConnectionInfo {
     }
 
     public QuicNewConnectionInfo(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicNewConnectionInfo{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("QuicVersion => ");
+            SB.append(getQuicVersion());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("LocalAddress => ");
+            if (CORRUPTED_MEMORY) SB.append("<?>");
+            else PanamaUtils.nativeObjectToString(getLocalAddress(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("RemoteAddress => ");
+            if (CORRUPTED_MEMORY) SB.append("<?>");
+            else PanamaUtils.nativeObjectToString(getRemoteAddress(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("CryptoBufferLength => ");
+            SB.append(getCryptoBufferLength());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("ClientAlpnListLength => ");
+            SB.append(getClientAlpnListLength());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("ServerNameLength => ");
+            SB.append(getServerNameLength());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("NegotiatedAlpnLength => ");
+            SB.append(getNegotiatedAlpnLength());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("CryptoBuffer => ");
+            SB.append(PanamaUtils.memorySegmentToString(getCryptoBuffer()));
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("ClientAlpnList => ");
+            SB.append(PanamaUtils.memorySegmentToString(getClientAlpnList()));
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("NegotiatedAlpn => ");
+            SB.append(PanamaUtils.memorySegmentToString(getNegotiatedAlpn()));
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("ServerName => ");
+            if (CORRUPTED_MEMORY) SB.append("<?>");
+            else PanamaUtils.nativeObjectToString(getServerName(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicNewConnectionInfo> {
@@ -225,11 +298,21 @@ public class QuicNewConnectionInfo {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicNewConnectionInfo.LAYOUT.byteSize() * len));
+            super(allocator, QuicNewConnectionInfo.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicNewConnectionInfo.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicNewConnectionInfo ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicNewConnectionInfo.Array";
         }
 
         @Override
@@ -269,10 +352,15 @@ public class QuicNewConnectionInfo {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicNewConnectionInfo.Func";
+        }
+
+        @Override
         protected QuicNewConnectionInfo construct(MemorySegment seg) {
             return new QuicNewConnectionInfo(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:331fbdbc061a3598ee111418fca825751d602419864bb8ffac94b6e469ad2402
+// metadata.generator-version: pni 21.0.0.15
+// sha256:bd4fe7194d3447b1a0253ba184d129bc75ce0de448d6126641b52882e8eaf3cd

@@ -22,15 +22,16 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicConnectionEventResumed, QuicConnectionEventResumed *)
+PNIBufExpand(QuicConnectionEventResumed, QuicConnectionEventResumed, 16)
 
-PNI_PACK(struct, QuicConnectionEventResumed, {
-    uint16_t ResumptionStateLength; /* padding */ uint64_t :48;
+struct QuicConnectionEventResumed {
+    uint16_t ResumptionStateLength;
     void * ResumptionState;
-});
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicConnectionEventResumed
-// metadata.generator-version: pni 21.0.0.8
-// sha256:c8f5ff18bfc100bbfd736938fddb1438690de58d84f989a30d6c52d3238a8879
+// metadata.generator-version: pni 21.0.0.13
+// sha256:46ef71c48d53a0adb715a851e796d8d47f5287220950012c75370cadc3f2867c

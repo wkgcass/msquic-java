@@ -23,14 +23,15 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicConnectionEventPeerAddressChanged, QuicConnectionEventPeerAddressChanged *)
+PNIBufExpand(QuicConnectionEventPeerAddressChanged, QuicConnectionEventPeerAddressChanged, 8)
 
-PNI_PACK(struct, QuicConnectionEventPeerAddressChanged, {
+struct QuicConnectionEventPeerAddressChanged {
     QUIC_ADDR * Address;
-});
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicConnectionEventPeerAddressChanged
-// metadata.generator-version: pni 21.0.0.8
-// sha256:301259a9fbe4d517f53da16ea13a50a085551e84df35c379dc3e476d733c36aa
+// metadata.generator-version: pni 21.0.0.13
+// sha256:fda8d8f455228477d146ce7c69a284f9b27840b3028c7748da29f15e1cd12f0b

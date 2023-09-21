@@ -6,14 +6,19 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicConnectionEventPeerCertificateReceived {
+public class QuicConnectionEventPeerCertificateReceived extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.ADDRESS_UNALIGNED.withName("Certificate"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("DeferredErrorFlags"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("DeferredStatus"),
-        ValueLayout.ADDRESS_UNALIGNED.withName("Chain")
-    );
+        ValueLayout.ADDRESS.withName("Certificate"),
+        ValueLayout.JAVA_INT.withName("DeferredErrorFlags"),
+        ValueLayout.JAVA_INT.withName("DeferredStatus"),
+        ValueLayout.ADDRESS.withName("Chain")
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle CertificateVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("Certificate")
@@ -86,7 +91,37 @@ public class QuicConnectionEventPeerCertificateReceived {
     }
 
     public QuicConnectionEventPeerCertificateReceived(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicConnectionEventPeerCertificateReceived{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Certificate => ");
+            SB.append(PanamaUtils.memorySegmentToString(getCertificate()));
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("DeferredErrorFlags => ");
+            SB.append(getDeferredErrorFlags());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("DeferredStatus => ");
+            SB.append(getDeferredStatus());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Chain => ");
+            SB.append(PanamaUtils.memorySegmentToString(getChain()));
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicConnectionEventPeerCertificateReceived> {
@@ -95,11 +130,21 @@ public class QuicConnectionEventPeerCertificateReceived {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicConnectionEventPeerCertificateReceived.LAYOUT.byteSize() * len));
+            super(allocator, QuicConnectionEventPeerCertificateReceived.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicConnectionEventPeerCertificateReceived.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicConnectionEventPeerCertificateReceived ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicConnectionEventPeerCertificateReceived.Array";
         }
 
         @Override
@@ -139,10 +184,15 @@ public class QuicConnectionEventPeerCertificateReceived {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicConnectionEventPeerCertificateReceived.Func";
+        }
+
+        @Override
         protected QuicConnectionEventPeerCertificateReceived construct(MemorySegment seg) {
             return new QuicConnectionEventPeerCertificateReceived(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:1990cb2b4fb9dad3a2fa5346578eb164432217bd645434f5e88092c1db71a4f5
+// metadata.generator-version: pni 21.0.0.15
+// sha256:4a0e13f34fa02667af270e620d43192400cb575357df29245973358d513f0c29

@@ -23,18 +23,19 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicStreamEventReceive, QuicStreamEventReceive *)
+PNIBufExpand(QuicStreamEventReceive, QuicStreamEventReceive, 32)
 
-PNI_PACK(struct, QuicStreamEventReceive, {
+struct QuicStreamEventReceive {
     uint64_t AbsoluteOffset;
     uint64_t TotalBufferLength;
     QUIC_BUFFER * Buffers;
     uint32_t BufferCount;
     int32_t Flags;
-});
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicStreamEventReceive
-// metadata.generator-version: pni 21.0.0.8
-// sha256:fa2346332332e3cdce55c86b2099ac46d87c19cb3455dcbf8c90cd0d839fc1ab
+// metadata.generator-version: pni 21.0.0.13
+// sha256:37193b18fb33936bc66bb1211e76dd5e01e0946503e0e9bb8d767ea71ff6847d

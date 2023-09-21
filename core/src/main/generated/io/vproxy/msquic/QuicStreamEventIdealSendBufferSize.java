@@ -6,11 +6,16 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicStreamEventIdealSendBufferSize {
+public class QuicStreamEventIdealSendBufferSize extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.JAVA_LONG_UNALIGNED.withName("ByteCount")
-    );
+        ValueLayout.JAVA_LONG.withName("ByteCount")
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle ByteCountVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("ByteCount")
@@ -32,7 +37,22 @@ public class QuicStreamEventIdealSendBufferSize {
     }
 
     public QuicStreamEventIdealSendBufferSize(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicStreamEventIdealSendBufferSize{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("ByteCount => ");
+            SB.append(getByteCount());
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicStreamEventIdealSendBufferSize> {
@@ -41,11 +61,21 @@ public class QuicStreamEventIdealSendBufferSize {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicStreamEventIdealSendBufferSize.LAYOUT.byteSize() * len));
+            super(allocator, QuicStreamEventIdealSendBufferSize.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicStreamEventIdealSendBufferSize.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicStreamEventIdealSendBufferSize ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicStreamEventIdealSendBufferSize.Array";
         }
 
         @Override
@@ -85,10 +115,15 @@ public class QuicStreamEventIdealSendBufferSize {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicStreamEventIdealSendBufferSize.Func";
+        }
+
+        @Override
         protected QuicStreamEventIdealSendBufferSize construct(MemorySegment seg) {
             return new QuicStreamEventIdealSendBufferSize(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:08305e4649d43d5a4d10adacf5dbd4ed43d1dbec1556dbc57138d1d7c945a5bf
+// metadata.generator-version: pni 21.0.0.15
+// sha256:403ee0ff7a738cfe5f660f2a3c192c7108eb19f7859d9012a399aef4534660fc

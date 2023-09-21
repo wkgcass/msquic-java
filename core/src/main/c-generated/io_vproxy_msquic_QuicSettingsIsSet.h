@@ -22,8 +22,9 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicSettingsIsSet, QuicSettingsIsSet *)
+PNIBufExpand(QuicSettingsIsSet, QuicSettingsIsSet, 8)
 
-PNI_PACK(struct, QuicSettingsIsSet, {
+struct QuicSettingsIsSet {
     uint64_t MaxBytesPerKey : 1;
     uint64_t HandshakeIdleTimeoutMs : 1;
     uint64_t IdleTimeoutMs : 1;
@@ -63,11 +64,11 @@ PNI_PACK(struct, QuicSettingsIsSet, {
     uint64_t ReliableResetEnabled : 1;
     uint64_t : 27;
 
-});
+};
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicSettingsIsSet
-// metadata.generator-version: pni 21.0.0.8
-// sha256:619a35dab60a2133ec16c2b781340efc2a5cf1c195a3b35c390cf9b7c516810f
+// metadata.generator-version: pni 21.0.0.13
+// sha256:12ec54d25bc84e500dac9d3680bca08f7d0d98f7a2635caf00ce0d9293fa0ada

@@ -6,19 +6,24 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicCredentialConfig {
+public class QuicCredentialConfig extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.JAVA_INT_UNALIGNED.withName("Type"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("Flags"),
+        ValueLayout.JAVA_INT.withName("Type"),
+        ValueLayout.JAVA_INT.withName("Flags"),
         io.vproxy.msquic.QuicCertificate.LAYOUT.withName("Certificate"),
-        ValueLayout.ADDRESS_UNALIGNED.withName("Principle"),
-        ValueLayout.ADDRESS_UNALIGNED.withName("Reserved"),
-        ValueLayout.ADDRESS_UNALIGNED.withName("AsyncHandler"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("AllowedCipherSuites"),
+        ValueLayout.ADDRESS.withName("Principle"),
+        ValueLayout.ADDRESS.withName("Reserved"),
+        ValueLayout.ADDRESS.withName("AsyncHandler"),
+        ValueLayout.JAVA_INT.withName("AllowedCipherSuites"),
         MemoryLayout.sequenceLayout(4L, ValueLayout.JAVA_BYTE) /* padding */,
-        ValueLayout.ADDRESS_UNALIGNED.withName("CaCertificateFile")
-    );
+        ValueLayout.ADDRESS.withName("CaCertificateFile")
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle TypeVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("Type")
@@ -159,7 +164,59 @@ public class QuicCredentialConfig {
     }
 
     public QuicCredentialConfig(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicCredentialConfig{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Type => ");
+            SB.append(getType());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Flags => ");
+            SB.append(getFlags());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Certificate => ");
+            PanamaUtils.nativeObjectToString(getCertificate(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Principle => ");
+            if (CORRUPTED_MEMORY) SB.append("<?>");
+            else PanamaUtils.nativeObjectToString(getPrinciple(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("Reserved => ");
+            SB.append(PanamaUtils.memorySegmentToString(getReserved()));
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("AsyncHandler => ");
+            SB.append(PanamaUtils.memorySegmentToString(getAsyncHandler()));
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("AllowedCipherSuites => ");
+            SB.append(getAllowedCipherSuites());
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("CaCertificateFile => ");
+            if (CORRUPTED_MEMORY) SB.append("<?>");
+            else PanamaUtils.nativeObjectToString(getCaCertificateFile(), SB, INDENT + 4, VISITED, CORRUPTED_MEMORY);
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicCredentialConfig> {
@@ -168,11 +225,21 @@ public class QuicCredentialConfig {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicCredentialConfig.LAYOUT.byteSize() * len));
+            super(allocator, QuicCredentialConfig.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicCredentialConfig.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicCredentialConfig ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicCredentialConfig.Array";
         }
 
         @Override
@@ -212,10 +279,15 @@ public class QuicCredentialConfig {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicCredentialConfig.Func";
+        }
+
+        @Override
         protected QuicCredentialConfig construct(MemorySegment seg) {
             return new QuicCredentialConfig(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:c8be820aef3a22e1a41470a25c26759923cfbeadc5e1291e484048321401321f
+// metadata.generator-version: pni 21.0.0.15
+// sha256:bde54a73148d77702b85f666f96357ea45d71b8a43f4f60e46bfed31802a6c63

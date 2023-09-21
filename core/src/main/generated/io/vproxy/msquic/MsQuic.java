@@ -21,7 +21,7 @@ public class MsQuic {
     public io.vproxy.msquic.QuicApiTable open(int Version, IntArray returnStatus, Allocator ALLOCATOR) {
         MemorySegment RESULT;
         try {
-            RESULT = (MemorySegment) openMH.invokeExact(Version, (MemorySegment) (returnStatus == null ? MemorySegment.NULL : returnStatus.MEMORY), ALLOCATOR.allocate(io.vproxy.msquic.QuicApiTable.LAYOUT.byteSize()));
+            RESULT = (MemorySegment) openMH.invokeExact(Version, (MemorySegment) (returnStatus == null ? MemorySegment.NULL : returnStatus.MEMORY), ALLOCATOR.allocate(io.vproxy.msquic.QuicApiTable.LAYOUT));
         } catch (Throwable THROWABLE) {
             throw PanamaUtils.convertInvokeExactException(THROWABLE);
         }
@@ -41,5 +41,5 @@ public class MsQuic {
         return RESULT;
     }
 }
-// metadata.generator-version: pni 21.0.0.8
-// sha256:2c54c5bddf83fdcfc022a09f96d80d1084c8088ce03ef4d6c9729e723cfd0c84
+// metadata.generator-version: pni 21.0.0.15
+// sha256:f1c84a8ddf5717ca1a410b882c44146b2be473ea81016487a42b93055a0e3d76

@@ -23,11 +23,12 @@ extern "C" {
 #endif
 
 PNIEnvExpand(QuicStream, QuicStream *)
+PNIBufExpand(QuicStream, QuicStream, 16)
 
-PNI_PACK(struct, QuicStream, {
+struct QuicStream {
     void * Api;
     void * Stream;
-});
+};
 
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicStream_close(QuicStream * self);
 JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_QuicStream_start(QuicStream * self, int32_t Flags);
@@ -40,5 +41,5 @@ JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_QuicStream_receiveSetEna
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicStream
-// metadata.generator-version: pni 21.0.0.8
-// sha256:1f09d9f70ca9cbbefb38150b4c0146bf1ab0cd3522623f03cc36a26b3497b27e
+// metadata.generator-version: pni 21.0.0.13
+// sha256:01ca89134c9b9b6bdcbcc67ced9408ea8673e1064026cc6e43aad3dfe7795e23

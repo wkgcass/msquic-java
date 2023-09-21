@@ -6,13 +6,18 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicConnectionEventDatagramSendStateChanged {
+public class QuicConnectionEventDatagramSendStateChanged extends AbstractNativeObject implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.ADDRESS_UNALIGNED.withName("ClientContext"),
-        ValueLayout.JAVA_INT_UNALIGNED.withName("State"),
+        ValueLayout.ADDRESS.withName("ClientContext"),
+        ValueLayout.JAVA_INT.withName("State"),
         MemoryLayout.sequenceLayout(4L, ValueLayout.JAVA_BYTE) /* padding */
-    );
+    ).withByteAlignment(8);
     public final MemorySegment MEMORY;
+
+    @Override
+    public MemorySegment MEMORY() {
+        return MEMORY;
+    }
 
     private static final VarHandle ClientContextVH = LAYOUT.varHandle(
         MemoryLayout.PathElement.groupElement("ClientContext")
@@ -54,7 +59,27 @@ public class QuicConnectionEventDatagramSendStateChanged {
     }
 
     public QuicConnectionEventDatagramSendStateChanged(Allocator ALLOCATOR) {
-        this(ALLOCATOR.allocate(LAYOUT.byteSize()));
+        this(ALLOCATOR.allocate(LAYOUT));
+    }
+
+    @Override
+    public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+        if (!VISITED.add(new NativeObjectTuple(this))) {
+            SB.append("<...>@").append(Long.toString(MEMORY.address(), 16));
+            return;
+        }
+        SB.append("QuicConnectionEventDatagramSendStateChanged{\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("ClientContext => ");
+            SB.append(PanamaUtils.memorySegmentToString(getClientContext()));
+        }
+        SB.append(",\n");
+        {
+            SB.append(" ".repeat(INDENT + 4)).append("State => ");
+            SB.append(getState());
+        }
+        SB.append("\n");
+        SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
     public static class Array extends RefArray<QuicConnectionEventDatagramSendStateChanged> {
@@ -63,11 +88,21 @@ public class QuicConnectionEventDatagramSendStateChanged {
         }
 
         public Array(Allocator allocator, long len) {
-            this(allocator.allocate(QuicConnectionEventDatagramSendStateChanged.LAYOUT.byteSize() * len));
+            super(allocator, QuicConnectionEventDatagramSendStateChanged.LAYOUT, len);
         }
 
         public Array(PNIBuf buf) {
-            this(buf.get());
+            super(buf, QuicConnectionEventDatagramSendStateChanged.LAYOUT);
+        }
+
+        @Override
+        protected void elementToString(io.vproxy.msquic.QuicConnectionEventDatagramSendStateChanged ELEM, StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
+            ELEM.toString(SB, INDENT, VISITED, CORRUPTED_MEMORY);
+        }
+
+        @Override
+        protected String toStringTypeName() {
+            return "QuicConnectionEventDatagramSendStateChanged.Array";
         }
 
         @Override
@@ -107,10 +142,15 @@ public class QuicConnectionEventDatagramSendStateChanged {
         }
 
         @Override
+        protected String toStringTypeName() {
+            return "QuicConnectionEventDatagramSendStateChanged.Func";
+        }
+
+        @Override
         protected QuicConnectionEventDatagramSendStateChanged construct(MemorySegment seg) {
             return new QuicConnectionEventDatagramSendStateChanged(seg);
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:1b32f41c8f55d2b1bbf36aee419e762f50851a79b5d5f461916d254c61874567
+// metadata.generator-version: pni 21.0.0.15
+// sha256:3427c0640a311560b9de2fa5e1bbb90f55f8a38be423490894981ce6fb9e9e23
