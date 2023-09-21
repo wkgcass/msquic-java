@@ -1,10 +1,25 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
+buildscript {
+    def PNI_VERSION = '21.0.0.15'
+    ext.set("PNI_VERSION", PNI_VERSION)
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'io.vproxy', name: 'pni-exec', version: PNI_VERSION
+    }
+}
+
 plugins {
     id 'java-library'
     id 'maven-publish'
     id 'signing'
 }
+
+def PNI_API_VERSION = project.PNI_VERSION
 
 group = 'io.vproxy'
 version = '1.0-SNAPSHOT'
@@ -66,8 +81,6 @@ subprojects {
     }
 }
 
-def PNI_API_VERSION = '21.0.0.11'
-
 project(':template') {
     dependencies {
         implementation 'io.vproxy:pni-api-jdk21:' + PNI_API_VERSION
@@ -75,14 +88,20 @@ project(':template') {
     compileJava {
         options.compilerArgs += '-parameters'
     }
-    task pniGenerate(type: Exec) {
-        workingDir project.rootProject.rootDir.getAbsolutePath()
-        commandLine('java', '-jar', 'misc/pni.jar',
-                '-cp', 'template/build/classes/java/main',
-                '-d', 'core/src/main/generated',
-                '-h', 'core/src/main/c-generated')
-
+    task pniGenerate() {
         dependsOn compileJava
+
+        def workingDir = project.rootProject.rootDir.getAbsolutePath()
+        def gen = new io.vproxy.pni.exec.Generator(
+            new io.vproxy.pni.exec.CompilerOptions()
+                .setClasspath(List.of(workingDir + '/template/build/classes/java/main'))
+                .setJavaOutputBaseDirectory(workingDir + '/core/src/main/generated')
+                .setCOutputDirectory(workingDir + '/core/src/main/c-generated')
+        )
+
+        doLast {
+            gen.generate()
+        }
     }
     task pniCompile(type: Exec) {
         workingDir project.rootProject.rootDir.getAbsolutePath() + '/core/src/main/c'
