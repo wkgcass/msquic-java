@@ -36,9 +36,8 @@ subprojects {
     version rootProject.version
 
     java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(21)
-        }
+        sourceCompatibility = '21'
+        targetCompatibility = '21'
     }
 
     tasks.withType(JavaCompile) {
@@ -72,7 +71,7 @@ subprojects {
     }
 
     task javadocJar(type: Jar) {
-        classifier = 'javadoc'
+        archiveClassifier = 'javadoc'
         from "$buildDir/docs/javadoc"
     }
 
