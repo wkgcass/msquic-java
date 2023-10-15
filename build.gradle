@@ -17,6 +17,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'signing'
+    id 'com.github.johnrengelman.shadow' version '7.1.2' apply false
 }
 
 def PNI_API_VERSION = project.PNI_VERSION
@@ -80,6 +81,11 @@ subprojects {
     }
 }
 
+def isGraalBuild() {
+    var path = java.nio.file.Path.of(project.rootProject.projectDir.getAbsolutePath(), "is-graal-build")
+    return java.nio.file.Files.readString(path).trim() == "true"
+}
+
 project(':template') {
     dependencies {
         implementation 'io.vproxy:pni-api-jdk21:' + PNI_API_VERSION
@@ -87,7 +93,7 @@ project(':template') {
     compileJava {
         options.compilerArgs += '-parameters'
     }
-    task pniGenerate() {
+    task pniGenerate1() {
         dependsOn compileJava
 
         def workingDir = project.rootProject.rootDir.getAbsolutePath()
@@ -106,31 +112,82 @@ project(':template') {
             gen.generate()
         }
     }
+    task pniGenerate2() {
+        dependsOn compileJava
+
+        def workingDir = project.rootProject.rootDir.getAbsolutePath()
+        def gen = new io.vproxy.pni.exec.Generator(
+            new io.vproxy.pni.exec.CompilerOptions()
+                .setClasspath(List.of(workingDir + '/template/build/classes/java/main'))
+                .setJavaOutputBaseDirectory(workingDir + '/core/src/main/generated-graal')
+                .setCOutputDirectory(workingDir + '/core/src/main/c-generated-graal')
+                .setCompilationFlag(io.vproxy.pni.exec.CompilationFlag.TYPE_NAME_PREFIX, "PNI")
+                .setCompilationFlag(io.vproxy.pni.exec.CompilationFlag.RELEASE_PNI_H_FILE, null)
+                .setCompilationFlag(io.vproxy.pni.exec.CompilationFlag.RELEASE_PNI_C_FILE, null)
+                .setCompilationFlag(io.vproxy.pni.exec.CompilationFlag.RELEASE_JNI_H_MOCK_FILE, null)
+                .setCompilationFlag(io.vproxy.pni.exec.CompilationFlag.GRAAL_NATIVE_IMAGE_FEATURE, "io.vproxy.msquic.Feature")
+                .setCompilationFlag(io.vproxy.pni.exec.CompilationFlag.GRAAL_C_ENTRYPOINT_LITERAL_UPCALL, null)
+        )
+
+        doLast {
+            gen.generate()
+        }
+    }
+    task pniGenerate() {
+        dependsOn pniGenerate1
+        dependsOn pniGenerate2
+    }
     task pniCompile(type: Exec) {
         workingDir project.rootProject.rootDir.getAbsolutePath() + '/core/src/main/c'
         commandLine './make-quic.sh'
+        if (isGraalBuild()) {
+            environment["GRAAL"] = "true"
+        }
 
         dependsOn pniGenerate
     }
 }
 
 project(':core') {
-    sourceSets {
-        main {
-            java {
-                srcDirs = ['src/main/java', 'src/main/generated', 'src/main/module-info']
+    if (isGraalBuild()) {
+        sourceSets {
+            main {
+                java {
+                    srcDirs = ['src/main/java', 'src/main/generated-graal', 'src/main/module-info']
+                }
+            }
+        }
+    } else {
+        sourceSets {
+            main {
+                java {
+                    srcDirs = ['src/main/java', 'src/main/generated', 'src/main/module-info']
+                }
             }
         }
     }
     dependencies {
         api 'io.vproxy:pni-api-jdk21:' + PNI_API_VERSION
+        api 'io.vproxy:pni-api-graal:' + PNI_API_VERSION
         api 'io.vproxy:commons:1.1.3'
+        compileOnly group: 'io.vproxy', name: 'graal-sdk-mock-nativeimage', version: '1.2.0'
+        runtimeOnly group: 'io.vproxy', name: 'graal-sdk-mock-runtime', version: '1.2.0'
     }
 }
 
 project(':sample') {
+    apply plugin: 'com.github.johnrengelman.shadow'
+
     dependencies {
         implementation project(':core')
+    }
+    jar {
+        manifest {
+            attributes 'Main-Class': 'io.vproxy.msquic.sample.Main'
+        }
+    }
+    shadowJar {
+        archiveFileName.set('sample.jar')
     }
     task runSampleClient(type: JavaExec) {
         standardInput = System.in
@@ -154,5 +211,29 @@ project(':sample') {
 
         dependsOn project(':template').tasks.pniCompile
         dependsOn compileJava
+    }
+    task buildSampleNativeImage(type: Exec) {
+        executable 'native-image'
+        def output = 'sample'
+        output += '.run'
+        args '-jar', './build/libs/sample.jar', '--features=io.vproxy.msquic.Feature',
+                '--enable-preview', '--enable-native-access=ALL-UNNAMED',
+                '-Ob', '--no-fallback',
+                '-o', output
+
+        dependsOn shadowJar
+    }
+    task runSampleNativeImage(type: Exec) {
+        standardInput = System.in
+
+        executable './sample.run'
+        args '-Djava.library.path=' + project.rootProject.rootDir.getAbsolutePath() + '/core/src/main/c' +
+                File.pathSeparator +
+                System.getenv("MSQUIC_LD")
+        if (System.getProperty("ARGS") != null) {
+            args Arrays.asList(System.getProperty("ARGS").split(" "))
+        }
+
+        dependsOn project(':template').tasks.pniCompile
     }
 }

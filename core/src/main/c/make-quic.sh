@@ -16,7 +16,14 @@ if [[ "$error" == "1" ]]; then
   exit 1
 fi
 
-ls ../c-generated | grep '\.h$' | awk '{print "#include \""$1"\""}' > io_vproxy_msquic_MsQuic.c
+C_GENERATED="c-generated"
+if [[ "$GRAAL" == "true" ]]
+then
+    C_GENERATED="c-generated-graal"
+    GCC_OPTS="$GCC_OPTS -DPNI_GRAAL=1"
+fi
+
+ls ../$C_GENERATED | grep '\.h$' | awk '{print "#include \""$1"\""}' > io_vproxy_msquic_MsQuic.c
 
 echo "" >> io_vproxy_msquic_MsQuic.c
 ./gen-strerror.py >> io_vproxy_msquic_MsQuic.c
@@ -56,14 +63,14 @@ gcc -std=gnu11 -O2 \
     $GCC_OPTS \
     -I ./dep/ae \
     -I "$MSQUIC_INC" \
-    -I "../c-generated" \
+    -I "../$C_GENERATED" \
     -L "$MSQUIC_LD" \
     -DQUIC_ENABLE_CUSTOM_EVENT_LOOP=1 \
     $cflags \
     -shared -Werror -lc -lpthread $NO_AS_NEEDED "-lmsquic" $AS_NEEDED -fPIC \
     io_vproxy_msquic_MsQuic.c \
     inline.c \
-    ../c-generated/io_vproxy_msquic_MsQuicUpcall.c \
-    ../c-generated/io_vproxy_msquic_QuicAddr.extra.c \
-    ../c-generated/pni.c \
+    ../$C_GENERATED/io_vproxy_msquic_MsQuicUpcall.c \
+    ../$C_GENERATED/io_vproxy_msquic_QuicAddr.extra.c \
+    ../$C_GENERATED/pni.c \
     -o "$target"
