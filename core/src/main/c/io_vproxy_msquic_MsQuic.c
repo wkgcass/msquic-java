@@ -60,6 +60,8 @@
 #include "io_vproxy_msquic_QuicStreamEventUnion.h"
 #include "io_vproxy_msquic_QuicTLSSecret.h"
 #include "io_vproxy_msquic_QuicTLSSecretIsSet.h"
+#include "jni.h"
+#include "pni.h"
 
 JNIEXPORT char * JNICALL JavaCritical_io_vproxy_msquic_MsQuicValues_QuicStatusString(int32_t status) {
     switch (status) {

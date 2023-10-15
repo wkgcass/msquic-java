@@ -56,7 +56,6 @@ gcc -std=gnu11 -O2 \
     $GCC_OPTS \
     -I ./dep/ae \
     -I "$MSQUIC_INC" \
-    -I "../../../../misc" \
     -I "../c-generated" \
     -L "$MSQUIC_LD" \
     -DQUIC_ENABLE_CUSTOM_EVENT_LOOP=1 \
@@ -66,4 +65,5 @@ gcc -std=gnu11 -O2 \
     inline.c \
     ../c-generated/io_vproxy_msquic_MsQuicUpcall.c \
     ../c-generated/io_vproxy_msquic_QuicAddr.extra.c \
+    ../c-generated/pni.c \
     -o "$target"
