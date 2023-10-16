@@ -70,7 +70,5 @@ gcc -std=gnu11 -O2 \
     -shared -Werror -lc -lpthread $NO_AS_NEEDED "-lmsquic" $AS_NEEDED -fPIC \
     io_vproxy_msquic_MsQuic.c \
     inline.c \
-    ../$C_GENERATED/io_vproxy_msquic_MsQuicUpcall.c \
-    ../$C_GENERATED/io_vproxy_msquic_QuicAddr.extra.c \
-    ../$C_GENERATED/pni.c \
+    ../$C_GENERATED/*.c \
     -o "$target"

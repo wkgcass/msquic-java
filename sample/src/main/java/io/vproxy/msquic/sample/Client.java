@@ -4,6 +4,7 @@ import io.vproxy.msquic.*;
 import io.vproxy.msquic.wrap.*;
 import io.vproxy.pni.Allocator;
 import io.vproxy.pni.PNIString;
+import io.vproxy.pni.graal.GraalUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,6 +31,9 @@ public class Client {
         System.loadLibrary("msquic");
         System.loadLibrary("msquic-java");
         MsQuicUpcall.setImpl(MsQuicUpcallImpl.get());
+        MsQuicModUpcall.setImpl(MsQuicModUpcallImpl.get());
+        MsQuicMod.get().MsQuicSetEventLoopThreadDispatcher(MsQuicModUpcall.dispatch);
+        GraalUtils.setThread();
 
         String host = null;
         String portStr = null;

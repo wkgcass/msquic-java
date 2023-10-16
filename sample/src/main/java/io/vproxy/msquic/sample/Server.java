@@ -6,6 +6,7 @@ import io.vproxy.msquic.*;
 import io.vproxy.msquic.wrap.*;
 import io.vproxy.pni.Allocator;
 import io.vproxy.pni.PNIString;
+import io.vproxy.pni.graal.GraalUtils;
 
 import static io.vproxy.msquic.MsQuicConsts.*;
 
@@ -25,6 +26,9 @@ public class Server {
         System.loadLibrary("msquic");
         System.loadLibrary("msquic-java");
         MsQuicUpcall.setImpl(MsQuicUpcallImpl.get());
+        MsQuicModUpcall.setImpl(MsQuicModUpcallImpl.get());
+        MsQuicMod.get().MsQuicSetEventLoopThreadDispatcher(MsQuicModUpcall.dispatch);
+        GraalUtils.setThread();
 
         String cert = null;
         String key = null;
