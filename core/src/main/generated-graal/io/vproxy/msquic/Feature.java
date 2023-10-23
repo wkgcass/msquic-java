@@ -27,6 +27,19 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
         /* JavaCritical_io_vproxy_msquic_MsQuic_buildQuicAddr */
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(boolean.class, String.class /* addr */, int.class /* port */, MemoryLayout.class /* io.vproxy.msquic.QuicAddr.LAYOUT.getClass() */ /* result */));
 
+        /* JavaCritical_io_vproxy_msquic_MsQuicMod_MsQuicSetEventLoopThreadDispatcher */
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class, MemorySegment.class /* dispatcher */));
+
+        /* JavaCritical_io_vproxy_msquic_MsQuicMod_CxPlatGetCurThread */
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class, MemorySegment.class /* Thread */));
+
+        /* JavaCritical_io_vproxy_msquic_MsQuicMod_INVOKE_LPTHREAD_START_ROUTINE */
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class /* Callback */, MemorySegment.class /* Context */));
+
+        /* graal upcall for io.vproxy.msquic.MsQuicModUpcall */
+        RuntimeClassInitialization.initializeAtBuildTime(io.vproxy.msquic.MsQuicModUpcall.class);
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class), Linker.Option.isTrivial());
+
         /* graal upcall for io.vproxy.msquic.MsQuicUpcall */
         RuntimeClassInitialization.initializeAtBuildTime(io.vproxy.msquic.MsQuicUpcall.class);
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class, MemorySegment.class, MemorySegment.class), Linker.Option.isTrivial());
@@ -165,4 +178,4 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
     }
 }
 // metadata.generator-version: pni 21.0.0.16
-// sha256:69da987f4a47fe0b98b8a7ffae6319eb644e3cb7323c96ad8c03e18179310900
+// sha256:6cf0814a29e11480052cee75751abf25c95a385ab485cd6865a362e412639638
