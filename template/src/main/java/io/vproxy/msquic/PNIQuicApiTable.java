@@ -106,3 +106,9 @@ abstract class PNIQuicRegistrationConfig {
     String AppName;
     int ExecutionProfile; // QUIC_EXECUTION_PROFILE
 }
+
+@Struct
+@AlwaysAligned
+abstract class PNIQuicRegistrationConfigEx extends PNIQuicRegistrationConfig {
+    MemorySegment Context;
+}

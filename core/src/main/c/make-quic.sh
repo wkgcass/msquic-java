@@ -23,7 +23,8 @@ then
     GCC_OPTS="$GCC_OPTS -DPNI_GRAAL=1"
 fi
 
-ls ../$C_GENERATED | grep '\.h$' | awk '{print "#include \""$1"\""}' > io_vproxy_msquic_MsQuic.c
+ls ../$C_GENERATED | grep '\.h$' | grep -v 'QuicRegistrationConfigEx' | \
+	awk '{print "#include \""$1"\""}' > io_vproxy_msquic_MsQuic.c
 
 echo "" >> io_vproxy_msquic_MsQuic.c
 ./gen-strerror.py >> io_vproxy_msquic_MsQuic.c
