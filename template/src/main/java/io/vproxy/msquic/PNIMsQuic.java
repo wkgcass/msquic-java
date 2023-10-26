@@ -2,7 +2,7 @@ package io.vproxy.msquic;
 
 import io.vproxy.pni.annotation.*;
 
-@Function
+@Downcall
 @Include("msquic.h")
 public interface PNIMsQuic {
     @Impl(
@@ -19,7 +19,7 @@ public interface PNIMsQuic {
             return NULL;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     PNIQuicApiTable open(@Unsigned int Version, @Raw int[] returnStatus);
 
     @Impl(
@@ -28,6 +28,6 @@ public interface PNIMsQuic {
             return QuicAddrFromString(addr, port, result);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     boolean buildQuicAddr(String addr, int port, PNIQuicAddr result);
 }

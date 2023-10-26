@@ -19,7 +19,7 @@ public abstract class PNIQuicListener {
             api->ListenerClose(lsn);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract void close();
 
     @Impl(
@@ -35,7 +35,7 @@ public abstract class PNIQuicListener {
             return res;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract int start(@Raw PNIQuicBuffer[] AlpnBuffers, int AlpnBufferCount, PNIQuicAddr Addr);
 
     @Impl(
@@ -46,7 +46,7 @@ public abstract class PNIQuicListener {
             api->ListenerStop(lsn);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract void stop();
 }
 

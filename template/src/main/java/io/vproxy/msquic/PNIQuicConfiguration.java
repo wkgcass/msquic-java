@@ -19,7 +19,7 @@ public abstract class PNIQuicConfiguration {
             api->ConfigurationClose(conf);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract void close();
 
     @Impl(
@@ -35,7 +35,7 @@ public abstract class PNIQuicConfiguration {
             return res;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract int loadCredential(PNIQuicCredentialConfig CredConfig);
 }
 

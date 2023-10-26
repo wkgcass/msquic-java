@@ -19,7 +19,7 @@ public abstract class PNIQuicConnection {
             api->ConnectionClose(conn);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract void close();
 
     @Impl(
@@ -31,7 +31,7 @@ public abstract class PNIQuicConnection {
             api->ConnectionShutdown(conn, Flags, ErrorCode);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract void shutdown(int Flags, long ErrorCode);
 
     @Impl(
@@ -48,7 +48,7 @@ public abstract class PNIQuicConnection {
             return res;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract int start(PNIQuicConfiguration Conf, int Family, String ServerName, int ServerPort);
 
     @Impl(
@@ -65,7 +65,7 @@ public abstract class PNIQuicConnection {
             return res;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract int setConfiguration(PNIQuicConfiguration Conf);
 
     @Impl(
@@ -81,7 +81,7 @@ public abstract class PNIQuicConnection {
             return res;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract int sendResumptionTicket(int Flags, int DataLength, @Raw byte[] ResumptionData);
 
     @Impl(
@@ -104,7 +104,7 @@ public abstract class PNIQuicConnection {
             return NULL;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract PNIQuicStream openStream(int Flags, MemorySegment Handler, MemorySegment Context, @Raw int[] returnStatus);
 
     @Impl(
@@ -120,7 +120,7 @@ public abstract class PNIQuicConnection {
             return res;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract int sendDatagram(PNIQuicBuffer Buffers, int BufferCount, int Flags, MemorySegment ClientSendContext);
 
     @Impl(
@@ -136,7 +136,7 @@ public abstract class PNIQuicConnection {
             return res;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract int resumptionTicketValidationComplete(boolean Result);
 
     @Impl(
@@ -152,7 +152,7 @@ public abstract class PNIQuicConnection {
             return res;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract int certificateValidationComplete(boolean Result, int TlsAlert);
 }
 

@@ -26,7 +26,7 @@ class PNICXPLAT_THREAD_CONFIG {
     MemorySegment Context;
 }
 
-@Function
+@Downcall
 @Include("msquic.h")
 interface PNIMsQuicMod {
     @Impl(
@@ -35,7 +35,7 @@ interface PNIMsQuicMod {
             return MsQuicSetEventLoopThreadDispatcher(dispatcher);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     int MsQuicSetEventLoopThreadDispatcher(MemorySegment dispatcher);
 
     @Impl(
@@ -44,7 +44,7 @@ interface PNIMsQuicMod {
             return CxPlatGetCurThread((CXPLAT_THREAD*) Thread);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     int CxPlatGetCurThread(MemorySegment Thread);
 
     @Impl(
@@ -53,7 +53,7 @@ interface PNIMsQuicMod {
             ((LPTHREAD_START_ROUTINE) Callback)(Context);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     void INVOKE_LPTHREAD_START_ROUTINE(MemorySegment Callback, MemorySegment Context);
 }
 

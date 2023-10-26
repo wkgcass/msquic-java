@@ -19,7 +19,7 @@ public abstract class PNIQuicStream {
             api->StreamClose(stream);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract void close();
 
     @Impl(
@@ -35,7 +35,7 @@ public abstract class PNIQuicStream {
             return res;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract int start(int Flags);
 
     @Impl(
@@ -51,7 +51,7 @@ public abstract class PNIQuicStream {
             return res;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract int shutdown(int Flags, long ErrorCode);
 
     @Impl(
@@ -67,7 +67,7 @@ public abstract class PNIQuicStream {
             return res;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract int send(PNIQuicBuffer Buffers, int BufferCount, int Flags, MemorySegment ClientSendContext);
 
     @Impl(
@@ -78,7 +78,7 @@ public abstract class PNIQuicStream {
             api->StreamReceiveComplete(stream, BufferLength);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract void receiveComplete(long BufferLength);
 
     @Impl(
@@ -94,7 +94,7 @@ public abstract class PNIQuicStream {
             return res;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract int receiveSetEnabled(boolean IsEnabled);
 }
 

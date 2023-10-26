@@ -1,14 +1,11 @@
 package io.vproxy.msquic;
 
-import io.vproxy.pni.annotation.Critical;
-import io.vproxy.pni.annotation.Function;
-import io.vproxy.pni.annotation.Impl;
-import io.vproxy.pni.annotation.Include;
+import io.vproxy.pni.annotation.*;
 
-@Function
+@Downcall
 @Include("msquic.h")
 public interface PNIMsQuicValues {
-    @Critical
+    @Style(Styles.critical)
     String QuicStatusString(int status);
 
     @Impl(
@@ -17,7 +14,7 @@ public interface PNIMsQuicValues {
             return QUIC_STATUS_NOT_SUPPORTED;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     int QUIC_STATUS_NOT_SUPPORTED();
 
     @Impl(
@@ -26,7 +23,7 @@ public interface PNIMsQuicValues {
             return QUIC_STATUS_PENDING;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     int QUIC_STATUS_PENDING();
 
     @Impl(
@@ -35,7 +32,7 @@ public interface PNIMsQuicValues {
             return QUIC_ADDRESS_FAMILY_UNSPEC;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     int QUIC_ADDRESS_FAMILY_UNSPEC();
 
     @Impl(
@@ -44,7 +41,7 @@ public interface PNIMsQuicValues {
             return QUIC_ADDRESS_FAMILY_INET;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     int QUIC_ADDRESS_FAMILY_INET();
 
     @Impl(
@@ -53,6 +50,6 @@ public interface PNIMsQuicValues {
             return QUIC_ADDRESS_FAMILY_INET6;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     int QUIC_ADDRESS_FAMILY_INET6();
 }

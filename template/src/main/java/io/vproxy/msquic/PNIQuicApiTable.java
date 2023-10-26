@@ -17,7 +17,7 @@ public abstract class PNIQuicApiTable {
             MsQuicClose(api);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract void close();
 
     @Impl(
@@ -27,7 +27,7 @@ public abstract class PNIQuicApiTable {
             api->SetContext(Handle, Context);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract void setContext(MemorySegment Handle, MemorySegment Context);
 
     @Impl(
@@ -37,7 +37,7 @@ public abstract class PNIQuicApiTable {
             return api->GetContext(Handle);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract MemorySegment getContext(MemorySegment Handle);
 
     @Impl(
@@ -47,7 +47,7 @@ public abstract class PNIQuicApiTable {
             api->SetCallbackHandler(Handle, Handler, Context);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract void setCallbackHandler(MemorySegment Handle, MemorySegment Handler, MemorySegment Context);
 
     @Impl(
@@ -61,7 +61,7 @@ public abstract class PNIQuicApiTable {
             return res;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract int setParam(MemorySegment Handle, int Param, int BufferLength, MemorySegment Buffer);
 
     @Impl(
@@ -75,7 +75,7 @@ public abstract class PNIQuicApiTable {
             return res;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract int getParam(MemorySegment Handle, int Param, @Unsigned @Raw int[] BufferLength, MemorySegment Buffer);
 
     @Impl(
@@ -94,7 +94,7 @@ public abstract class PNIQuicApiTable {
             return NULL;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract PNIQuicRegistration openRegistration(PNIQuicRegistrationConfig Config, @Raw int[] returnStatus);
 }
 

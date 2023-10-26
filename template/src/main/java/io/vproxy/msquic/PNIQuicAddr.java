@@ -14,7 +14,7 @@ public abstract class PNIQuicAddr {
             return QuicAddrGetFamily(self);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract int getFamily();
 
     @Impl(
@@ -23,7 +23,7 @@ public abstract class PNIQuicAddr {
             QuicAddrSetFamily(self, family);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract void setFamily(int family);
 
     @Impl(
@@ -32,7 +32,7 @@ public abstract class PNIQuicAddr {
             return QuicAddrGetPort(self);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract int getPort();
 
     @Impl(
@@ -41,7 +41,7 @@ public abstract class PNIQuicAddr {
             QuicAddrSetPort(self, port);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract void setPort(int port);
 
     @Impl(
@@ -50,6 +50,6 @@ public abstract class PNIQuicAddr {
             QuicAddrToString(self, (QUIC_ADDR_STR*) str);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract void toString(String str);
 }

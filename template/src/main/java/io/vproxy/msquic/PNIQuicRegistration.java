@@ -22,7 +22,7 @@ public abstract class PNIQuicRegistration {
             api->RegistrationClose(reg);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract void close();
 
     @Impl(
@@ -34,7 +34,7 @@ public abstract class PNIQuicRegistration {
             api->RegistrationShutdown(reg, Flags, ErrorCode);
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract void shutdown(int Flags, long ErrorCode);
 
     @Impl(
@@ -56,7 +56,7 @@ public abstract class PNIQuicRegistration {
             return NULL;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract PNIQuicConfiguration openConfiguration(@Raw PNIQuicBuffer[] AlpnBuffers,
                                                     @Unsigned int AlpnBufferCount,
                                                     PNIQuicSettings Settings,
@@ -83,7 +83,7 @@ public abstract class PNIQuicRegistration {
             return NULL;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract PNIQuicListener openListener(MemorySegment Handler, MemorySegment Context, @Raw int[] returnStatus);
 
     @Impl(
@@ -106,7 +106,7 @@ public abstract class PNIQuicRegistration {
             return NULL;
             """
     )
-    @Critical
+    @Style(Styles.critical)
     abstract PNIQuicConnection openConnection(MemorySegment Handler, MemorySegment Context, @Raw int[] returnStatus);
 }
 
