@@ -66,7 +66,7 @@ public class QuicConfiguration extends AbstractNativeObject implements NativeObj
         this(ALLOCATOR.allocate(LAYOUT));
     }
 
-    private static final MethodHandle closeMH = PanamaUtils.lookupPNICriticalFunction(false, void.class, "JavaCritical_io_vproxy_msquic_QuicConfiguration_close", MemorySegment.class /* self */);
+    private static final MethodHandle closeMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "JavaCritical_io_vproxy_msquic_QuicConfiguration_close", MemorySegment.class /* self */);
 
     public void close() {
         try {
@@ -76,7 +76,7 @@ public class QuicConfiguration extends AbstractNativeObject implements NativeObj
         }
     }
 
-    private static final MethodHandle loadCredentialMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_QuicConfiguration_loadCredential", MemorySegment.class /* self */, io.vproxy.msquic.QuicCredentialConfig.LAYOUT.getClass() /* CredConfig */);
+    private static final MethodHandle loadCredentialMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_QuicConfiguration_loadCredential", MemorySegment.class /* self */, io.vproxy.msquic.QuicCredentialConfig.LAYOUT.getClass() /* CredConfig */);
 
     public int loadCredential(io.vproxy.msquic.QuicCredentialConfig CredConfig) {
         int RESULT;
@@ -178,5 +178,5 @@ public class QuicConfiguration extends AbstractNativeObject implements NativeObj
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.15
-// sha256:977ed74debb6d0c009f90123d2d479fef100d08a220b86d9ee4bb22644794389
+// metadata.generator-version: pni 21.0.0.17
+// sha256:d2daf6dfb4f2f7b85565d35fc1ae18a6b23dc7ce1ad0d030e7227b492b798a38

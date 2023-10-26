@@ -71,7 +71,7 @@ public class QuicListener extends AbstractNativeObject implements NativeObject {
         this(ALLOCATOR.allocate(LAYOUT));
     }
 
-    private static final MethodHandle closeMH = PanamaUtils.lookupPNICriticalFunction(false, void.class, "JavaCritical_io_vproxy_msquic_QuicListener_close", MemorySegment.class /* self */);
+    private static final MethodHandle closeMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "JavaCritical_io_vproxy_msquic_QuicListener_close", MemorySegment.class /* self */);
 
     public void close() {
         try {
@@ -81,7 +81,7 @@ public class QuicListener extends AbstractNativeObject implements NativeObject {
         }
     }
 
-    private static final MethodHandle startMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_QuicListener_start", MemorySegment.class /* self */, MemorySegment.class /* AlpnBuffers */, int.class /* AlpnBufferCount */, io.vproxy.msquic.QuicAddr.LAYOUT.getClass() /* Addr */);
+    private static final MethodHandle startMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_QuicListener_start", MemorySegment.class /* self */, MemorySegment.class /* AlpnBuffers */, int.class /* AlpnBufferCount */, io.vproxy.msquic.QuicAddr.LAYOUT.getClass() /* Addr */);
 
     public int start(io.vproxy.msquic.QuicBuffer.Array AlpnBuffers, int AlpnBufferCount, io.vproxy.msquic.QuicAddr Addr) {
         int RESULT;
@@ -93,7 +93,7 @@ public class QuicListener extends AbstractNativeObject implements NativeObject {
         return RESULT;
     }
 
-    private static final MethodHandle stopMH = PanamaUtils.lookupPNICriticalFunction(false, void.class, "JavaCritical_io_vproxy_msquic_QuicListener_stop", MemorySegment.class /* self */);
+    private static final MethodHandle stopMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "JavaCritical_io_vproxy_msquic_QuicListener_stop", MemorySegment.class /* self */);
 
     public void stop() {
         try {
@@ -193,5 +193,5 @@ public class QuicListener extends AbstractNativeObject implements NativeObject {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:d996118328a931975a9e38c4e313f91a6da29f17fb60728ba180571a1bdec875
+// metadata.generator-version: pni 21.0.0.17
+// sha256:8f92fcfd9eb71d411ba5a6f4d142c5f797ff14f5a7173f473b70d33d8453ad6c

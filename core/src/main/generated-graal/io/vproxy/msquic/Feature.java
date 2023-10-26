@@ -12,9 +12,10 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
     @Override
     public void duringSetup(DuringSetupAccess access) {
         /* PNIFunc & PNIRef & GraalThread */
-        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class), Linker.Option.isTrivial());
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class), PanamaHack.getCriticalOption());
         RuntimeClassInitialization.initializeAtBuildTime(GraalPNIFunc.class);
         RuntimeClassInitialization.initializeAtBuildTime(GraalPNIRef.class);
+        RuntimeClassInitialization.initializeAtBuildTime(PanamaHack.class);
         /* ImageInfo */
         RuntimeClassInitialization.initializeAtRunTime(ImageInfoDelegate.class);
         for (var m : ImageInfo.class.getMethods()) {
@@ -38,11 +39,11 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
 
         /* graal upcall for io.vproxy.msquic.MsQuicModUpcall */
         RuntimeClassInitialization.initializeAtBuildTime(io.vproxy.msquic.MsQuicModUpcall.class);
-        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class), Linker.Option.isTrivial());
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class), PanamaHack.getCriticalOption());
 
         /* graal upcall for io.vproxy.msquic.MsQuicUpcall */
         RuntimeClassInitialization.initializeAtBuildTime(io.vproxy.msquic.MsQuicUpcall.class);
-        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class, MemorySegment.class, MemorySegment.class), Linker.Option.isTrivial());
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class, MemorySegment.class, MemorySegment.class), PanamaHack.getCriticalOption());
 
         /* JavaCritical_io_vproxy_msquic_MsQuicValues_QuicStatusString */
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(String.class, int.class /* status */));
@@ -62,8 +63,8 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
         /* JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_ADDRESS_FAMILY_INET6 */
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class));
 
-/* JavaCritical_io_vproxy_msquic_QuicAddr___getLayoutByteSize */
-        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(long.class), Linker.Option.isTrivial());
+        /* JavaCritical_io_vproxy_msquic_QuicAddr___getLayoutByteSize */
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(long.class), PanamaHack.getCriticalOption());
 
         /* JavaCritical_io_vproxy_msquic_QuicAddr_getFamily */
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class, MemorySegment.class /* self */));
@@ -177,5 +178,5 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class, MemorySegment.class /* self */, boolean.class /* IsEnabled */));
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:6cf0814a29e11480052cee75751abf25c95a385ab485cd6865a362e412639638
+// metadata.generator-version: pni 21.0.0.17
+// sha256:03e863cabaa9293c24fe04ab430a16a602beabeb7b120998906605dba39f283f

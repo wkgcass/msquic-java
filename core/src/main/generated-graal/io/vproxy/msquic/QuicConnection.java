@@ -71,7 +71,7 @@ public class QuicConnection extends AbstractNativeObject implements NativeObject
         this(ALLOCATOR.allocate(LAYOUT));
     }
 
-    private static final MethodHandle closeMH = PanamaUtils.lookupPNICriticalFunction(false, void.class, "JavaCritical_io_vproxy_msquic_QuicConnection_close", MemorySegment.class /* self */);
+    private static final MethodHandle closeMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "JavaCritical_io_vproxy_msquic_QuicConnection_close", MemorySegment.class /* self */);
 
     public void close() {
         try {
@@ -81,7 +81,7 @@ public class QuicConnection extends AbstractNativeObject implements NativeObject
         }
     }
 
-    private static final MethodHandle shutdownMH = PanamaUtils.lookupPNICriticalFunction(false, void.class, "JavaCritical_io_vproxy_msquic_QuicConnection_shutdown", MemorySegment.class /* self */, int.class /* Flags */, long.class /* ErrorCode */);
+    private static final MethodHandle shutdownMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "JavaCritical_io_vproxy_msquic_QuicConnection_shutdown", MemorySegment.class /* self */, int.class /* Flags */, long.class /* ErrorCode */);
 
     public void shutdown(int Flags, long ErrorCode) {
         try {
@@ -91,7 +91,7 @@ public class QuicConnection extends AbstractNativeObject implements NativeObject
         }
     }
 
-    private static final MethodHandle startMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_QuicConnection_start", MemorySegment.class /* self */, io.vproxy.msquic.QuicConfiguration.LAYOUT.getClass() /* Conf */, int.class /* Family */, String.class /* ServerName */, int.class /* ServerPort */);
+    private static final MethodHandle startMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_QuicConnection_start", MemorySegment.class /* self */, io.vproxy.msquic.QuicConfiguration.LAYOUT.getClass() /* Conf */, int.class /* Family */, String.class /* ServerName */, int.class /* ServerPort */);
 
     public int start(io.vproxy.msquic.QuicConfiguration Conf, int Family, PNIString ServerName, int ServerPort) {
         int RESULT;
@@ -103,7 +103,7 @@ public class QuicConnection extends AbstractNativeObject implements NativeObject
         return RESULT;
     }
 
-    private static final MethodHandle setConfigurationMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_QuicConnection_setConfiguration", MemorySegment.class /* self */, io.vproxy.msquic.QuicConfiguration.LAYOUT.getClass() /* Conf */);
+    private static final MethodHandle setConfigurationMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_QuicConnection_setConfiguration", MemorySegment.class /* self */, io.vproxy.msquic.QuicConfiguration.LAYOUT.getClass() /* Conf */);
 
     public int setConfiguration(io.vproxy.msquic.QuicConfiguration Conf) {
         int RESULT;
@@ -115,7 +115,7 @@ public class QuicConnection extends AbstractNativeObject implements NativeObject
         return RESULT;
     }
 
-    private static final MethodHandle sendResumptionTicketMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_QuicConnection_sendResumptionTicket", MemorySegment.class /* self */, int.class /* Flags */, int.class /* DataLength */, MemorySegment.class /* ResumptionData */);
+    private static final MethodHandle sendResumptionTicketMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_QuicConnection_sendResumptionTicket", MemorySegment.class /* self */, int.class /* Flags */, int.class /* DataLength */, MemorySegment.class /* ResumptionData */);
 
     public int sendResumptionTicket(int Flags, int DataLength, MemorySegment ResumptionData) {
         int RESULT;
@@ -127,7 +127,7 @@ public class QuicConnection extends AbstractNativeObject implements NativeObject
         return RESULT;
     }
 
-    private static final MethodHandle openStreamMH = PanamaUtils.lookupPNICriticalFunction(false, io.vproxy.msquic.QuicStream.LAYOUT.getClass(), "JavaCritical_io_vproxy_msquic_QuicConnection_openStream", MemorySegment.class /* self */, int.class /* Flags */, MemorySegment.class /* Handler */, MemorySegment.class /* Context */, MemorySegment.class /* returnStatus */, MemorySegment.class /* return */);
+    private static final MethodHandle openStreamMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), io.vproxy.msquic.QuicStream.LAYOUT.getClass(), "JavaCritical_io_vproxy_msquic_QuicConnection_openStream", MemorySegment.class /* self */, int.class /* Flags */, MemorySegment.class /* Handler */, MemorySegment.class /* Context */, MemorySegment.class /* returnStatus */, MemorySegment.class /* return */);
 
     public io.vproxy.msquic.QuicStream openStream(int Flags, MemorySegment Handler, MemorySegment Context, IntArray returnStatus, Allocator ALLOCATOR) {
         MemorySegment RESULT;
@@ -140,7 +140,7 @@ public class QuicConnection extends AbstractNativeObject implements NativeObject
         return RESULT == null ? null : new io.vproxy.msquic.QuicStream(RESULT);
     }
 
-    private static final MethodHandle sendDatagramMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_QuicConnection_sendDatagram", MemorySegment.class /* self */, io.vproxy.msquic.QuicBuffer.LAYOUT.getClass() /* Buffers */, int.class /* BufferCount */, int.class /* Flags */, MemorySegment.class /* ClientSendContext */);
+    private static final MethodHandle sendDatagramMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_QuicConnection_sendDatagram", MemorySegment.class /* self */, io.vproxy.msquic.QuicBuffer.LAYOUT.getClass() /* Buffers */, int.class /* BufferCount */, int.class /* Flags */, MemorySegment.class /* ClientSendContext */);
 
     public int sendDatagram(io.vproxy.msquic.QuicBuffer Buffers, int BufferCount, int Flags, MemorySegment ClientSendContext) {
         int RESULT;
@@ -152,7 +152,7 @@ public class QuicConnection extends AbstractNativeObject implements NativeObject
         return RESULT;
     }
 
-    private static final MethodHandle resumptionTicketValidationCompleteMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_QuicConnection_resumptionTicketValidationComplete", MemorySegment.class /* self */, boolean.class /* Result */);
+    private static final MethodHandle resumptionTicketValidationCompleteMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_QuicConnection_resumptionTicketValidationComplete", MemorySegment.class /* self */, boolean.class /* Result */);
 
     public int resumptionTicketValidationComplete(boolean Result) {
         int RESULT;
@@ -164,7 +164,7 @@ public class QuicConnection extends AbstractNativeObject implements NativeObject
         return RESULT;
     }
 
-    private static final MethodHandle certificateValidationCompleteMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_QuicConnection_certificateValidationComplete", MemorySegment.class /* self */, boolean.class /* Result */, int.class /* TlsAlert */);
+    private static final MethodHandle certificateValidationCompleteMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_QuicConnection_certificateValidationComplete", MemorySegment.class /* self */, boolean.class /* Result */, int.class /* TlsAlert */);
 
     public int certificateValidationComplete(boolean Result, int TlsAlert) {
         int RESULT;
@@ -266,5 +266,5 @@ public class QuicConnection extends AbstractNativeObject implements NativeObject
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:6d84e3032ba9892c3c1a668dfdeb9b2be3f76061b2a17eddc90af8cb77516aab
+// metadata.generator-version: pni 21.0.0.17
+// sha256:39de67e6704464bdde99c22746b226831c0a96881d03adfd4ca28ab39c142368

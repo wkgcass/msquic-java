@@ -15,7 +15,7 @@ public class MsQuicModUpcall {
     private static final Arena ARENA = Arena.ofShared();
 
     public static MemorySegment dispatch;
-    public static final CEntryPointLiteral<CFunctionPointer> dispatchCEPL = GraalUtils.defineCFunctionByName(io.vproxy.msquic.MsQuicModUpcall.class, "dispatch");
+    public static final CEntryPointLiteral<CFunctionPointer> dispatchCEPL = GraalUtils.defineCFunctionByName(new PNILinkOptions(), io.vproxy.msquic.MsQuicModUpcall.class, "dispatch");
 
     @CEntryPoint
     public static int dispatch(IsolateThread THREAD, VoidPointer ConfigPTR, VoidPointer EventQPTR, VoidPointer ThreadPTR, VoidPointer ContextPTR) {
@@ -39,13 +39,13 @@ public class MsQuicModUpcall {
     private static void setNativeImpl() {
         dispatch = MemorySegment.ofAddress(dispatchCEPL.getFunctionPointer().rawValue());
 
-        var initMH = PanamaUtils.lookupPNICriticalFunction(true, void.class, "JavaCritical_io_vproxy_msquic_MsQuicModUpcall_INIT", MemorySegment.class);
+        var initMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions().setCritical(true), void.class, "JavaCritical_io_vproxy_msquic_MsQuicModUpcall_INIT", MemorySegment.class);
         try {
             initMH.invoke(dispatch);
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
-        dispatch = PanamaUtils.lookupFunctionPointer("JavaCritical_io_vproxy_msquic_MsQuicModUpcall_dispatch").orElseThrow(() -> new NullPointerException("JavaCritical_io_vproxy_msquic_MsQuicModUpcall_dispatch"));
+        dispatch = PanamaUtils.lookupFunctionPointer(new PNILookupOptions(), "JavaCritical_io_vproxy_msquic_MsQuicModUpcall_dispatch").orElseThrow(() -> new NullPointerException("JavaCritical_io_vproxy_msquic_MsQuicModUpcall_dispatch"));
     }
 
     private static Interface IMPL = null;
@@ -60,5 +60,5 @@ public class MsQuicModUpcall {
         int dispatch(io.vproxy.msquic.CXPLAT_THREAD_CONFIG Config, MemorySegment EventQ, MemorySegment Thread, MemorySegment Context);
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:049769351e36172bf9586e4b30029b4e071ce432faa97da12fa96c1b5c991086
+// metadata.generator-version: pni 21.0.0.17
+// sha256:fe3c0c963c03e483183cd9aa0f84dc0ecf572b1e678da1190cf3a6a7c7e5a90e

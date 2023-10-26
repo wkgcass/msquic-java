@@ -66,7 +66,7 @@ public class QuicRegistration extends AbstractNativeObject implements NativeObje
         this(ALLOCATOR.allocate(LAYOUT));
     }
 
-    private static final MethodHandle closeMH = PanamaUtils.lookupPNICriticalFunction(false, void.class, "JavaCritical_io_vproxy_msquic_QuicRegistration_close", MemorySegment.class /* self */);
+    private static final MethodHandle closeMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "JavaCritical_io_vproxy_msquic_QuicRegistration_close", MemorySegment.class /* self */);
 
     public void close() {
         try {
@@ -76,7 +76,7 @@ public class QuicRegistration extends AbstractNativeObject implements NativeObje
         }
     }
 
-    private static final MethodHandle shutdownMH = PanamaUtils.lookupPNICriticalFunction(false, void.class, "JavaCritical_io_vproxy_msquic_QuicRegistration_shutdown", MemorySegment.class /* self */, int.class /* Flags */, long.class /* ErrorCode */);
+    private static final MethodHandle shutdownMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "JavaCritical_io_vproxy_msquic_QuicRegistration_shutdown", MemorySegment.class /* self */, int.class /* Flags */, long.class /* ErrorCode */);
 
     public void shutdown(int Flags, long ErrorCode) {
         try {
@@ -86,7 +86,7 @@ public class QuicRegistration extends AbstractNativeObject implements NativeObje
         }
     }
 
-    private static final MethodHandle openConfigurationMH = PanamaUtils.lookupPNICriticalFunction(false, io.vproxy.msquic.QuicConfiguration.LAYOUT.getClass(), "JavaCritical_io_vproxy_msquic_QuicRegistration_openConfiguration", MemorySegment.class /* self */, MemorySegment.class /* AlpnBuffers */, int.class /* AlpnBufferCount */, io.vproxy.msquic.QuicSettings.LAYOUT.getClass() /* Settings */, MemorySegment.class /* Context */, MemorySegment.class /* returnStatus */, MemorySegment.class /* return */);
+    private static final MethodHandle openConfigurationMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), io.vproxy.msquic.QuicConfiguration.LAYOUT.getClass(), "JavaCritical_io_vproxy_msquic_QuicRegistration_openConfiguration", MemorySegment.class /* self */, MemorySegment.class /* AlpnBuffers */, int.class /* AlpnBufferCount */, io.vproxy.msquic.QuicSettings.LAYOUT.getClass() /* Settings */, MemorySegment.class /* Context */, MemorySegment.class /* returnStatus */, MemorySegment.class /* return */);
 
     public io.vproxy.msquic.QuicConfiguration openConfiguration(io.vproxy.msquic.QuicBuffer.Array AlpnBuffers, int AlpnBufferCount, io.vproxy.msquic.QuicSettings Settings, MemorySegment Context, IntArray returnStatus, Allocator ALLOCATOR) {
         MemorySegment RESULT;
@@ -99,7 +99,7 @@ public class QuicRegistration extends AbstractNativeObject implements NativeObje
         return RESULT == null ? null : new io.vproxy.msquic.QuicConfiguration(RESULT);
     }
 
-    private static final MethodHandle openListenerMH = PanamaUtils.lookupPNICriticalFunction(false, io.vproxy.msquic.QuicListener.LAYOUT.getClass(), "JavaCritical_io_vproxy_msquic_QuicRegistration_openListener", MemorySegment.class /* self */, MemorySegment.class /* Handler */, MemorySegment.class /* Context */, MemorySegment.class /* returnStatus */, MemorySegment.class /* return */);
+    private static final MethodHandle openListenerMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), io.vproxy.msquic.QuicListener.LAYOUT.getClass(), "JavaCritical_io_vproxy_msquic_QuicRegistration_openListener", MemorySegment.class /* self */, MemorySegment.class /* Handler */, MemorySegment.class /* Context */, MemorySegment.class /* returnStatus */, MemorySegment.class /* return */);
 
     public io.vproxy.msquic.QuicListener openListener(MemorySegment Handler, MemorySegment Context, IntArray returnStatus, Allocator ALLOCATOR) {
         MemorySegment RESULT;
@@ -112,7 +112,7 @@ public class QuicRegistration extends AbstractNativeObject implements NativeObje
         return RESULT == null ? null : new io.vproxy.msquic.QuicListener(RESULT);
     }
 
-    private static final MethodHandle openConnectionMH = PanamaUtils.lookupPNICriticalFunction(false, io.vproxy.msquic.QuicConnection.LAYOUT.getClass(), "JavaCritical_io_vproxy_msquic_QuicRegistration_openConnection", MemorySegment.class /* self */, MemorySegment.class /* Handler */, MemorySegment.class /* Context */, MemorySegment.class /* returnStatus */, MemorySegment.class /* return */);
+    private static final MethodHandle openConnectionMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), io.vproxy.msquic.QuicConnection.LAYOUT.getClass(), "JavaCritical_io_vproxy_msquic_QuicRegistration_openConnection", MemorySegment.class /* self */, MemorySegment.class /* Handler */, MemorySegment.class /* Context */, MemorySegment.class /* returnStatus */, MemorySegment.class /* return */);
 
     public io.vproxy.msquic.QuicConnection openConnection(MemorySegment Handler, MemorySegment Context, IntArray returnStatus, Allocator ALLOCATOR) {
         MemorySegment RESULT;
@@ -215,5 +215,5 @@ public class QuicRegistration extends AbstractNativeObject implements NativeObje
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.15
-// sha256:d5e290fe0ae74b43e89dccfb66dacb08a607252c7d0a72a822ba9eaa02152076
+// metadata.generator-version: pni 21.0.0.17
+// sha256:7b4aed06d99369bbea4a9031a40c598ffdd34b053846dcb0648543221df6c679

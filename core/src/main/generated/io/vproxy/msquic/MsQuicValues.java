@@ -16,7 +16,7 @@ public class MsQuicValues {
         return INSTANCE;
     }
 
-    private static final MethodHandle QuicStatusStringMH = PanamaUtils.lookupPNICriticalFunction(false, String.class, "JavaCritical_io_vproxy_msquic_MsQuicValues_QuicStatusString", int.class /* status */);
+    private static final MethodHandle QuicStatusStringMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), String.class, "JavaCritical_io_vproxy_msquic_MsQuicValues_QuicStatusString", int.class /* status */);
 
     public PNIString QuicStatusString(int status) {
         MemorySegment RESULT;
@@ -28,7 +28,7 @@ public class MsQuicValues {
         return RESULT.address() == 0 ? null : new PNIString(RESULT);
     }
 
-    private static final MethodHandle QUIC_STATUS_NOT_SUPPORTEDMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_STATUS_NOT_SUPPORTED");
+    private static final MethodHandle QUIC_STATUS_NOT_SUPPORTEDMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_STATUS_NOT_SUPPORTED");
 
     public int QUIC_STATUS_NOT_SUPPORTED() {
         int RESULT;
@@ -40,7 +40,7 @@ public class MsQuicValues {
         return RESULT;
     }
 
-    private static final MethodHandle QUIC_STATUS_PENDINGMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_STATUS_PENDING");
+    private static final MethodHandle QUIC_STATUS_PENDINGMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_STATUS_PENDING");
 
     public int QUIC_STATUS_PENDING() {
         int RESULT;
@@ -52,7 +52,7 @@ public class MsQuicValues {
         return RESULT;
     }
 
-    private static final MethodHandle QUIC_ADDRESS_FAMILY_UNSPECMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_ADDRESS_FAMILY_UNSPEC");
+    private static final MethodHandle QUIC_ADDRESS_FAMILY_UNSPECMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_ADDRESS_FAMILY_UNSPEC");
 
     public int QUIC_ADDRESS_FAMILY_UNSPEC() {
         int RESULT;
@@ -64,7 +64,7 @@ public class MsQuicValues {
         return RESULT;
     }
 
-    private static final MethodHandle QUIC_ADDRESS_FAMILY_INETMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_ADDRESS_FAMILY_INET");
+    private static final MethodHandle QUIC_ADDRESS_FAMILY_INETMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_ADDRESS_FAMILY_INET");
 
     public int QUIC_ADDRESS_FAMILY_INET() {
         int RESULT;
@@ -76,7 +76,7 @@ public class MsQuicValues {
         return RESULT;
     }
 
-    private static final MethodHandle QUIC_ADDRESS_FAMILY_INET6MH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_ADDRESS_FAMILY_INET6");
+    private static final MethodHandle QUIC_ADDRESS_FAMILY_INET6MH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_MsQuicValues_QUIC_ADDRESS_FAMILY_INET6");
 
     public int QUIC_ADDRESS_FAMILY_INET6() {
         int RESULT;
@@ -88,5 +88,5 @@ public class MsQuicValues {
         return RESULT;
     }
 }
-// metadata.generator-version: pni 21.0.0.11
-// sha256:c71dfd09159dd87ba22813697cd8741cd0ba8aaa2d1be799a772241951f2fde3
+// metadata.generator-version: pni 21.0.0.17
+// sha256:639cc0dfab8357b7976fe5749d56fae25a03eb530046464c760be5362047f94e

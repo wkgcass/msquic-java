@@ -16,7 +16,7 @@ public class MsQuic {
         return INSTANCE;
     }
 
-    private static final MethodHandle openMH = PanamaUtils.lookupPNICriticalFunction(false, io.vproxy.msquic.QuicApiTable.LAYOUT.getClass(), "JavaCritical_io_vproxy_msquic_MsQuic_open", int.class /* Version */, MemorySegment.class /* returnStatus */, MemorySegment.class /* return */);
+    private static final MethodHandle openMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), io.vproxy.msquic.QuicApiTable.LAYOUT.getClass(), "JavaCritical_io_vproxy_msquic_MsQuic_open", int.class /* Version */, MemorySegment.class /* returnStatus */, MemorySegment.class /* return */);
 
     public io.vproxy.msquic.QuicApiTable open(int Version, IntArray returnStatus, Allocator ALLOCATOR) {
         MemorySegment RESULT;
@@ -29,7 +29,7 @@ public class MsQuic {
         return RESULT == null ? null : new io.vproxy.msquic.QuicApiTable(RESULT);
     }
 
-    private static final MethodHandle buildQuicAddrMH = PanamaUtils.lookupPNICriticalFunction(false, boolean.class, "JavaCritical_io_vproxy_msquic_MsQuic_buildQuicAddr", String.class /* addr */, int.class /* port */, io.vproxy.msquic.QuicAddr.LAYOUT.getClass() /* result */);
+    private static final MethodHandle buildQuicAddrMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), boolean.class, "JavaCritical_io_vproxy_msquic_MsQuic_buildQuicAddr", String.class /* addr */, int.class /* port */, io.vproxy.msquic.QuicAddr.LAYOUT.getClass() /* result */);
 
     public boolean buildQuicAddr(PNIString addr, int port, io.vproxy.msquic.QuicAddr result) {
         boolean RESULT;
@@ -41,5 +41,5 @@ public class MsQuic {
         return RESULT;
     }
 }
-// metadata.generator-version: pni 21.0.0.15
-// sha256:f1c84a8ddf5717ca1a410b882c44146b2be473ea81016487a42b93055a0e3d76
+// metadata.generator-version: pni 21.0.0.17
+// sha256:a6b02da0eff832ec89bcb7a5c80846b980a6d06056af7b3bbe28424ed0ef89e9

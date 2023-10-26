@@ -65,11 +65,11 @@ public class MsQuicUpcall {
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
-        listenerCallback = PanamaUtils.defineCFunction(ARENA, listenerCallbackMH, int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class);
-        connectionCallback = PanamaUtils.defineCFunction(ARENA, connectionCallbackMH, int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class);
-        streamCallback = PanamaUtils.defineCFunction(ARENA, streamCallbackMH, int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class);
+        listenerCallback = PanamaUtils.defineCFunction(new PNILinkOptions(), ARENA, listenerCallbackMH, int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class);
+        connectionCallback = PanamaUtils.defineCFunction(new PNILinkOptions(), ARENA, connectionCallbackMH, int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class);
+        streamCallback = PanamaUtils.defineCFunction(new PNILinkOptions(), ARENA, streamCallbackMH, int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class);
 
-        var initMH = PanamaUtils.lookupPNICriticalFunction(true, void.class, "JavaCritical_io_vproxy_msquic_MsQuicUpcall_INIT", MemorySegment.class, MemorySegment.class, MemorySegment.class);
+        var initMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions().setCritical(true), void.class, "JavaCritical_io_vproxy_msquic_MsQuicUpcall_INIT", MemorySegment.class, MemorySegment.class, MemorySegment.class);
         try {
             initMH.invoke(listenerCallback, connectionCallback, streamCallback);
         } catch (Throwable t) {
@@ -92,5 +92,5 @@ public class MsQuicUpcall {
         int streamCallback(MemorySegment Stream, MemorySegment Context, io.vproxy.msquic.QuicStreamEvent Event);
     }
 }
-// metadata.generator-version: pni 21.0.0.8
-// sha256:fa344e57cd20dfc9b9fde13f528ad6c65270c66d16e324c1f179947e7f85629e
+// metadata.generator-version: pni 21.0.0.17
+// sha256:6d15d70d46fe0c34e575b594816f96e493263215bd6f56ab070e51a0673eb705

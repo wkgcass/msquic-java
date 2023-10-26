@@ -66,7 +66,7 @@ public class QuicStream extends AbstractNativeObject implements NativeObject {
         this(ALLOCATOR.allocate(LAYOUT));
     }
 
-    private static final MethodHandle closeMH = PanamaUtils.lookupPNICriticalFunction(false, void.class, "JavaCritical_io_vproxy_msquic_QuicStream_close", MemorySegment.class /* self */);
+    private static final MethodHandle closeMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "JavaCritical_io_vproxy_msquic_QuicStream_close", MemorySegment.class /* self */);
 
     public void close() {
         try {
@@ -76,7 +76,7 @@ public class QuicStream extends AbstractNativeObject implements NativeObject {
         }
     }
 
-    private static final MethodHandle startMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_QuicStream_start", MemorySegment.class /* self */, int.class /* Flags */);
+    private static final MethodHandle startMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_QuicStream_start", MemorySegment.class /* self */, int.class /* Flags */);
 
     public int start(int Flags) {
         int RESULT;
@@ -88,7 +88,7 @@ public class QuicStream extends AbstractNativeObject implements NativeObject {
         return RESULT;
     }
 
-    private static final MethodHandle shutdownMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_QuicStream_shutdown", MemorySegment.class /* self */, int.class /* Flags */, long.class /* ErrorCode */);
+    private static final MethodHandle shutdownMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_QuicStream_shutdown", MemorySegment.class /* self */, int.class /* Flags */, long.class /* ErrorCode */);
 
     public int shutdown(int Flags, long ErrorCode) {
         int RESULT;
@@ -100,7 +100,7 @@ public class QuicStream extends AbstractNativeObject implements NativeObject {
         return RESULT;
     }
 
-    private static final MethodHandle sendMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_QuicStream_send", MemorySegment.class /* self */, io.vproxy.msquic.QuicBuffer.LAYOUT.getClass() /* Buffers */, int.class /* BufferCount */, int.class /* Flags */, MemorySegment.class /* ClientSendContext */);
+    private static final MethodHandle sendMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_QuicStream_send", MemorySegment.class /* self */, io.vproxy.msquic.QuicBuffer.LAYOUT.getClass() /* Buffers */, int.class /* BufferCount */, int.class /* Flags */, MemorySegment.class /* ClientSendContext */);
 
     public int send(io.vproxy.msquic.QuicBuffer Buffers, int BufferCount, int Flags, MemorySegment ClientSendContext) {
         int RESULT;
@@ -112,7 +112,7 @@ public class QuicStream extends AbstractNativeObject implements NativeObject {
         return RESULT;
     }
 
-    private static final MethodHandle receiveCompleteMH = PanamaUtils.lookupPNICriticalFunction(false, void.class, "JavaCritical_io_vproxy_msquic_QuicStream_receiveComplete", MemorySegment.class /* self */, long.class /* BufferLength */);
+    private static final MethodHandle receiveCompleteMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "JavaCritical_io_vproxy_msquic_QuicStream_receiveComplete", MemorySegment.class /* self */, long.class /* BufferLength */);
 
     public void receiveComplete(long BufferLength) {
         try {
@@ -122,7 +122,7 @@ public class QuicStream extends AbstractNativeObject implements NativeObject {
         }
     }
 
-    private static final MethodHandle receiveSetEnabledMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_QuicStream_receiveSetEnabled", MemorySegment.class /* self */, boolean.class /* IsEnabled */);
+    private static final MethodHandle receiveSetEnabledMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_QuicStream_receiveSetEnabled", MemorySegment.class /* self */, boolean.class /* IsEnabled */);
 
     public int receiveSetEnabled(boolean IsEnabled) {
         int RESULT;
@@ -224,5 +224,5 @@ public class QuicStream extends AbstractNativeObject implements NativeObject {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.15
-// sha256:8bbb994f58394963a1d8f79d76eef4be813c4429ca6665628709910e1041c76c
+// metadata.generator-version: pni 21.0.0.17
+// sha256:dc261730a2456530f7324da69c4c9f7db861bd0b4f0b5d79c2f2447ab4850339

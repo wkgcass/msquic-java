@@ -127,38 +127,32 @@ public class QuicTLSSecret extends AbstractNativeObject implements NativeObject 
         SB.append(",\n");
         {
             SB.append(" ".repeat(INDENT + 4)).append("ClientRandom => ");
-            if (CORRUPTED_MEMORY) SB.append("<?>");
-            else SB.append(PanamaUtils.memorySegmentToString(getClientRandom()));
+            SB.append(PanamaUtils.memorySegmentToString(getClientRandom()));
         }
         SB.append(",\n");
         {
             SB.append(" ".repeat(INDENT + 4)).append("ClientEarlyTrafficSecret => ");
-            if (CORRUPTED_MEMORY) SB.append("<?>");
-            else SB.append(PanamaUtils.memorySegmentToString(getClientEarlyTrafficSecret()));
+            SB.append(PanamaUtils.memorySegmentToString(getClientEarlyTrafficSecret()));
         }
         SB.append(",\n");
         {
             SB.append(" ".repeat(INDENT + 4)).append("ClientHandshakeTrafficSecret => ");
-            if (CORRUPTED_MEMORY) SB.append("<?>");
-            else SB.append(PanamaUtils.memorySegmentToString(getClientHandshakeTrafficSecret()));
+            SB.append(PanamaUtils.memorySegmentToString(getClientHandshakeTrafficSecret()));
         }
         SB.append(",\n");
         {
             SB.append(" ".repeat(INDENT + 4)).append("ServerHandshakeTrafficSecret => ");
-            if (CORRUPTED_MEMORY) SB.append("<?>");
-            else SB.append(PanamaUtils.memorySegmentToString(getServerHandshakeTrafficSecret()));
+            SB.append(PanamaUtils.memorySegmentToString(getServerHandshakeTrafficSecret()));
         }
         SB.append(",\n");
         {
             SB.append(" ".repeat(INDENT + 4)).append("ClientTrafficSecret0 => ");
-            if (CORRUPTED_MEMORY) SB.append("<?>");
-            else SB.append(PanamaUtils.memorySegmentToString(getClientTrafficSecret0()));
+            SB.append(PanamaUtils.memorySegmentToString(getClientTrafficSecret0()));
         }
         SB.append(",\n");
         {
             SB.append(" ".repeat(INDENT + 4)).append("ServerTrafficSecret0 => ");
-            if (CORRUPTED_MEMORY) SB.append("<?>");
-            else SB.append(PanamaUtils.memorySegmentToString(getServerTrafficSecret0()));
+            SB.append(PanamaUtils.memorySegmentToString(getServerTrafficSecret0()));
         }
         SB.append("\n");
         SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
@@ -234,5 +228,5 @@ public class QuicTLSSecret extends AbstractNativeObject implements NativeObject 
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:4a0b9e90b619935fe7bdc37fc2c8353b9d5dbfc19cbc73aa2a4017f05e65f5e2
+// metadata.generator-version: pni 21.0.0.17
+// sha256:f68d80f6d84b77f6a32b6db42db361e5b0422142175f714fa502e91d4f46a05a

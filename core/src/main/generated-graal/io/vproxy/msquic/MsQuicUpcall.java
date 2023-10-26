@@ -15,7 +15,7 @@ public class MsQuicUpcall {
     private static final Arena ARENA = Arena.ofShared();
 
     public static MemorySegment listenerCallback;
-    public static final CEntryPointLiteral<CFunctionPointer> listenerCallbackCEPL = GraalUtils.defineCFunctionByName(io.vproxy.msquic.MsQuicUpcall.class, "listenerCallback");
+    public static final CEntryPointLiteral<CFunctionPointer> listenerCallbackCEPL = GraalUtils.defineCFunctionByName(new PNILinkOptions(), io.vproxy.msquic.MsQuicUpcall.class, "listenerCallback");
 
     @CEntryPoint
     public static int listenerCallback(IsolateThread THREAD, VoidPointer ListenerPTR, VoidPointer ContextPTR, VoidPointer EventPTR) {
@@ -35,7 +35,7 @@ public class MsQuicUpcall {
     }
 
     public static MemorySegment connectionCallback;
-    public static final CEntryPointLiteral<CFunctionPointer> connectionCallbackCEPL = GraalUtils.defineCFunctionByName(io.vproxy.msquic.MsQuicUpcall.class, "connectionCallback");
+    public static final CEntryPointLiteral<CFunctionPointer> connectionCallbackCEPL = GraalUtils.defineCFunctionByName(new PNILinkOptions(), io.vproxy.msquic.MsQuicUpcall.class, "connectionCallback");
 
     @CEntryPoint
     public static int connectionCallback(IsolateThread THREAD, VoidPointer ConnectionPTR, VoidPointer ContextPTR, VoidPointer EventPTR) {
@@ -55,7 +55,7 @@ public class MsQuicUpcall {
     }
 
     public static MemorySegment streamCallback;
-    public static final CEntryPointLiteral<CFunctionPointer> streamCallbackCEPL = GraalUtils.defineCFunctionByName(io.vproxy.msquic.MsQuicUpcall.class, "streamCallback");
+    public static final CEntryPointLiteral<CFunctionPointer> streamCallbackCEPL = GraalUtils.defineCFunctionByName(new PNILinkOptions(), io.vproxy.msquic.MsQuicUpcall.class, "streamCallback");
 
     @CEntryPoint
     public static int streamCallback(IsolateThread THREAD, VoidPointer StreamPTR, VoidPointer ContextPTR, VoidPointer EventPTR) {
@@ -79,15 +79,15 @@ public class MsQuicUpcall {
         connectionCallback = MemorySegment.ofAddress(connectionCallbackCEPL.getFunctionPointer().rawValue());
         streamCallback = MemorySegment.ofAddress(streamCallbackCEPL.getFunctionPointer().rawValue());
 
-        var initMH = PanamaUtils.lookupPNICriticalFunction(true, void.class, "JavaCritical_io_vproxy_msquic_MsQuicUpcall_INIT", MemorySegment.class, MemorySegment.class, MemorySegment.class);
+        var initMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions().setCritical(true), void.class, "JavaCritical_io_vproxy_msquic_MsQuicUpcall_INIT", MemorySegment.class, MemorySegment.class, MemorySegment.class);
         try {
             initMH.invoke(listenerCallback, connectionCallback, streamCallback);
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
-        listenerCallback = PanamaUtils.lookupFunctionPointer("JavaCritical_io_vproxy_msquic_MsQuicUpcall_listenerCallback").orElseThrow(() -> new NullPointerException("JavaCritical_io_vproxy_msquic_MsQuicUpcall_listenerCallback"));
-        connectionCallback = PanamaUtils.lookupFunctionPointer("JavaCritical_io_vproxy_msquic_MsQuicUpcall_connectionCallback").orElseThrow(() -> new NullPointerException("JavaCritical_io_vproxy_msquic_MsQuicUpcall_connectionCallback"));
-        streamCallback = PanamaUtils.lookupFunctionPointer("JavaCritical_io_vproxy_msquic_MsQuicUpcall_streamCallback").orElseThrow(() -> new NullPointerException("JavaCritical_io_vproxy_msquic_MsQuicUpcall_streamCallback"));
+        listenerCallback = PanamaUtils.lookupFunctionPointer(new PNILookupOptions(), "JavaCritical_io_vproxy_msquic_MsQuicUpcall_listenerCallback").orElseThrow(() -> new NullPointerException("JavaCritical_io_vproxy_msquic_MsQuicUpcall_listenerCallback"));
+        connectionCallback = PanamaUtils.lookupFunctionPointer(new PNILookupOptions(), "JavaCritical_io_vproxy_msquic_MsQuicUpcall_connectionCallback").orElseThrow(() -> new NullPointerException("JavaCritical_io_vproxy_msquic_MsQuicUpcall_connectionCallback"));
+        streamCallback = PanamaUtils.lookupFunctionPointer(new PNILookupOptions(), "JavaCritical_io_vproxy_msquic_MsQuicUpcall_streamCallback").orElseThrow(() -> new NullPointerException("JavaCritical_io_vproxy_msquic_MsQuicUpcall_streamCallback"));
     }
 
     private static Interface IMPL = null;
@@ -106,5 +106,5 @@ public class MsQuicUpcall {
         int streamCallback(MemorySegment Stream, MemorySegment Context, io.vproxy.msquic.QuicStreamEvent Event);
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:39cc0e0e93bf94e9365e7ea3256b7acffdb0080cbe0e5fb392739afc69c96d08
+// metadata.generator-version: pni 21.0.0.17
+// sha256:7b3e7ef4c07d12cce4de25f05b6b697d62bef913859df3032021ef4bf6993bbd

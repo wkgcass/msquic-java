@@ -16,7 +16,7 @@ public class MsQuicMod {
         return INSTANCE;
     }
 
-    private static final MethodHandle MsQuicSetEventLoopThreadDispatcherMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_MsQuicMod_MsQuicSetEventLoopThreadDispatcher", MemorySegment.class /* dispatcher */);
+    private static final MethodHandle MsQuicSetEventLoopThreadDispatcherMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_MsQuicMod_MsQuicSetEventLoopThreadDispatcher", MemorySegment.class /* dispatcher */);
 
     public int MsQuicSetEventLoopThreadDispatcher(MemorySegment dispatcher) {
         int RESULT;
@@ -28,7 +28,7 @@ public class MsQuicMod {
         return RESULT;
     }
 
-    private static final MethodHandle CxPlatGetCurThreadMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_MsQuicMod_CxPlatGetCurThread", MemorySegment.class /* Thread */);
+    private static final MethodHandle CxPlatGetCurThreadMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_MsQuicMod_CxPlatGetCurThread", MemorySegment.class /* Thread */);
 
     public int CxPlatGetCurThread(MemorySegment Thread) {
         int RESULT;
@@ -40,7 +40,7 @@ public class MsQuicMod {
         return RESULT;
     }
 
-    private static final MethodHandle INVOKE_LPTHREAD_START_ROUTINEMH = PanamaUtils.lookupPNICriticalFunction(false, void.class, "JavaCritical_io_vproxy_msquic_MsQuicMod_INVOKE_LPTHREAD_START_ROUTINE", MemorySegment.class /* Callback */, MemorySegment.class /* Context */);
+    private static final MethodHandle INVOKE_LPTHREAD_START_ROUTINEMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "JavaCritical_io_vproxy_msquic_MsQuicMod_INVOKE_LPTHREAD_START_ROUTINE", MemorySegment.class /* Callback */, MemorySegment.class /* Context */);
 
     public void INVOKE_LPTHREAD_START_ROUTINE(MemorySegment Callback, MemorySegment Context) {
         try {
@@ -50,5 +50,5 @@ public class MsQuicMod {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:39470c9777a16c8ce036ecc67a533c02ac857e08e687661c9eef51dc9d1f507e
+// metadata.generator-version: pni 21.0.0.17
+// sha256:97320be900997ed4af4ceb5d9ffe76ea460fa54109d96c4d3f86224f0721040f

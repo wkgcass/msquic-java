@@ -32,9 +32,9 @@ public class MsQuicModUpcall {
         } catch (Throwable t) {
             throw new RuntimeException(t);
         }
-        dispatch = PanamaUtils.defineCFunction(ARENA, dispatchMH, int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class);
+        dispatch = PanamaUtils.defineCFunction(new PNILinkOptions(), ARENA, dispatchMH, int.class, MemorySegment.class, MemorySegment.class, MemorySegment.class, MemorySegment.class);
 
-        var initMH = PanamaUtils.lookupPNICriticalFunction(true, void.class, "JavaCritical_io_vproxy_msquic_MsQuicModUpcall_INIT", MemorySegment.class);
+        var initMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions().setCritical(true), void.class, "JavaCritical_io_vproxy_msquic_MsQuicModUpcall_INIT", MemorySegment.class);
         try {
             initMH.invoke(dispatch);
         } catch (Throwable t) {
@@ -53,5 +53,5 @@ public class MsQuicModUpcall {
         int dispatch(io.vproxy.msquic.CXPLAT_THREAD_CONFIG Config, MemorySegment EventQ, MemorySegment Thread, MemorySegment Context);
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:3b6d469b9769a044880309bbc43cd2c703b142bc02c0a6e9fb06e0f5ae4ffa69
+// metadata.generator-version: pni 21.0.0.17
+// sha256:a4cad00e4992df9cfc15e13236e020d68297c2a46d082fe44cf221e38397175b

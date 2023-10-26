@@ -12,7 +12,7 @@ import org.graalvm.nativeimage.c.type.VoidPointer;
 import org.graalvm.word.WordFactory;
 
 public class QuicAddr extends AbstractNativeObject implements NativeObject {
-    private static final MethodHandle __getLayoutByteSizeMH = PanamaUtils.lookupPNICriticalFunction(true, long.class, "JavaCritical_io_vproxy_msquic_QuicAddr___getLayoutByteSize");
+    private static final MethodHandle __getLayoutByteSizeMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions().setCritical(true), long.class, "JavaCritical_io_vproxy_msquic_QuicAddr___getLayoutByteSize");
 
     private static long __getLayoutByteSize() {
         long RESULT;
@@ -44,7 +44,7 @@ public class QuicAddr extends AbstractNativeObject implements NativeObject {
         this(ALLOCATOR.allocate(LAYOUT));
     }
 
-    private static final MethodHandle getFamilyMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_QuicAddr_getFamily", MemorySegment.class /* self */);
+    private static final MethodHandle getFamilyMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_QuicAddr_getFamily", MemorySegment.class /* self */);
 
     public int getFamily() {
         int RESULT;
@@ -56,7 +56,7 @@ public class QuicAddr extends AbstractNativeObject implements NativeObject {
         return RESULT;
     }
 
-    private static final MethodHandle setFamilyMH = PanamaUtils.lookupPNICriticalFunction(false, void.class, "JavaCritical_io_vproxy_msquic_QuicAddr_setFamily", MemorySegment.class /* self */, int.class /* family */);
+    private static final MethodHandle setFamilyMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "JavaCritical_io_vproxy_msquic_QuicAddr_setFamily", MemorySegment.class /* self */, int.class /* family */);
 
     public void setFamily(int family) {
         try {
@@ -66,7 +66,7 @@ public class QuicAddr extends AbstractNativeObject implements NativeObject {
         }
     }
 
-    private static final MethodHandle getPortMH = PanamaUtils.lookupPNICriticalFunction(false, int.class, "JavaCritical_io_vproxy_msquic_QuicAddr_getPort", MemorySegment.class /* self */);
+    private static final MethodHandle getPortMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_QuicAddr_getPort", MemorySegment.class /* self */);
 
     public int getPort() {
         int RESULT;
@@ -78,7 +78,7 @@ public class QuicAddr extends AbstractNativeObject implements NativeObject {
         return RESULT;
     }
 
-    private static final MethodHandle setPortMH = PanamaUtils.lookupPNICriticalFunction(false, void.class, "JavaCritical_io_vproxy_msquic_QuicAddr_setPort", MemorySegment.class /* self */, int.class /* port */);
+    private static final MethodHandle setPortMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "JavaCritical_io_vproxy_msquic_QuicAddr_setPort", MemorySegment.class /* self */, int.class /* port */);
 
     public void setPort(int port) {
         try {
@@ -88,7 +88,7 @@ public class QuicAddr extends AbstractNativeObject implements NativeObject {
         }
     }
 
-    private static final MethodHandle toStringMH = PanamaUtils.lookupPNICriticalFunction(false, void.class, "JavaCritical_io_vproxy_msquic_QuicAddr_toString", MemorySegment.class /* self */, String.class /* str */);
+    private static final MethodHandle toStringMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "JavaCritical_io_vproxy_msquic_QuicAddr_toString", MemorySegment.class /* self */, String.class /* str */);
 
     public void toString(PNIString str) {
         try {
@@ -178,5 +178,5 @@ public class QuicAddr extends AbstractNativeObject implements NativeObject {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:027fd657821bf8c2e0eb973584a1eb7e8213992e22eef7070784f2f684043e33
+// metadata.generator-version: pni 21.0.0.17
+// sha256:2e58ccd4f6cdfa7fcc2432cd8a8ddbf19788ddfdd93f2be87864073048a8ef4c
