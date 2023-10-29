@@ -97,9 +97,8 @@ abstract class PNIQuicNewConnectionInfo {
 @AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicListenerEventStopComplete {
-    @BitField(
-        name = {"AppCloseInProgress"},
-        bit = {1}
-    )
+    @Bit({
+        @Bit.Field(name = "AppCloseInProgress", bits = 1, bool = true)
+    })
     @Unsigned byte Field01;
 }

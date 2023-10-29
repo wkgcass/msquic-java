@@ -141,24 +141,24 @@ abstract class PNIQuicSettings {
     @Unsigned short StatelessOperationExpirationMs;
     @Unsigned short MinimumMtu;
     @Unsigned short MaximumMtu;
-    @BitField(
-        name = {
-            "SendBufferingEnabled", "PacingEnabled", "MigrationEnabled",
-            "DatagramReceiveEnabled", "ServerResumptionLevel", "GreaseQuicBitEnabled",
-            "EcnEnabled"
-        },
-        bit = {1, 1, 1, 1, 2, 1, 1}
-    )
+    @Bit({
+        @Bit.Field(name = "SendBufferingEnabled", bits = 1, bool = true),
+        @Bit.Field(name = "PacingEnabled", bits = 1, bool = true),
+        @Bit.Field(name = "MigrationEnabled", bits = 1, bool = true),
+        @Bit.Field(name = "DatagramReceiveEnabled", bits = 1, bool = true),
+        @Bit.Field(name = "ServerResumptionLevel", bits = 2),
+        @Bit.Field(name = "GreaseQuicBitEnabled", bits = 1, bool = true),
+        @Bit.Field(name = "EcnEnabled", bits = 1, bool = true),
+    })
     @Unsigned byte Field01;
     @Unsigned byte MaxOperationsPerDrain;
     @Unsigned byte MtuDiscoveryMissingProbeCount;
     @Unsigned int DestCidUpdateIdleTimeoutMs;
-    @BitField(
-        name = {
-            "HyStartEnabled", "EncryptionOffloadAllowed", "ReliableResetEnabled",
-        },
-        bit = {1, 1, 1}
-    )
+    @Bit({
+        @Bit.Field(name = "HyStartEnabled", bits = 1, bool = true),
+        @Bit.Field(name = "EncryptionOffloadAllowed", bits = 1, bool = true),
+        @Bit.Field(name = "ReliableResetEnabled", bits = 1, bool = true),
+    })
     @Unsigned long Flags;
 }
 
@@ -166,41 +166,44 @@ abstract class PNIQuicSettings {
 @AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicSettingsIsSet {
-    @BitField(
-        name = {
-            /* 01 */ "MaxBytesPerKey", "HandshakeIdleTimeoutMs", "IdleTimeoutMs",
-            /* 02 */ "MtuDiscoverySearchCompleteTimeoutUs",
-            /* 03 */ "TlsClientMaxSendBuffer", "TlsServerMaxSendBuffer",
-            /* 04 */ "StreamRecvWindowDefault", "StreamRecvBufferDefault",
-            /* 05 */ "ConnFlowControlWindow", "MaxWorkerQueueDelayUs",
-            /* 06 */ "MaxStatelessOperations", "InitialWindowPackets",
-            /* 07 */ "SendIdleTimeoutMs", "InitialRttMs", "MaxAckDelayMs",
-            /* 08 */ "DisconnectTimeoutMs", "KeepAliveIntervalMs", "CongestionControlAlgorithm",
-            /* 09 */ "PeerBidiStreamCount", "PeerUnidiStreamCount", "MaxBindingStatelessOperations",
-            /* 10 */ "StatelessOperationExpirationMs", "MinimumMtu", "MaximumMtu",
-            /* 11 */ "SendBufferingEnabled", "PacingEnabled", "MigrationEnabled",
-            /* 12 */ "DatagramReceiveEnabled", "ServerResumptionLevel", "MaxOperationsPerDrain",
-            /* 13 */ "MtuDiscoveryMissingProbeCount", "DestCidUpdateIdleTimeoutMs",
-            /* 14 */ "GreaseQuicBitEnabled", "EcnEnabled", "HyStartEnabled",
-            /* 15 */ "EncryptionOffloadAllowed", "ReliableResetEnabled",
-        },
-        bit = {
-            /* 01 */ 1, 1, 1,
-            /* 02 */ 1,
-            /* 03 */ 1, 1,
-            /* 04 */ 1, 1,
-            /* 05 */ 1, 1,
-            /* 06 */ 1, 1,
-            /* 07 */ 1, 1, 1,
-            /* 08 */ 1, 1, 1,
-            /* 09 */ 1, 1, 1,
-            /* 10 */ 1, 1, 1,
-            /* 11 */ 1, 1, 1,
-            /* 12 */ 1, 1, 1,
-            /* 13 */ 1, 1,
-            /* 14 */ 1, 1, 1,
-            /* 15 */ 1, 1,
-        }
-    )
+    @Bit({
+        @Bit.Field(name = "MaxBytesPerKey", bits = 1, bool = true),
+        @Bit.Field(name = "HandshakeIdleTimeoutMs", bits = 1, bool = true),
+        @Bit.Field(name = "IdleTimeoutMs", bits = 1, bool = true),
+        @Bit.Field(name = "MtuDiscoverySearchCompleteTimeoutUs", bits = 1, bool = true),
+        @Bit.Field(name = "TlsClientMaxSendBuffer", bits = 1, bool = true),
+        @Bit.Field(name = "TlsServerMaxSendBuffer", bits = 1, bool = true),
+        @Bit.Field(name = "StreamRecvWindowDefault", bits = 1, bool = true),
+        @Bit.Field(name = "StreamRecvBufferDefault", bits = 1, bool = true),
+        @Bit.Field(name = "ConnFlowControlWindow", bits = 1, bool = true),
+        @Bit.Field(name = "MaxWorkerQueueDelayUs", bits = 1, bool = true),
+        @Bit.Field(name = "MaxStatelessOperations", bits = 1, bool = true),
+        @Bit.Field(name = "InitialWindowPackets", bits = 1, bool = true),
+        @Bit.Field(name = "SendIdleTimeoutMs", bits = 1, bool = true),
+        @Bit.Field(name = "InitialRttMs", bits = 1, bool = true),
+        @Bit.Field(name = "MaxAckDelayMs", bits = 1, bool = true),
+        @Bit.Field(name = "DisconnectTimeoutMs", bits = 1, bool = true),
+        @Bit.Field(name = "KeepAliveIntervalMs", bits = 1, bool = true),
+        @Bit.Field(name = "CongestionControlAlgorithm", bits = 1, bool = true),
+        @Bit.Field(name = "PeerBidiStreamCount", bits = 1, bool = true),
+        @Bit.Field(name = "PeerUnidiStreamCount", bits = 1, bool = true),
+        @Bit.Field(name = "MaxBindingStatelessOperations", bits = 1, bool = true),
+        @Bit.Field(name = "StatelessOperationExpirationMs", bits = 1, bool = true),
+        @Bit.Field(name = "MinimumMtu", bits = 1, bool = true),
+        @Bit.Field(name = "MaximumMtu", bits = 1, bool = true),
+        @Bit.Field(name = "SendBufferingEnabled", bits = 1, bool = true),
+        @Bit.Field(name = "PacingEnabled", bits = 1, bool = true),
+        @Bit.Field(name = "MigrationEnabled", bits = 1, bool = true),
+        @Bit.Field(name = "DatagramReceiveEnabled", bits = 1, bool = true),
+        @Bit.Field(name = "ServerResumptionLevel", bits = 1, bool = true),
+        @Bit.Field(name = "MaxOperationsPerDrain", bits = 1, bool = true),
+        @Bit.Field(name = "MtuDiscoveryMissingProbeCount", bits = 1, bool = true),
+        @Bit.Field(name = "DestCidUpdateIdleTimeoutMs", bits = 1, bool = true),
+        @Bit.Field(name = "GreaseQuicBitEnabled", bits = 1, bool = true),
+        @Bit.Field(name = "EcnEnabled", bits = 1, bool = true),
+        @Bit.Field(name = "HyStartEnabled", bits = 1, bool = true),
+        @Bit.Field(name = "EncryptionOffloadAllowed", bits = 1, bool = true),
+        @Bit.Field(name = "ReliableResetEnabled", bits = 1, bool = true),
+    })
     @Unsigned long IsSetFlags;
 }

@@ -21,15 +21,13 @@ public class PNIQuicTLSSecret {
 @AlwaysAligned
 @Include("msquic.h")
 class PNIQuicTLSSecretIsSet {
-    @BitField(
-        name = {
-            "ClientRandom", "ClientEarlyTrafficSecret", "ClientHandshakeTrafficSecret",
-            "ServerHandshakeTrafficSecret", "ClientTrafficSecret0", "ServerTrafficSecret0"
-        },
-        bit = {
-            1, 1, 1,
-            1, 1, 1
-        }
-    )
+    @Bit({
+        @Bit.Field(name = "ClientRandom", bits = 1, bool = true),
+        @Bit.Field(name = "ClientEarlyTrafficSecret", bits = 1, bool = true),
+        @Bit.Field(name = "ClientHandshakeTrafficSecret", bits = 1, bool = true),
+        @Bit.Field(name = "ServerHandshakeTrafficSecret", bits = 1, bool = true),
+        @Bit.Field(name = "ClientTrafficSecret0", bits = 1, bool = true),
+        @Bit.Field(name = "ServerTrafficSecret0", bits = 1, bool = true),
+    })
     @Unsigned byte IsSet;
 }

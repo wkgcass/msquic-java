@@ -1,7 +1,7 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 buildscript {
-    def PNI_VERSION = '21.0.0.17'
+    def PNI_VERSION = '21.0.0.18'
     ext.set("PNI_VERSION", PNI_VERSION)
 
     repositories {
@@ -170,8 +170,8 @@ project(':core') {
         api 'io.vproxy:pni-api-jdk21:' + PNI_API_VERSION
         api 'io.vproxy:pni-api-graal:' + PNI_API_VERSION
         api 'io.vproxy:commons:1.2.0'
-        compileOnly group: 'io.vproxy', name: 'graal-sdk-mock-nativeimage', version: '1.2.0'
-        runtimeOnly group: 'io.vproxy', name: 'graal-sdk-mock-runtime', version: '1.2.0'
+        compileOnly group: 'io.vproxy', name: 'graal-sdk-mock-nativeimage', version: '1.2.1'
+        runtimeOnly group: 'io.vproxy', name: 'graal-sdk-mock-runtime', version: '1.2.1'
     }
 }
 

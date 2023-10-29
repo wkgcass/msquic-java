@@ -127,10 +127,9 @@ abstract class PNIQuicStreamEventUnion {
 abstract class PNIQuicStreamEventStartComplete {
     int Status; // QUIC_STATUS
     long ID;
-    @BitField(
-        name = {"PeerAccepted"},
-        bit = {1}
-    )
+    @Bit({
+        @Bit.Field(name = "PeerAccepted", bits = 1, bool = true),
+    })
     @Unsigned byte Field01;
 }
 
@@ -179,10 +178,11 @@ abstract class PNIQuicStreamEventSendShutdownComplete {
 @Include("msquic.h")
 abstract class PNIQuicStreamEventShutdownComplete {
     boolean ConnectionShutdown;
-    @BitField(
-        name = {"AppCloseInProgress", "ConnectionShutdownByApp", "ConnectionClosedRemotely"},
-        bit = {1, 1, 1}
-    )
+    @Bit({
+        @Bit.Field(name = "AppCloseInProgress", bits = 1, bool = true),
+        @Bit.Field(name = "ConnectionShutdownByApp", bits = 1, bool = true),
+        @Bit.Field(name = "ConnectionClosedRemotely", bits = 1, bool = true),
+    })
     @Unsigned byte Field01;
     long ConnectionErrorCode;
     int ConnectionCloseStatus; // QUIC_STATUS

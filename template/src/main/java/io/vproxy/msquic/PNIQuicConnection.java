@@ -216,10 +216,11 @@ abstract class PNIQuicConnectionEventShutdownInitiatedByPeer {
 @AlwaysAligned
 @Include("msquic.h")
 abstract class PNIQuicConnectionEventConnectionShutdownComplete {
-    @BitField(
-        name = {"HandshakeCompleted", "PeerAcknowledgedShutdown", "AppCloseInProgress"},
-        bit = {1, 1, 1}
-    )
+    @Bit({
+        @Bit.Field(name = "HandshakeCompleted", bits = 1, bool = true),
+        @Bit.Field(name = "PeerAcknowledgedShutdown", bits = 1, bool = true),
+        @Bit.Field(name = "AppCloseInProgress", bits = 1, bool = true),
+    })
     @Unsigned byte Field01;
 }
 
