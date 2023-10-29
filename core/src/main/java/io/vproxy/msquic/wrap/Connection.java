@@ -192,7 +192,7 @@ public abstract class Connection {
                     Utils.hexDump(negotiatedAlpn);
                 }
                 {
-                    Logger.alert("SessionResumed: " + data.getSessionResumed());
+                    Logger.alert("SessionResumed: " + data.isSessionResumed());
                 }
                 var SSLKEYLOGFILE = getSSLKeyLogFilePath();
                 if (SSLKEYLOGFILE != null) {
@@ -232,9 +232,9 @@ public abstract class Connection {
                 Logger.alert("QUIC_CONNECTION_EVENT_SHUTDOWN_COMPLETE");
                 var data = event.getUnion().getSHUTDOWN_COMPLETE();
                 {
-                    Logger.alert("HandshakeCompleted: " + data.getHandshakeCompleted());
-                    Logger.alert("PeerAcknowledgedShutdown: " + data.getPeerAcknowledgedShutdown());
-                    Logger.alert("AppCloseInProgress: " + data.getAppCloseInProgress());
+                    Logger.alert("HandshakeCompleted: " + data.isHandshakeCompleted());
+                    Logger.alert("PeerAcknowledgedShutdown: " + data.isPeerAcknowledgedShutdown());
+                    Logger.alert("AppCloseInProgress: " + data.isAppCloseInProgress());
                 }
             }
             case QUIC_CONNECTION_EVENT_LOCAL_ADDRESS_CHANGED -> {
@@ -279,7 +279,7 @@ public abstract class Connection {
                 Logger.alert("QUIC_CONNECTION_EVENT_PEER_NEEDS_STREAMS");
                 var data = event.getUnion().getPEER_NEEDS_STREAMS();
                 {
-                    Logger.alert("Bidirectional: " + data.getBidirectional());
+                    Logger.alert("Bidirectional: " + data.isBidirectional());
                 }
             }
             case QUIC_CONNECTION_EVENT_IDEAL_PROCESSOR_CHANGED -> {
@@ -294,7 +294,7 @@ public abstract class Connection {
                 Logger.alert("QUIC_CONNECTION_EVENT_DATAGRAM_STATE_CHANGED");
                 var data = event.getUnion().getDATAGRAM_STATE_CHANGED();
                 {
-                    Logger.alert("SendEnabled: " + data.getSendEnabled());
+                    Logger.alert("SendEnabled: " + data.isSendEnabled());
                     Logger.alert("MaxSendLength: " + data.getMaxSendLength());
                 }
             }
@@ -356,7 +356,7 @@ public abstract class Connection {
                 Logger.alert("QUIC_CONNECTION_EVENT_RELIABLE_RESET_NEGOTIATED");
                 var data = event.getUnion().getRELIABLE_RESET_NEGOTIATED();
                 {
-                    Logger.alert("IsNegotiated: " + data.getIsNegotiated());
+                    Logger.alert("IsNegotiated: " + data.isIsNegotiated());
                 }
             }
             default -> Logger.alert("UNKNOWN CONNECTION EVENT: " + event.getType());

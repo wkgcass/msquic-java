@@ -156,7 +156,7 @@ public abstract class Listener {
             case QUIC_LISTENER_EVENT_STOP_COMPLETE -> {
                 Logger.alert("QUIC_LISTENER_EVENT_STOP_COMPLETE");
                 {
-                    var appCloseInProgress = event.getUnion().getSTOP_COMPLETE().getAppCloseInProgress();
+                    var appCloseInProgress = event.getUnion().getSTOP_COMPLETE().isAppCloseInProgress();
                     Logger.alert("AppCloseInProgress: " + appCloseInProgress);
                 }
             }

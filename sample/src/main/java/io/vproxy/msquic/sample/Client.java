@@ -96,11 +96,11 @@ public class Client {
             var confAllocator = Allocator.ofUnsafe();
             var settings = new QuicSettings(confAllocator);
             {
-                settings.getIsSet().setIdleTimeoutMs(1);
+                settings.getIsSet().setIdleTimeoutMs(true);
                 settings.setIdleTimeoutMs(60 * 60_000); // 1 hour
-                settings.getIsSet().setCongestionControlAlgorithm(1);
+                settings.getIsSet().setCongestionControlAlgorithm(true);
                 settings.setCongestionControlAlgorithm((short) QUIC_CONGESTION_CONTROL_ALGORITHM_BBR);
-                settings.getIsSet().setPeerBidiStreamCount(1);
+                settings.getIsSet().setPeerBidiStreamCount(true);
                 settings.setPeerBidiStreamCount((short) 128);
             }
             var buffers = new QuicBuffer.Array(confAllocator, 1);

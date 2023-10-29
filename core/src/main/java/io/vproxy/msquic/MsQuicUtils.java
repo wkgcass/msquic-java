@@ -11,23 +11,23 @@ public class MsQuicUtils {
         var sb = new StringBuilder();
         int len = s.getSecretLength() & 0xff;
         String clientRandom = convertToHexString(s.getClientRandom(), (int) s.getClientRandom().byteSize());
-        if (s.getIsSet().getClientEarlyTrafficSecret() == 1) {
+        if (s.getIsSet().isClientEarlyTrafficSecret()) {
             sb.append("CLIENT_EARLY_TRAFFIC_SECRET ").append(clientRandom).append(" ")
                 .append(convertToHexString(s.getClientEarlyTrafficSecret(), len)).append("\n");
         }
-        if (s.getIsSet().getClientHandshakeTrafficSecret() == 1) {
+        if (s.getIsSet().isClientHandshakeTrafficSecret()) {
             sb.append("CLIENT_HANDSHAKE_TRAFFIC_SECRET ").append(clientRandom).append(" ")
                 .append(convertToHexString(s.getClientHandshakeTrafficSecret(), len)).append("\n");
         }
-        if (s.getIsSet().getServerHandshakeTrafficSecret() == 1) {
+        if (s.getIsSet().isServerHandshakeTrafficSecret()) {
             sb.append("SERVER_HANDSHAKE_TRAFFIC_SECRET ").append(clientRandom).append(" ")
                 .append(convertToHexString(s.getServerHandshakeTrafficSecret(), len)).append("\n");
         }
-        if (s.getIsSet().getClientTrafficSecret0() == 1) {
+        if (s.getIsSet().isClientTrafficSecret0()) {
             sb.append("CLIENT_TRAFFIC_SECRET_0 ").append(clientRandom).append(" ")
                 .append(convertToHexString(s.getClientTrafficSecret0(), len)).append("\n");
         }
-        if (s.getIsSet().getServerTrafficSecret0() == 1) {
+        if (s.getIsSet().isServerTrafficSecret0()) {
             sb.append("SERVER_TRAFFIC_SECRET_0 ").append(clientRandom).append(" ")
                 .append(convertToHexString(s.getServerTrafficSecret0(), len)).append("\n");
         }

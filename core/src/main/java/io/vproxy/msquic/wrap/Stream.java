@@ -216,7 +216,7 @@ public abstract class Stream {
                     var ctxRef = PNIRef.<SendContext>of(context);
                     var ctx = ctxRef.getRef();
                     ctxRef.close();
-                    finish(ctx, !data.getCanceled());
+                    finish(ctx, !data.isCanceled());
                 }
                 yield 0;
             }
@@ -242,7 +242,7 @@ public abstract class Stream {
                 {
                     Logger.alert("Status: " + data.getStatus());
                     Logger.alert("ID: " + data.getID());
-                    Logger.alert("PeerAccepted: " + data.getPeerAccepted());
+                    Logger.alert("PeerAccepted: " + data.isPeerAccepted());
                 }
             }
             case QUIC_STREAM_EVENT_RECEIVE -> {
@@ -270,7 +270,7 @@ public abstract class Stream {
                 Logger.alert("QUIC_STREAM_EVENT_SEND_COMPLETE");
                 var data = event.getUnion().getSEND_COMPLETE();
                 {
-                    Logger.alert("Canceled: " + data.getCanceled());
+                    Logger.alert("Canceled: " + data.isCanceled());
                     Logger.alert("ClientContext: " + data.getClientContext());
                 }
             }
@@ -299,17 +299,17 @@ public abstract class Stream {
                 Logger.alert("QUIC_STREAM_EVENT_SEND_SHUTDOWN_COMPLETE");
                 var data = event.getUnion().getSEND_SHUTDOWN_COMPLETE();
                 {
-                    Logger.alert("Graceful: " + data.getGraceful());
+                    Logger.alert("Graceful: " + data.isGraceful());
                 }
             }
             case QUIC_STREAM_EVENT_SHUTDOWN_COMPLETE -> {
                 Logger.alert("QUIC_STREAM_EVENT_SHUTDOWN_COMPLETE");
                 var data = event.getUnion().getSHUTDOWN_COMPLETE();
                 {
-                    Logger.alert("ConnectionShutdown: " + data.getConnectionShutdown());
-                    Logger.alert("AppCloseInProgress: " + data.getAppCloseInProgress());
-                    Logger.alert("ConnectionShutdownByApp: " + data.getConnectionShutdownByApp());
-                    Logger.alert("ConnectionClosedRemotely: " + data.getConnectionClosedRemotely());
+                    Logger.alert("ConnectionShutdown: " + data.isConnectionShutdown());
+                    Logger.alert("AppCloseInProgress: " + data.isAppCloseInProgress());
+                    Logger.alert("ConnectionShutdownByApp: " + data.isConnectionShutdownByApp());
+                    Logger.alert("ConnectionClosedRemotely: " + data.isConnectionClosedRemotely());
                     Logger.alert("ConnectionErrorCode: " + data.getConnectionErrorCode());
                     Logger.alert("ConnectionCloseStatus: " + data.getConnectionCloseStatus());
                 }
