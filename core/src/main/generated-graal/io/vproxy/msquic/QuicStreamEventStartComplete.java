@@ -62,17 +62,17 @@ public class QuicStreamEventStartComplete extends AbstractNativeObject implement
         Field01VH.set(MEMORY, Field01);
     }
 
-    public byte getPeerAccepted() {
+    public boolean isPeerAccepted() {
         var N = getField01();
-        return (byte) ((N >> 0) & 0b1);
+        return ((N >> 0) & 0b1) == 1;
     }
 
-    public void setPeerAccepted(byte PeerAccepted) {
+    public void setPeerAccepted(boolean PeerAccepted) {
         var N = getField01();
         byte MASK = (byte) (0b1 << 0);
-        PeerAccepted = (byte) (PeerAccepted & 0b1);
-        PeerAccepted = (byte) (PeerAccepted << 0);
-        N = (byte) ((N & ~MASK) | (PeerAccepted & MASK));
+        var NN = (byte) (PeerAccepted ? 1 : 0);
+        NN = (byte) (NN << 0);
+        N = (byte) ((N & ~MASK) | (NN & MASK));
         setField01(N);
     }
 
@@ -112,7 +112,7 @@ public class QuicStreamEventStartComplete extends AbstractNativeObject implement
             SB.append(" ".repeat(INDENT + 4)).append("Field01 => ");
             SB.append(getField01());
             SB.append(" {\n");
-            SB.append(" ".repeat(INDENT + 8)).append("PeerAccepted:1 => ").append(getPeerAccepted());
+            SB.append(" ".repeat(INDENT + 8)).append("PeerAccepted:1 => ").append(isPeerAccepted());
             SB.append("\n");
             SB.append(" ".repeat(INDENT + 4)).append("}");
         }
@@ -190,5 +190,5 @@ public class QuicStreamEventStartComplete extends AbstractNativeObject implement
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:47b8d544ae108a29167ef09645537fda8f343f624c67f812748b1706fb3764f5
+// metadata.generator-version: pni 21.0.0.18
+// sha256:f33a22a1718fb7446c70e6194c26cf6bb930ece09af27bcdc189b9cf0f7c271d

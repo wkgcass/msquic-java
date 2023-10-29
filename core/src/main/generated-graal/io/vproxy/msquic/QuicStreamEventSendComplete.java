@@ -28,7 +28,7 @@ public class QuicStreamEventSendComplete extends AbstractNativeObject implements
         MemoryLayout.PathElement.groupElement("Canceled")
     );
 
-    public boolean getCanceled() {
+    public boolean isCanceled() {
         return (boolean) CanceledVH.get(MEMORY);
     }
 
@@ -76,7 +76,7 @@ public class QuicStreamEventSendComplete extends AbstractNativeObject implements
         SB.append("QuicStreamEventSendComplete{\n");
         {
             SB.append(" ".repeat(INDENT + 4)).append("Canceled => ");
-            SB.append(getCanceled());
+            SB.append(isCanceled());
         }
         SB.append(",\n");
         {
@@ -157,5 +157,5 @@ public class QuicStreamEventSendComplete extends AbstractNativeObject implements
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:8ce3596c16aa1b0bf166423cd77e115807fd78ae90af161ddaac3ec54532be06
+// metadata.generator-version: pni 21.0.0.18
+// sha256:05b3d5a6c64cc143ed901459031cbd1331ca93a1c423742c1d9ec97fcb2a82d1

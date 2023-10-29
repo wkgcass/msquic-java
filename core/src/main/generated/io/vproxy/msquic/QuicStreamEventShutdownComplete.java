@@ -26,7 +26,7 @@ public class QuicStreamEventShutdownComplete extends AbstractNativeObject implem
         MemoryLayout.PathElement.groupElement("ConnectionShutdown")
     );
 
-    public boolean getConnectionShutdown() {
+    public boolean isConnectionShutdown() {
         return (boolean) ConnectionShutdownVH.get(MEMORY);
     }
 
@@ -46,45 +46,45 @@ public class QuicStreamEventShutdownComplete extends AbstractNativeObject implem
         Field01VH.set(MEMORY, Field01);
     }
 
-    public byte getAppCloseInProgress() {
+    public boolean isAppCloseInProgress() {
         var N = getField01();
-        return (byte) ((N >> 0) & 0b1);
+        return ((N >> 0) & 0b1) == 1;
     }
 
-    public void setAppCloseInProgress(byte AppCloseInProgress) {
+    public void setAppCloseInProgress(boolean AppCloseInProgress) {
         var N = getField01();
         byte MASK = (byte) (0b1 << 0);
-        AppCloseInProgress = (byte) (AppCloseInProgress & 0b1);
-        AppCloseInProgress = (byte) (AppCloseInProgress << 0);
-        N = (byte) ((N & ~MASK) | (AppCloseInProgress & MASK));
+        var NN = (byte) (AppCloseInProgress ? 1 : 0);
+        NN = (byte) (NN << 0);
+        N = (byte) ((N & ~MASK) | (NN & MASK));
         setField01(N);
     }
 
-    public byte getConnectionShutdownByApp() {
+    public boolean isConnectionShutdownByApp() {
         var N = getField01();
-        return (byte) ((N >> 1) & 0b1);
+        return ((N >> 1) & 0b1) == 1;
     }
 
-    public void setConnectionShutdownByApp(byte ConnectionShutdownByApp) {
+    public void setConnectionShutdownByApp(boolean ConnectionShutdownByApp) {
         var N = getField01();
         byte MASK = (byte) (0b1 << 1);
-        ConnectionShutdownByApp = (byte) (ConnectionShutdownByApp & 0b1);
-        ConnectionShutdownByApp = (byte) (ConnectionShutdownByApp << 1);
-        N = (byte) ((N & ~MASK) | (ConnectionShutdownByApp & MASK));
+        var NN = (byte) (ConnectionShutdownByApp ? 1 : 0);
+        NN = (byte) (NN << 1);
+        N = (byte) ((N & ~MASK) | (NN & MASK));
         setField01(N);
     }
 
-    public byte getConnectionClosedRemotely() {
+    public boolean isConnectionClosedRemotely() {
         var N = getField01();
-        return (byte) ((N >> 2) & 0b1);
+        return ((N >> 2) & 0b1) == 1;
     }
 
-    public void setConnectionClosedRemotely(byte ConnectionClosedRemotely) {
+    public void setConnectionClosedRemotely(boolean ConnectionClosedRemotely) {
         var N = getField01();
         byte MASK = (byte) (0b1 << 2);
-        ConnectionClosedRemotely = (byte) (ConnectionClosedRemotely & 0b1);
-        ConnectionClosedRemotely = (byte) (ConnectionClosedRemotely << 2);
-        N = (byte) ((N & ~MASK) | (ConnectionClosedRemotely & MASK));
+        var NN = (byte) (ConnectionClosedRemotely ? 1 : 0);
+        NN = (byte) (NN << 2);
+        N = (byte) ((N & ~MASK) | (NN & MASK));
         setField01(N);
     }
 
@@ -137,18 +137,18 @@ public class QuicStreamEventShutdownComplete extends AbstractNativeObject implem
         SB.append("QuicStreamEventShutdownComplete{\n");
         {
             SB.append(" ".repeat(INDENT + 4)).append("ConnectionShutdown => ");
-            SB.append(getConnectionShutdown());
+            SB.append(isConnectionShutdown());
         }
         SB.append(",\n");
         {
             SB.append(" ".repeat(INDENT + 4)).append("Field01 => ");
             SB.append(getField01());
             SB.append(" {\n");
-            SB.append(" ".repeat(INDENT + 8)).append("AppCloseInProgress:1 => ").append(getAppCloseInProgress());
+            SB.append(" ".repeat(INDENT + 8)).append("AppCloseInProgress:1 => ").append(isAppCloseInProgress());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("ConnectionShutdownByApp:1 => ").append(getConnectionShutdownByApp());
+            SB.append(" ".repeat(INDENT + 8)).append("ConnectionShutdownByApp:1 => ").append(isConnectionShutdownByApp());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("ConnectionClosedRemotely:1 => ").append(getConnectionClosedRemotely());
+            SB.append(" ".repeat(INDENT + 8)).append("ConnectionClosedRemotely:1 => ").append(isConnectionClosedRemotely());
             SB.append("\n");
             SB.append(" ".repeat(INDENT + 4)).append("}");
         }
@@ -236,5 +236,5 @@ public class QuicStreamEventShutdownComplete extends AbstractNativeObject implem
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.15
-// sha256:d3409096c15e3fe6b9d2be4b98b66149b468b7dd40498f25c4df2151742df25a
+// metadata.generator-version: pni 21.0.0.18
+// sha256:d3d49582e970f034367094b3f4ac92566611b136c257d4b82b61754fe7c2b438

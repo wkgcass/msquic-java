@@ -34,45 +34,45 @@ public class QuicConnectionEventConnectionShutdownComplete extends AbstractNativ
         Field01VH.set(MEMORY, Field01);
     }
 
-    public byte getHandshakeCompleted() {
+    public boolean isHandshakeCompleted() {
         var N = getField01();
-        return (byte) ((N >> 0) & 0b1);
+        return ((N >> 0) & 0b1) == 1;
     }
 
-    public void setHandshakeCompleted(byte HandshakeCompleted) {
+    public void setHandshakeCompleted(boolean HandshakeCompleted) {
         var N = getField01();
         byte MASK = (byte) (0b1 << 0);
-        HandshakeCompleted = (byte) (HandshakeCompleted & 0b1);
-        HandshakeCompleted = (byte) (HandshakeCompleted << 0);
-        N = (byte) ((N & ~MASK) | (HandshakeCompleted & MASK));
+        var NN = (byte) (HandshakeCompleted ? 1 : 0);
+        NN = (byte) (NN << 0);
+        N = (byte) ((N & ~MASK) | (NN & MASK));
         setField01(N);
     }
 
-    public byte getPeerAcknowledgedShutdown() {
+    public boolean isPeerAcknowledgedShutdown() {
         var N = getField01();
-        return (byte) ((N >> 1) & 0b1);
+        return ((N >> 1) & 0b1) == 1;
     }
 
-    public void setPeerAcknowledgedShutdown(byte PeerAcknowledgedShutdown) {
+    public void setPeerAcknowledgedShutdown(boolean PeerAcknowledgedShutdown) {
         var N = getField01();
         byte MASK = (byte) (0b1 << 1);
-        PeerAcknowledgedShutdown = (byte) (PeerAcknowledgedShutdown & 0b1);
-        PeerAcknowledgedShutdown = (byte) (PeerAcknowledgedShutdown << 1);
-        N = (byte) ((N & ~MASK) | (PeerAcknowledgedShutdown & MASK));
+        var NN = (byte) (PeerAcknowledgedShutdown ? 1 : 0);
+        NN = (byte) (NN << 1);
+        N = (byte) ((N & ~MASK) | (NN & MASK));
         setField01(N);
     }
 
-    public byte getAppCloseInProgress() {
+    public boolean isAppCloseInProgress() {
         var N = getField01();
-        return (byte) ((N >> 2) & 0b1);
+        return ((N >> 2) & 0b1) == 1;
     }
 
-    public void setAppCloseInProgress(byte AppCloseInProgress) {
+    public void setAppCloseInProgress(boolean AppCloseInProgress) {
         var N = getField01();
         byte MASK = (byte) (0b1 << 2);
-        AppCloseInProgress = (byte) (AppCloseInProgress & 0b1);
-        AppCloseInProgress = (byte) (AppCloseInProgress << 2);
-        N = (byte) ((N & ~MASK) | (AppCloseInProgress & MASK));
+        var NN = (byte) (AppCloseInProgress ? 1 : 0);
+        NN = (byte) (NN << 2);
+        N = (byte) ((N & ~MASK) | (NN & MASK));
         setField01(N);
     }
 
@@ -98,11 +98,11 @@ public class QuicConnectionEventConnectionShutdownComplete extends AbstractNativ
             SB.append(" ".repeat(INDENT + 4)).append("Field01 => ");
             SB.append(getField01());
             SB.append(" {\n");
-            SB.append(" ".repeat(INDENT + 8)).append("HandshakeCompleted:1 => ").append(getHandshakeCompleted());
+            SB.append(" ".repeat(INDENT + 8)).append("HandshakeCompleted:1 => ").append(isHandshakeCompleted());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("PeerAcknowledgedShutdown:1 => ").append(getPeerAcknowledgedShutdown());
+            SB.append(" ".repeat(INDENT + 8)).append("PeerAcknowledgedShutdown:1 => ").append(isPeerAcknowledgedShutdown());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("AppCloseInProgress:1 => ").append(getAppCloseInProgress());
+            SB.append(" ".repeat(INDENT + 8)).append("AppCloseInProgress:1 => ").append(isAppCloseInProgress());
             SB.append("\n");
             SB.append(" ".repeat(INDENT + 4)).append("}");
         }
@@ -180,5 +180,5 @@ public class QuicConnectionEventConnectionShutdownComplete extends AbstractNativ
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:b1fcd280873cd701c70bfa808f8f0eda83d0f2442c98aca756d7069bb2276eba
+// metadata.generator-version: pni 21.0.0.18
+// sha256:1bd0aa32d86bbe05620f3a6c801dcea4f1beac91a071d4bf8312a27391694c84

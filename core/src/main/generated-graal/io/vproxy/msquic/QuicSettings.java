@@ -359,59 +359,59 @@ public class QuicSettings extends AbstractNativeObject implements NativeObject {
         Field01VH.set(MEMORY, Field01);
     }
 
-    public byte getSendBufferingEnabled() {
+    public boolean isSendBufferingEnabled() {
         var N = getField01();
-        return (byte) ((N >> 0) & 0b1);
+        return ((N >> 0) & 0b1) == 1;
     }
 
-    public void setSendBufferingEnabled(byte SendBufferingEnabled) {
+    public void setSendBufferingEnabled(boolean SendBufferingEnabled) {
         var N = getField01();
         byte MASK = (byte) (0b1 << 0);
-        SendBufferingEnabled = (byte) (SendBufferingEnabled & 0b1);
-        SendBufferingEnabled = (byte) (SendBufferingEnabled << 0);
-        N = (byte) ((N & ~MASK) | (SendBufferingEnabled & MASK));
+        var NN = (byte) (SendBufferingEnabled ? 1 : 0);
+        NN = (byte) (NN << 0);
+        N = (byte) ((N & ~MASK) | (NN & MASK));
         setField01(N);
     }
 
-    public byte getPacingEnabled() {
+    public boolean isPacingEnabled() {
         var N = getField01();
-        return (byte) ((N >> 1) & 0b1);
+        return ((N >> 1) & 0b1) == 1;
     }
 
-    public void setPacingEnabled(byte PacingEnabled) {
+    public void setPacingEnabled(boolean PacingEnabled) {
         var N = getField01();
         byte MASK = (byte) (0b1 << 1);
-        PacingEnabled = (byte) (PacingEnabled & 0b1);
-        PacingEnabled = (byte) (PacingEnabled << 1);
-        N = (byte) ((N & ~MASK) | (PacingEnabled & MASK));
+        var NN = (byte) (PacingEnabled ? 1 : 0);
+        NN = (byte) (NN << 1);
+        N = (byte) ((N & ~MASK) | (NN & MASK));
         setField01(N);
     }
 
-    public byte getMigrationEnabled() {
+    public boolean isMigrationEnabled() {
         var N = getField01();
-        return (byte) ((N >> 2) & 0b1);
+        return ((N >> 2) & 0b1) == 1;
     }
 
-    public void setMigrationEnabled(byte MigrationEnabled) {
+    public void setMigrationEnabled(boolean MigrationEnabled) {
         var N = getField01();
         byte MASK = (byte) (0b1 << 2);
-        MigrationEnabled = (byte) (MigrationEnabled & 0b1);
-        MigrationEnabled = (byte) (MigrationEnabled << 2);
-        N = (byte) ((N & ~MASK) | (MigrationEnabled & MASK));
+        var NN = (byte) (MigrationEnabled ? 1 : 0);
+        NN = (byte) (NN << 2);
+        N = (byte) ((N & ~MASK) | (NN & MASK));
         setField01(N);
     }
 
-    public byte getDatagramReceiveEnabled() {
+    public boolean isDatagramReceiveEnabled() {
         var N = getField01();
-        return (byte) ((N >> 3) & 0b1);
+        return ((N >> 3) & 0b1) == 1;
     }
 
-    public void setDatagramReceiveEnabled(byte DatagramReceiveEnabled) {
+    public void setDatagramReceiveEnabled(boolean DatagramReceiveEnabled) {
         var N = getField01();
         byte MASK = (byte) (0b1 << 3);
-        DatagramReceiveEnabled = (byte) (DatagramReceiveEnabled & 0b1);
-        DatagramReceiveEnabled = (byte) (DatagramReceiveEnabled << 3);
-        N = (byte) ((N & ~MASK) | (DatagramReceiveEnabled & MASK));
+        var NN = (byte) (DatagramReceiveEnabled ? 1 : 0);
+        NN = (byte) (NN << 3);
+        N = (byte) ((N & ~MASK) | (NN & MASK));
         setField01(N);
     }
 
@@ -429,31 +429,31 @@ public class QuicSettings extends AbstractNativeObject implements NativeObject {
         setField01(N);
     }
 
-    public byte getGreaseQuicBitEnabled() {
+    public boolean isGreaseQuicBitEnabled() {
         var N = getField01();
-        return (byte) ((N >> 6) & 0b1);
+        return ((N >> 6) & 0b1) == 1;
     }
 
-    public void setGreaseQuicBitEnabled(byte GreaseQuicBitEnabled) {
+    public void setGreaseQuicBitEnabled(boolean GreaseQuicBitEnabled) {
         var N = getField01();
         byte MASK = (byte) (0b1 << 6);
-        GreaseQuicBitEnabled = (byte) (GreaseQuicBitEnabled & 0b1);
-        GreaseQuicBitEnabled = (byte) (GreaseQuicBitEnabled << 6);
-        N = (byte) ((N & ~MASK) | (GreaseQuicBitEnabled & MASK));
+        var NN = (byte) (GreaseQuicBitEnabled ? 1 : 0);
+        NN = (byte) (NN << 6);
+        N = (byte) ((N & ~MASK) | (NN & MASK));
         setField01(N);
     }
 
-    public byte getEcnEnabled() {
+    public boolean isEcnEnabled() {
         var N = getField01();
-        return (byte) ((N >> 7) & 0b1);
+        return ((N >> 7) & 0b1) == 1;
     }
 
-    public void setEcnEnabled(byte EcnEnabled) {
+    public void setEcnEnabled(boolean EcnEnabled) {
         var N = getField01();
         byte MASK = (byte) (0b1 << 7);
-        EcnEnabled = (byte) (EcnEnabled & 0b1);
-        EcnEnabled = (byte) (EcnEnabled << 7);
-        N = (byte) ((N & ~MASK) | (EcnEnabled & MASK));
+        var NN = (byte) (EcnEnabled ? 1 : 0);
+        NN = (byte) (NN << 7);
+        N = (byte) ((N & ~MASK) | (NN & MASK));
         setField01(N);
     }
 
@@ -505,45 +505,45 @@ public class QuicSettings extends AbstractNativeObject implements NativeObject {
         FlagsVH.set(MEMORY, Flags);
     }
 
-    public long getHyStartEnabled() {
+    public boolean isHyStartEnabled() {
         var N = getFlags();
-        return (long) ((N >> 0) & 0b1);
+        return ((N >> 0) & 0b1) == 1;
     }
 
-    public void setHyStartEnabled(long HyStartEnabled) {
+    public void setHyStartEnabled(boolean HyStartEnabled) {
         var N = getFlags();
         long MASK = (long) (0b1 << 0);
-        HyStartEnabled = (long) (HyStartEnabled & 0b1);
-        HyStartEnabled = (long) (HyStartEnabled << 0);
-        N = (long) ((N & ~MASK) | (HyStartEnabled & MASK));
+        var NN = (long) (HyStartEnabled ? 1 : 0);
+        NN = (long) (NN << 0);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setFlags(N);
     }
 
-    public long getEncryptionOffloadAllowed() {
+    public boolean isEncryptionOffloadAllowed() {
         var N = getFlags();
-        return (long) ((N >> 1) & 0b1);
+        return ((N >> 1) & 0b1) == 1;
     }
 
-    public void setEncryptionOffloadAllowed(long EncryptionOffloadAllowed) {
+    public void setEncryptionOffloadAllowed(boolean EncryptionOffloadAllowed) {
         var N = getFlags();
         long MASK = (long) (0b1 << 1);
-        EncryptionOffloadAllowed = (long) (EncryptionOffloadAllowed & 0b1);
-        EncryptionOffloadAllowed = (long) (EncryptionOffloadAllowed << 1);
-        N = (long) ((N & ~MASK) | (EncryptionOffloadAllowed & MASK));
+        var NN = (long) (EncryptionOffloadAllowed ? 1 : 0);
+        NN = (long) (NN << 1);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setFlags(N);
     }
 
-    public long getReliableResetEnabled() {
+    public boolean isReliableResetEnabled() {
         var N = getFlags();
-        return (long) ((N >> 2) & 0b1);
+        return ((N >> 2) & 0b1) == 1;
     }
 
-    public void setReliableResetEnabled(long ReliableResetEnabled) {
+    public void setReliableResetEnabled(boolean ReliableResetEnabled) {
         var N = getFlags();
         long MASK = (long) (0b1 << 2);
-        ReliableResetEnabled = (long) (ReliableResetEnabled & 0b1);
-        ReliableResetEnabled = (long) (ReliableResetEnabled << 2);
-        N = (long) ((N & ~MASK) | (ReliableResetEnabled & MASK));
+        var NN = (long) (ReliableResetEnabled ? 1 : 0);
+        NN = (long) (NN << 2);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setFlags(N);
     }
 
@@ -726,19 +726,19 @@ public class QuicSettings extends AbstractNativeObject implements NativeObject {
             SB.append(" ".repeat(INDENT + 4)).append("Field01 => ");
             SB.append(getField01());
             SB.append(" {\n");
-            SB.append(" ".repeat(INDENT + 8)).append("SendBufferingEnabled:1 => ").append(getSendBufferingEnabled());
+            SB.append(" ".repeat(INDENT + 8)).append("SendBufferingEnabled:1 => ").append(isSendBufferingEnabled());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("PacingEnabled:1 => ").append(getPacingEnabled());
+            SB.append(" ".repeat(INDENT + 8)).append("PacingEnabled:1 => ").append(isPacingEnabled());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("MigrationEnabled:1 => ").append(getMigrationEnabled());
+            SB.append(" ".repeat(INDENT + 8)).append("MigrationEnabled:1 => ").append(isMigrationEnabled());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("DatagramReceiveEnabled:1 => ").append(getDatagramReceiveEnabled());
+            SB.append(" ".repeat(INDENT + 8)).append("DatagramReceiveEnabled:1 => ").append(isDatagramReceiveEnabled());
             SB.append(",\n");
             SB.append(" ".repeat(INDENT + 8)).append("ServerResumptionLevel:2 => ").append(getServerResumptionLevel());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("GreaseQuicBitEnabled:1 => ").append(getGreaseQuicBitEnabled());
+            SB.append(" ".repeat(INDENT + 8)).append("GreaseQuicBitEnabled:1 => ").append(isGreaseQuicBitEnabled());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("EcnEnabled:1 => ").append(getEcnEnabled());
+            SB.append(" ".repeat(INDENT + 8)).append("EcnEnabled:1 => ").append(isEcnEnabled());
             SB.append("\n");
             SB.append(" ".repeat(INDENT + 4)).append("}");
         }
@@ -762,11 +762,11 @@ public class QuicSettings extends AbstractNativeObject implements NativeObject {
             SB.append(" ".repeat(INDENT + 4)).append("Flags => ");
             SB.append(getFlags());
             SB.append(" {\n");
-            SB.append(" ".repeat(INDENT + 8)).append("HyStartEnabled:1 => ").append(getHyStartEnabled());
+            SB.append(" ".repeat(INDENT + 8)).append("HyStartEnabled:1 => ").append(isHyStartEnabled());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("EncryptionOffloadAllowed:1 => ").append(getEncryptionOffloadAllowed());
+            SB.append(" ".repeat(INDENT + 8)).append("EncryptionOffloadAllowed:1 => ").append(isEncryptionOffloadAllowed());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("ReliableResetEnabled:1 => ").append(getReliableResetEnabled());
+            SB.append(" ".repeat(INDENT + 8)).append("ReliableResetEnabled:1 => ").append(isReliableResetEnabled());
             SB.append("\n");
             SB.append(" ".repeat(INDENT + 4)).append("}");
         }
@@ -844,5 +844,5 @@ public class QuicSettings extends AbstractNativeObject implements NativeObject {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:c31ce4032de56f8304b6ebc28cdacbfaa9b8fed06a5f91a5af31d748e7a65bda
+// metadata.generator-version: pni 21.0.0.18
+// sha256:397e4a15ce72bcf0b796356692455e8c222c4995172d7492529182c77bc5c502

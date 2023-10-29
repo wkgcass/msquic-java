@@ -26,7 +26,7 @@ public class QuicConnectionEventReliableResetNegotiated extends AbstractNativeOb
         MemoryLayout.PathElement.groupElement("IsNegotiated")
     );
 
-    public boolean getIsNegotiated() {
+    public boolean isIsNegotiated() {
         return (boolean) IsNegotiatedVH.get(MEMORY);
     }
 
@@ -54,7 +54,7 @@ public class QuicConnectionEventReliableResetNegotiated extends AbstractNativeOb
         SB.append("QuicConnectionEventReliableResetNegotiated{\n");
         {
             SB.append(" ".repeat(INDENT + 4)).append("IsNegotiated => ");
-            SB.append(getIsNegotiated());
+            SB.append(isIsNegotiated());
         }
         SB.append("\n");
         SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
@@ -130,5 +130,5 @@ public class QuicConnectionEventReliableResetNegotiated extends AbstractNativeOb
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:de07ddfecc865f6de0d979c39be521be1fd7ede560d87b5cdd43cabe83914525
+// metadata.generator-version: pni 21.0.0.18
+// sha256:92f234637b1a842bc83e3895696fd33d302e50a9de770c93f0d77ec5712030bd

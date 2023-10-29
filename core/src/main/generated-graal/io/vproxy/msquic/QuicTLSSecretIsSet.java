@@ -34,87 +34,87 @@ public class QuicTLSSecretIsSet extends AbstractNativeObject implements NativeOb
         IsSetVH.set(MEMORY, IsSet);
     }
 
-    public byte getClientRandom() {
+    public boolean isClientRandom() {
         var N = getIsSet();
-        return (byte) ((N >> 0) & 0b1);
+        return ((N >> 0) & 0b1) == 1;
     }
 
-    public void setClientRandom(byte ClientRandom) {
+    public void setClientRandom(boolean ClientRandom) {
         var N = getIsSet();
         byte MASK = (byte) (0b1 << 0);
-        ClientRandom = (byte) (ClientRandom & 0b1);
-        ClientRandom = (byte) (ClientRandom << 0);
-        N = (byte) ((N & ~MASK) | (ClientRandom & MASK));
+        var NN = (byte) (ClientRandom ? 1 : 0);
+        NN = (byte) (NN << 0);
+        N = (byte) ((N & ~MASK) | (NN & MASK));
         setIsSet(N);
     }
 
-    public byte getClientEarlyTrafficSecret() {
+    public boolean isClientEarlyTrafficSecret() {
         var N = getIsSet();
-        return (byte) ((N >> 1) & 0b1);
+        return ((N >> 1) & 0b1) == 1;
     }
 
-    public void setClientEarlyTrafficSecret(byte ClientEarlyTrafficSecret) {
+    public void setClientEarlyTrafficSecret(boolean ClientEarlyTrafficSecret) {
         var N = getIsSet();
         byte MASK = (byte) (0b1 << 1);
-        ClientEarlyTrafficSecret = (byte) (ClientEarlyTrafficSecret & 0b1);
-        ClientEarlyTrafficSecret = (byte) (ClientEarlyTrafficSecret << 1);
-        N = (byte) ((N & ~MASK) | (ClientEarlyTrafficSecret & MASK));
+        var NN = (byte) (ClientEarlyTrafficSecret ? 1 : 0);
+        NN = (byte) (NN << 1);
+        N = (byte) ((N & ~MASK) | (NN & MASK));
         setIsSet(N);
     }
 
-    public byte getClientHandshakeTrafficSecret() {
+    public boolean isClientHandshakeTrafficSecret() {
         var N = getIsSet();
-        return (byte) ((N >> 2) & 0b1);
+        return ((N >> 2) & 0b1) == 1;
     }
 
-    public void setClientHandshakeTrafficSecret(byte ClientHandshakeTrafficSecret) {
+    public void setClientHandshakeTrafficSecret(boolean ClientHandshakeTrafficSecret) {
         var N = getIsSet();
         byte MASK = (byte) (0b1 << 2);
-        ClientHandshakeTrafficSecret = (byte) (ClientHandshakeTrafficSecret & 0b1);
-        ClientHandshakeTrafficSecret = (byte) (ClientHandshakeTrafficSecret << 2);
-        N = (byte) ((N & ~MASK) | (ClientHandshakeTrafficSecret & MASK));
+        var NN = (byte) (ClientHandshakeTrafficSecret ? 1 : 0);
+        NN = (byte) (NN << 2);
+        N = (byte) ((N & ~MASK) | (NN & MASK));
         setIsSet(N);
     }
 
-    public byte getServerHandshakeTrafficSecret() {
+    public boolean isServerHandshakeTrafficSecret() {
         var N = getIsSet();
-        return (byte) ((N >> 3) & 0b1);
+        return ((N >> 3) & 0b1) == 1;
     }
 
-    public void setServerHandshakeTrafficSecret(byte ServerHandshakeTrafficSecret) {
+    public void setServerHandshakeTrafficSecret(boolean ServerHandshakeTrafficSecret) {
         var N = getIsSet();
         byte MASK = (byte) (0b1 << 3);
-        ServerHandshakeTrafficSecret = (byte) (ServerHandshakeTrafficSecret & 0b1);
-        ServerHandshakeTrafficSecret = (byte) (ServerHandshakeTrafficSecret << 3);
-        N = (byte) ((N & ~MASK) | (ServerHandshakeTrafficSecret & MASK));
+        var NN = (byte) (ServerHandshakeTrafficSecret ? 1 : 0);
+        NN = (byte) (NN << 3);
+        N = (byte) ((N & ~MASK) | (NN & MASK));
         setIsSet(N);
     }
 
-    public byte getClientTrafficSecret0() {
+    public boolean isClientTrafficSecret0() {
         var N = getIsSet();
-        return (byte) ((N >> 4) & 0b1);
+        return ((N >> 4) & 0b1) == 1;
     }
 
-    public void setClientTrafficSecret0(byte ClientTrafficSecret0) {
+    public void setClientTrafficSecret0(boolean ClientTrafficSecret0) {
         var N = getIsSet();
         byte MASK = (byte) (0b1 << 4);
-        ClientTrafficSecret0 = (byte) (ClientTrafficSecret0 & 0b1);
-        ClientTrafficSecret0 = (byte) (ClientTrafficSecret0 << 4);
-        N = (byte) ((N & ~MASK) | (ClientTrafficSecret0 & MASK));
+        var NN = (byte) (ClientTrafficSecret0 ? 1 : 0);
+        NN = (byte) (NN << 4);
+        N = (byte) ((N & ~MASK) | (NN & MASK));
         setIsSet(N);
     }
 
-    public byte getServerTrafficSecret0() {
+    public boolean isServerTrafficSecret0() {
         var N = getIsSet();
-        return (byte) ((N >> 5) & 0b1);
+        return ((N >> 5) & 0b1) == 1;
     }
 
-    public void setServerTrafficSecret0(byte ServerTrafficSecret0) {
+    public void setServerTrafficSecret0(boolean ServerTrafficSecret0) {
         var N = getIsSet();
         byte MASK = (byte) (0b1 << 5);
-        ServerTrafficSecret0 = (byte) (ServerTrafficSecret0 & 0b1);
-        ServerTrafficSecret0 = (byte) (ServerTrafficSecret0 << 5);
-        N = (byte) ((N & ~MASK) | (ServerTrafficSecret0 & MASK));
+        var NN = (byte) (ServerTrafficSecret0 ? 1 : 0);
+        NN = (byte) (NN << 5);
+        N = (byte) ((N & ~MASK) | (NN & MASK));
         setIsSet(N);
     }
 
@@ -140,17 +140,17 @@ public class QuicTLSSecretIsSet extends AbstractNativeObject implements NativeOb
             SB.append(" ".repeat(INDENT + 4)).append("IsSet => ");
             SB.append(getIsSet());
             SB.append(" {\n");
-            SB.append(" ".repeat(INDENT + 8)).append("ClientRandom:1 => ").append(getClientRandom());
+            SB.append(" ".repeat(INDENT + 8)).append("ClientRandom:1 => ").append(isClientRandom());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("ClientEarlyTrafficSecret:1 => ").append(getClientEarlyTrafficSecret());
+            SB.append(" ".repeat(INDENT + 8)).append("ClientEarlyTrafficSecret:1 => ").append(isClientEarlyTrafficSecret());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("ClientHandshakeTrafficSecret:1 => ").append(getClientHandshakeTrafficSecret());
+            SB.append(" ".repeat(INDENT + 8)).append("ClientHandshakeTrafficSecret:1 => ").append(isClientHandshakeTrafficSecret());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("ServerHandshakeTrafficSecret:1 => ").append(getServerHandshakeTrafficSecret());
+            SB.append(" ".repeat(INDENT + 8)).append("ServerHandshakeTrafficSecret:1 => ").append(isServerHandshakeTrafficSecret());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("ClientTrafficSecret0:1 => ").append(getClientTrafficSecret0());
+            SB.append(" ".repeat(INDENT + 8)).append("ClientTrafficSecret0:1 => ").append(isClientTrafficSecret0());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("ServerTrafficSecret0:1 => ").append(getServerTrafficSecret0());
+            SB.append(" ".repeat(INDENT + 8)).append("ServerTrafficSecret0:1 => ").append(isServerTrafficSecret0());
             SB.append("\n");
             SB.append(" ".repeat(INDENT + 4)).append("}");
         }
@@ -228,5 +228,5 @@ public class QuicTLSSecretIsSet extends AbstractNativeObject implements NativeOb
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:8a152cbb52c781b3800cb91f0d40a7c78f3e474f02bf12e511bd59dd30023a55
+// metadata.generator-version: pni 21.0.0.18
+// sha256:93c54adaa69c632efba2147cdbbfaa7d8d913ebff25fce18df16226244dc56bf

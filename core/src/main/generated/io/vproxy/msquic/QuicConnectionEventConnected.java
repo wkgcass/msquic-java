@@ -24,7 +24,7 @@ public class QuicConnectionEventConnected extends AbstractNativeObject implement
         MemoryLayout.PathElement.groupElement("SessionResumed")
     );
 
-    public boolean getSessionResumed() {
+    public boolean isSessionResumed() {
         return (boolean) SessionResumedVH.get(MEMORY);
     }
 
@@ -85,7 +85,7 @@ public class QuicConnectionEventConnected extends AbstractNativeObject implement
         SB.append("QuicConnectionEventConnected{\n");
         {
             SB.append(" ".repeat(INDENT + 4)).append("SessionResumed => ");
-            SB.append(getSessionResumed());
+            SB.append(isSessionResumed());
         }
         SB.append(",\n");
         {
@@ -171,5 +171,5 @@ public class QuicConnectionEventConnected extends AbstractNativeObject implement
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.15
-// sha256:8ea348b9ba10b903aaa46210f3a0b20736a0ceeba178a5da3b5db5bcf64de5dc
+// metadata.generator-version: pni 21.0.0.18
+// sha256:332286bfa727d565f3e160261270f1a3d272fb72618009bc4f868b3f8c420ef4

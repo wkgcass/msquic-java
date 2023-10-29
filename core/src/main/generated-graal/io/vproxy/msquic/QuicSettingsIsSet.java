@@ -34,521 +34,521 @@ public class QuicSettingsIsSet extends AbstractNativeObject implements NativeObj
         IsSetFlagsVH.set(MEMORY, IsSetFlags);
     }
 
-    public long getMaxBytesPerKey() {
+    public boolean isMaxBytesPerKey() {
         var N = getIsSetFlags();
-        return (long) ((N >> 0) & 0b1);
+        return ((N >> 0) & 0b1) == 1;
     }
 
-    public void setMaxBytesPerKey(long MaxBytesPerKey) {
+    public void setMaxBytesPerKey(boolean MaxBytesPerKey) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 0);
-        MaxBytesPerKey = (long) (MaxBytesPerKey & 0b1);
-        MaxBytesPerKey = (long) (MaxBytesPerKey << 0);
-        N = (long) ((N & ~MASK) | (MaxBytesPerKey & MASK));
+        var NN = (long) (MaxBytesPerKey ? 1 : 0);
+        NN = (long) (NN << 0);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getHandshakeIdleTimeoutMs() {
+    public boolean isHandshakeIdleTimeoutMs() {
         var N = getIsSetFlags();
-        return (long) ((N >> 1) & 0b1);
+        return ((N >> 1) & 0b1) == 1;
     }
 
-    public void setHandshakeIdleTimeoutMs(long HandshakeIdleTimeoutMs) {
+    public void setHandshakeIdleTimeoutMs(boolean HandshakeIdleTimeoutMs) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 1);
-        HandshakeIdleTimeoutMs = (long) (HandshakeIdleTimeoutMs & 0b1);
-        HandshakeIdleTimeoutMs = (long) (HandshakeIdleTimeoutMs << 1);
-        N = (long) ((N & ~MASK) | (HandshakeIdleTimeoutMs & MASK));
+        var NN = (long) (HandshakeIdleTimeoutMs ? 1 : 0);
+        NN = (long) (NN << 1);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getIdleTimeoutMs() {
+    public boolean isIdleTimeoutMs() {
         var N = getIsSetFlags();
-        return (long) ((N >> 2) & 0b1);
+        return ((N >> 2) & 0b1) == 1;
     }
 
-    public void setIdleTimeoutMs(long IdleTimeoutMs) {
+    public void setIdleTimeoutMs(boolean IdleTimeoutMs) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 2);
-        IdleTimeoutMs = (long) (IdleTimeoutMs & 0b1);
-        IdleTimeoutMs = (long) (IdleTimeoutMs << 2);
-        N = (long) ((N & ~MASK) | (IdleTimeoutMs & MASK));
+        var NN = (long) (IdleTimeoutMs ? 1 : 0);
+        NN = (long) (NN << 2);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getMtuDiscoverySearchCompleteTimeoutUs() {
+    public boolean isMtuDiscoverySearchCompleteTimeoutUs() {
         var N = getIsSetFlags();
-        return (long) ((N >> 3) & 0b1);
+        return ((N >> 3) & 0b1) == 1;
     }
 
-    public void setMtuDiscoverySearchCompleteTimeoutUs(long MtuDiscoverySearchCompleteTimeoutUs) {
+    public void setMtuDiscoverySearchCompleteTimeoutUs(boolean MtuDiscoverySearchCompleteTimeoutUs) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 3);
-        MtuDiscoverySearchCompleteTimeoutUs = (long) (MtuDiscoverySearchCompleteTimeoutUs & 0b1);
-        MtuDiscoverySearchCompleteTimeoutUs = (long) (MtuDiscoverySearchCompleteTimeoutUs << 3);
-        N = (long) ((N & ~MASK) | (MtuDiscoverySearchCompleteTimeoutUs & MASK));
+        var NN = (long) (MtuDiscoverySearchCompleteTimeoutUs ? 1 : 0);
+        NN = (long) (NN << 3);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getTlsClientMaxSendBuffer() {
+    public boolean isTlsClientMaxSendBuffer() {
         var N = getIsSetFlags();
-        return (long) ((N >> 4) & 0b1);
+        return ((N >> 4) & 0b1) == 1;
     }
 
-    public void setTlsClientMaxSendBuffer(long TlsClientMaxSendBuffer) {
+    public void setTlsClientMaxSendBuffer(boolean TlsClientMaxSendBuffer) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 4);
-        TlsClientMaxSendBuffer = (long) (TlsClientMaxSendBuffer & 0b1);
-        TlsClientMaxSendBuffer = (long) (TlsClientMaxSendBuffer << 4);
-        N = (long) ((N & ~MASK) | (TlsClientMaxSendBuffer & MASK));
+        var NN = (long) (TlsClientMaxSendBuffer ? 1 : 0);
+        NN = (long) (NN << 4);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getTlsServerMaxSendBuffer() {
+    public boolean isTlsServerMaxSendBuffer() {
         var N = getIsSetFlags();
-        return (long) ((N >> 5) & 0b1);
+        return ((N >> 5) & 0b1) == 1;
     }
 
-    public void setTlsServerMaxSendBuffer(long TlsServerMaxSendBuffer) {
+    public void setTlsServerMaxSendBuffer(boolean TlsServerMaxSendBuffer) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 5);
-        TlsServerMaxSendBuffer = (long) (TlsServerMaxSendBuffer & 0b1);
-        TlsServerMaxSendBuffer = (long) (TlsServerMaxSendBuffer << 5);
-        N = (long) ((N & ~MASK) | (TlsServerMaxSendBuffer & MASK));
+        var NN = (long) (TlsServerMaxSendBuffer ? 1 : 0);
+        NN = (long) (NN << 5);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getStreamRecvWindowDefault() {
+    public boolean isStreamRecvWindowDefault() {
         var N = getIsSetFlags();
-        return (long) ((N >> 6) & 0b1);
+        return ((N >> 6) & 0b1) == 1;
     }
 
-    public void setStreamRecvWindowDefault(long StreamRecvWindowDefault) {
+    public void setStreamRecvWindowDefault(boolean StreamRecvWindowDefault) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 6);
-        StreamRecvWindowDefault = (long) (StreamRecvWindowDefault & 0b1);
-        StreamRecvWindowDefault = (long) (StreamRecvWindowDefault << 6);
-        N = (long) ((N & ~MASK) | (StreamRecvWindowDefault & MASK));
+        var NN = (long) (StreamRecvWindowDefault ? 1 : 0);
+        NN = (long) (NN << 6);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getStreamRecvBufferDefault() {
+    public boolean isStreamRecvBufferDefault() {
         var N = getIsSetFlags();
-        return (long) ((N >> 7) & 0b1);
+        return ((N >> 7) & 0b1) == 1;
     }
 
-    public void setStreamRecvBufferDefault(long StreamRecvBufferDefault) {
+    public void setStreamRecvBufferDefault(boolean StreamRecvBufferDefault) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 7);
-        StreamRecvBufferDefault = (long) (StreamRecvBufferDefault & 0b1);
-        StreamRecvBufferDefault = (long) (StreamRecvBufferDefault << 7);
-        N = (long) ((N & ~MASK) | (StreamRecvBufferDefault & MASK));
+        var NN = (long) (StreamRecvBufferDefault ? 1 : 0);
+        NN = (long) (NN << 7);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getConnFlowControlWindow() {
+    public boolean isConnFlowControlWindow() {
         var N = getIsSetFlags();
-        return (long) ((N >> 8) & 0b1);
+        return ((N >> 8) & 0b1) == 1;
     }
 
-    public void setConnFlowControlWindow(long ConnFlowControlWindow) {
+    public void setConnFlowControlWindow(boolean ConnFlowControlWindow) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 8);
-        ConnFlowControlWindow = (long) (ConnFlowControlWindow & 0b1);
-        ConnFlowControlWindow = (long) (ConnFlowControlWindow << 8);
-        N = (long) ((N & ~MASK) | (ConnFlowControlWindow & MASK));
+        var NN = (long) (ConnFlowControlWindow ? 1 : 0);
+        NN = (long) (NN << 8);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getMaxWorkerQueueDelayUs() {
+    public boolean isMaxWorkerQueueDelayUs() {
         var N = getIsSetFlags();
-        return (long) ((N >> 9) & 0b1);
+        return ((N >> 9) & 0b1) == 1;
     }
 
-    public void setMaxWorkerQueueDelayUs(long MaxWorkerQueueDelayUs) {
+    public void setMaxWorkerQueueDelayUs(boolean MaxWorkerQueueDelayUs) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 9);
-        MaxWorkerQueueDelayUs = (long) (MaxWorkerQueueDelayUs & 0b1);
-        MaxWorkerQueueDelayUs = (long) (MaxWorkerQueueDelayUs << 9);
-        N = (long) ((N & ~MASK) | (MaxWorkerQueueDelayUs & MASK));
+        var NN = (long) (MaxWorkerQueueDelayUs ? 1 : 0);
+        NN = (long) (NN << 9);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getMaxStatelessOperations() {
+    public boolean isMaxStatelessOperations() {
         var N = getIsSetFlags();
-        return (long) ((N >> 10) & 0b1);
+        return ((N >> 10) & 0b1) == 1;
     }
 
-    public void setMaxStatelessOperations(long MaxStatelessOperations) {
+    public void setMaxStatelessOperations(boolean MaxStatelessOperations) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 10);
-        MaxStatelessOperations = (long) (MaxStatelessOperations & 0b1);
-        MaxStatelessOperations = (long) (MaxStatelessOperations << 10);
-        N = (long) ((N & ~MASK) | (MaxStatelessOperations & MASK));
+        var NN = (long) (MaxStatelessOperations ? 1 : 0);
+        NN = (long) (NN << 10);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getInitialWindowPackets() {
+    public boolean isInitialWindowPackets() {
         var N = getIsSetFlags();
-        return (long) ((N >> 11) & 0b1);
+        return ((N >> 11) & 0b1) == 1;
     }
 
-    public void setInitialWindowPackets(long InitialWindowPackets) {
+    public void setInitialWindowPackets(boolean InitialWindowPackets) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 11);
-        InitialWindowPackets = (long) (InitialWindowPackets & 0b1);
-        InitialWindowPackets = (long) (InitialWindowPackets << 11);
-        N = (long) ((N & ~MASK) | (InitialWindowPackets & MASK));
+        var NN = (long) (InitialWindowPackets ? 1 : 0);
+        NN = (long) (NN << 11);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getSendIdleTimeoutMs() {
+    public boolean isSendIdleTimeoutMs() {
         var N = getIsSetFlags();
-        return (long) ((N >> 12) & 0b1);
+        return ((N >> 12) & 0b1) == 1;
     }
 
-    public void setSendIdleTimeoutMs(long SendIdleTimeoutMs) {
+    public void setSendIdleTimeoutMs(boolean SendIdleTimeoutMs) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 12);
-        SendIdleTimeoutMs = (long) (SendIdleTimeoutMs & 0b1);
-        SendIdleTimeoutMs = (long) (SendIdleTimeoutMs << 12);
-        N = (long) ((N & ~MASK) | (SendIdleTimeoutMs & MASK));
+        var NN = (long) (SendIdleTimeoutMs ? 1 : 0);
+        NN = (long) (NN << 12);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getInitialRttMs() {
+    public boolean isInitialRttMs() {
         var N = getIsSetFlags();
-        return (long) ((N >> 13) & 0b1);
+        return ((N >> 13) & 0b1) == 1;
     }
 
-    public void setInitialRttMs(long InitialRttMs) {
+    public void setInitialRttMs(boolean InitialRttMs) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 13);
-        InitialRttMs = (long) (InitialRttMs & 0b1);
-        InitialRttMs = (long) (InitialRttMs << 13);
-        N = (long) ((N & ~MASK) | (InitialRttMs & MASK));
+        var NN = (long) (InitialRttMs ? 1 : 0);
+        NN = (long) (NN << 13);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getMaxAckDelayMs() {
+    public boolean isMaxAckDelayMs() {
         var N = getIsSetFlags();
-        return (long) ((N >> 14) & 0b1);
+        return ((N >> 14) & 0b1) == 1;
     }
 
-    public void setMaxAckDelayMs(long MaxAckDelayMs) {
+    public void setMaxAckDelayMs(boolean MaxAckDelayMs) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 14);
-        MaxAckDelayMs = (long) (MaxAckDelayMs & 0b1);
-        MaxAckDelayMs = (long) (MaxAckDelayMs << 14);
-        N = (long) ((N & ~MASK) | (MaxAckDelayMs & MASK));
+        var NN = (long) (MaxAckDelayMs ? 1 : 0);
+        NN = (long) (NN << 14);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getDisconnectTimeoutMs() {
+    public boolean isDisconnectTimeoutMs() {
         var N = getIsSetFlags();
-        return (long) ((N >> 15) & 0b1);
+        return ((N >> 15) & 0b1) == 1;
     }
 
-    public void setDisconnectTimeoutMs(long DisconnectTimeoutMs) {
+    public void setDisconnectTimeoutMs(boolean DisconnectTimeoutMs) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 15);
-        DisconnectTimeoutMs = (long) (DisconnectTimeoutMs & 0b1);
-        DisconnectTimeoutMs = (long) (DisconnectTimeoutMs << 15);
-        N = (long) ((N & ~MASK) | (DisconnectTimeoutMs & MASK));
+        var NN = (long) (DisconnectTimeoutMs ? 1 : 0);
+        NN = (long) (NN << 15);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getKeepAliveIntervalMs() {
+    public boolean isKeepAliveIntervalMs() {
         var N = getIsSetFlags();
-        return (long) ((N >> 16) & 0b1);
+        return ((N >> 16) & 0b1) == 1;
     }
 
-    public void setKeepAliveIntervalMs(long KeepAliveIntervalMs) {
+    public void setKeepAliveIntervalMs(boolean KeepAliveIntervalMs) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 16);
-        KeepAliveIntervalMs = (long) (KeepAliveIntervalMs & 0b1);
-        KeepAliveIntervalMs = (long) (KeepAliveIntervalMs << 16);
-        N = (long) ((N & ~MASK) | (KeepAliveIntervalMs & MASK));
+        var NN = (long) (KeepAliveIntervalMs ? 1 : 0);
+        NN = (long) (NN << 16);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getCongestionControlAlgorithm() {
+    public boolean isCongestionControlAlgorithm() {
         var N = getIsSetFlags();
-        return (long) ((N >> 17) & 0b1);
+        return ((N >> 17) & 0b1) == 1;
     }
 
-    public void setCongestionControlAlgorithm(long CongestionControlAlgorithm) {
+    public void setCongestionControlAlgorithm(boolean CongestionControlAlgorithm) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 17);
-        CongestionControlAlgorithm = (long) (CongestionControlAlgorithm & 0b1);
-        CongestionControlAlgorithm = (long) (CongestionControlAlgorithm << 17);
-        N = (long) ((N & ~MASK) | (CongestionControlAlgorithm & MASK));
+        var NN = (long) (CongestionControlAlgorithm ? 1 : 0);
+        NN = (long) (NN << 17);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getPeerBidiStreamCount() {
+    public boolean isPeerBidiStreamCount() {
         var N = getIsSetFlags();
-        return (long) ((N >> 18) & 0b1);
+        return ((N >> 18) & 0b1) == 1;
     }
 
-    public void setPeerBidiStreamCount(long PeerBidiStreamCount) {
+    public void setPeerBidiStreamCount(boolean PeerBidiStreamCount) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 18);
-        PeerBidiStreamCount = (long) (PeerBidiStreamCount & 0b1);
-        PeerBidiStreamCount = (long) (PeerBidiStreamCount << 18);
-        N = (long) ((N & ~MASK) | (PeerBidiStreamCount & MASK));
+        var NN = (long) (PeerBidiStreamCount ? 1 : 0);
+        NN = (long) (NN << 18);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getPeerUnidiStreamCount() {
+    public boolean isPeerUnidiStreamCount() {
         var N = getIsSetFlags();
-        return (long) ((N >> 19) & 0b1);
+        return ((N >> 19) & 0b1) == 1;
     }
 
-    public void setPeerUnidiStreamCount(long PeerUnidiStreamCount) {
+    public void setPeerUnidiStreamCount(boolean PeerUnidiStreamCount) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 19);
-        PeerUnidiStreamCount = (long) (PeerUnidiStreamCount & 0b1);
-        PeerUnidiStreamCount = (long) (PeerUnidiStreamCount << 19);
-        N = (long) ((N & ~MASK) | (PeerUnidiStreamCount & MASK));
+        var NN = (long) (PeerUnidiStreamCount ? 1 : 0);
+        NN = (long) (NN << 19);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getMaxBindingStatelessOperations() {
+    public boolean isMaxBindingStatelessOperations() {
         var N = getIsSetFlags();
-        return (long) ((N >> 20) & 0b1);
+        return ((N >> 20) & 0b1) == 1;
     }
 
-    public void setMaxBindingStatelessOperations(long MaxBindingStatelessOperations) {
+    public void setMaxBindingStatelessOperations(boolean MaxBindingStatelessOperations) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 20);
-        MaxBindingStatelessOperations = (long) (MaxBindingStatelessOperations & 0b1);
-        MaxBindingStatelessOperations = (long) (MaxBindingStatelessOperations << 20);
-        N = (long) ((N & ~MASK) | (MaxBindingStatelessOperations & MASK));
+        var NN = (long) (MaxBindingStatelessOperations ? 1 : 0);
+        NN = (long) (NN << 20);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getStatelessOperationExpirationMs() {
+    public boolean isStatelessOperationExpirationMs() {
         var N = getIsSetFlags();
-        return (long) ((N >> 21) & 0b1);
+        return ((N >> 21) & 0b1) == 1;
     }
 
-    public void setStatelessOperationExpirationMs(long StatelessOperationExpirationMs) {
+    public void setStatelessOperationExpirationMs(boolean StatelessOperationExpirationMs) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 21);
-        StatelessOperationExpirationMs = (long) (StatelessOperationExpirationMs & 0b1);
-        StatelessOperationExpirationMs = (long) (StatelessOperationExpirationMs << 21);
-        N = (long) ((N & ~MASK) | (StatelessOperationExpirationMs & MASK));
+        var NN = (long) (StatelessOperationExpirationMs ? 1 : 0);
+        NN = (long) (NN << 21);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getMinimumMtu() {
+    public boolean isMinimumMtu() {
         var N = getIsSetFlags();
-        return (long) ((N >> 22) & 0b1);
+        return ((N >> 22) & 0b1) == 1;
     }
 
-    public void setMinimumMtu(long MinimumMtu) {
+    public void setMinimumMtu(boolean MinimumMtu) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 22);
-        MinimumMtu = (long) (MinimumMtu & 0b1);
-        MinimumMtu = (long) (MinimumMtu << 22);
-        N = (long) ((N & ~MASK) | (MinimumMtu & MASK));
+        var NN = (long) (MinimumMtu ? 1 : 0);
+        NN = (long) (NN << 22);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getMaximumMtu() {
+    public boolean isMaximumMtu() {
         var N = getIsSetFlags();
-        return (long) ((N >> 23) & 0b1);
+        return ((N >> 23) & 0b1) == 1;
     }
 
-    public void setMaximumMtu(long MaximumMtu) {
+    public void setMaximumMtu(boolean MaximumMtu) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 23);
-        MaximumMtu = (long) (MaximumMtu & 0b1);
-        MaximumMtu = (long) (MaximumMtu << 23);
-        N = (long) ((N & ~MASK) | (MaximumMtu & MASK));
+        var NN = (long) (MaximumMtu ? 1 : 0);
+        NN = (long) (NN << 23);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getSendBufferingEnabled() {
+    public boolean isSendBufferingEnabled() {
         var N = getIsSetFlags();
-        return (long) ((N >> 24) & 0b1);
+        return ((N >> 24) & 0b1) == 1;
     }
 
-    public void setSendBufferingEnabled(long SendBufferingEnabled) {
+    public void setSendBufferingEnabled(boolean SendBufferingEnabled) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 24);
-        SendBufferingEnabled = (long) (SendBufferingEnabled & 0b1);
-        SendBufferingEnabled = (long) (SendBufferingEnabled << 24);
-        N = (long) ((N & ~MASK) | (SendBufferingEnabled & MASK));
+        var NN = (long) (SendBufferingEnabled ? 1 : 0);
+        NN = (long) (NN << 24);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getPacingEnabled() {
+    public boolean isPacingEnabled() {
         var N = getIsSetFlags();
-        return (long) ((N >> 25) & 0b1);
+        return ((N >> 25) & 0b1) == 1;
     }
 
-    public void setPacingEnabled(long PacingEnabled) {
+    public void setPacingEnabled(boolean PacingEnabled) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 25);
-        PacingEnabled = (long) (PacingEnabled & 0b1);
-        PacingEnabled = (long) (PacingEnabled << 25);
-        N = (long) ((N & ~MASK) | (PacingEnabled & MASK));
+        var NN = (long) (PacingEnabled ? 1 : 0);
+        NN = (long) (NN << 25);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getMigrationEnabled() {
+    public boolean isMigrationEnabled() {
         var N = getIsSetFlags();
-        return (long) ((N >> 26) & 0b1);
+        return ((N >> 26) & 0b1) == 1;
     }
 
-    public void setMigrationEnabled(long MigrationEnabled) {
+    public void setMigrationEnabled(boolean MigrationEnabled) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 26);
-        MigrationEnabled = (long) (MigrationEnabled & 0b1);
-        MigrationEnabled = (long) (MigrationEnabled << 26);
-        N = (long) ((N & ~MASK) | (MigrationEnabled & MASK));
+        var NN = (long) (MigrationEnabled ? 1 : 0);
+        NN = (long) (NN << 26);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getDatagramReceiveEnabled() {
+    public boolean isDatagramReceiveEnabled() {
         var N = getIsSetFlags();
-        return (long) ((N >> 27) & 0b1);
+        return ((N >> 27) & 0b1) == 1;
     }
 
-    public void setDatagramReceiveEnabled(long DatagramReceiveEnabled) {
+    public void setDatagramReceiveEnabled(boolean DatagramReceiveEnabled) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 27);
-        DatagramReceiveEnabled = (long) (DatagramReceiveEnabled & 0b1);
-        DatagramReceiveEnabled = (long) (DatagramReceiveEnabled << 27);
-        N = (long) ((N & ~MASK) | (DatagramReceiveEnabled & MASK));
+        var NN = (long) (DatagramReceiveEnabled ? 1 : 0);
+        NN = (long) (NN << 27);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getServerResumptionLevel() {
+    public boolean isServerResumptionLevel() {
         var N = getIsSetFlags();
-        return (long) ((N >> 28) & 0b1);
+        return ((N >> 28) & 0b1) == 1;
     }
 
-    public void setServerResumptionLevel(long ServerResumptionLevel) {
+    public void setServerResumptionLevel(boolean ServerResumptionLevel) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 28);
-        ServerResumptionLevel = (long) (ServerResumptionLevel & 0b1);
-        ServerResumptionLevel = (long) (ServerResumptionLevel << 28);
-        N = (long) ((N & ~MASK) | (ServerResumptionLevel & MASK));
+        var NN = (long) (ServerResumptionLevel ? 1 : 0);
+        NN = (long) (NN << 28);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getMaxOperationsPerDrain() {
+    public boolean isMaxOperationsPerDrain() {
         var N = getIsSetFlags();
-        return (long) ((N >> 29) & 0b1);
+        return ((N >> 29) & 0b1) == 1;
     }
 
-    public void setMaxOperationsPerDrain(long MaxOperationsPerDrain) {
+    public void setMaxOperationsPerDrain(boolean MaxOperationsPerDrain) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 29);
-        MaxOperationsPerDrain = (long) (MaxOperationsPerDrain & 0b1);
-        MaxOperationsPerDrain = (long) (MaxOperationsPerDrain << 29);
-        N = (long) ((N & ~MASK) | (MaxOperationsPerDrain & MASK));
+        var NN = (long) (MaxOperationsPerDrain ? 1 : 0);
+        NN = (long) (NN << 29);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getMtuDiscoveryMissingProbeCount() {
+    public boolean isMtuDiscoveryMissingProbeCount() {
         var N = getIsSetFlags();
-        return (long) ((N >> 30) & 0b1);
+        return ((N >> 30) & 0b1) == 1;
     }
 
-    public void setMtuDiscoveryMissingProbeCount(long MtuDiscoveryMissingProbeCount) {
+    public void setMtuDiscoveryMissingProbeCount(boolean MtuDiscoveryMissingProbeCount) {
         var N = getIsSetFlags();
         long MASK = (long) (0b1 << 30);
-        MtuDiscoveryMissingProbeCount = (long) (MtuDiscoveryMissingProbeCount & 0b1);
-        MtuDiscoveryMissingProbeCount = (long) (MtuDiscoveryMissingProbeCount << 30);
-        N = (long) ((N & ~MASK) | (MtuDiscoveryMissingProbeCount & MASK));
+        var NN = (long) (MtuDiscoveryMissingProbeCount ? 1 : 0);
+        NN = (long) (NN << 30);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getDestCidUpdateIdleTimeoutMs() {
+    public boolean isDestCidUpdateIdleTimeoutMs() {
         var N = getIsSetFlags();
-        return (long) ((N >> 31) & 0b1);
+        return ((N >> 31) & 0b1) == 1;
     }
 
-    public void setDestCidUpdateIdleTimeoutMs(long DestCidUpdateIdleTimeoutMs) {
+    public void setDestCidUpdateIdleTimeoutMs(boolean DestCidUpdateIdleTimeoutMs) {
         var N = getIsSetFlags();
-        long MASK = (long) (0b1 << 31);
-        DestCidUpdateIdleTimeoutMs = (long) (DestCidUpdateIdleTimeoutMs & 0b1);
-        DestCidUpdateIdleTimeoutMs = (long) (DestCidUpdateIdleTimeoutMs << 31);
-        N = (long) ((N & ~MASK) | (DestCidUpdateIdleTimeoutMs & MASK));
+        long MASK = (long) (0b1L << 31);
+        var NN = (long) (DestCidUpdateIdleTimeoutMs ? 1 : 0);
+        NN = (long) (NN << 31);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getGreaseQuicBitEnabled() {
+    public boolean isGreaseQuicBitEnabled() {
         var N = getIsSetFlags();
-        return (long) ((N >> 32) & 0b1);
+        return ((N >> 32) & 0b1) == 1;
     }
 
-    public void setGreaseQuicBitEnabled(long GreaseQuicBitEnabled) {
+    public void setGreaseQuicBitEnabled(boolean GreaseQuicBitEnabled) {
         var N = getIsSetFlags();
-        long MASK = (long) (0b1 << 32);
-        GreaseQuicBitEnabled = (long) (GreaseQuicBitEnabled & 0b1);
-        GreaseQuicBitEnabled = (long) (GreaseQuicBitEnabled << 32);
-        N = (long) ((N & ~MASK) | (GreaseQuicBitEnabled & MASK));
+        long MASK = (long) (0b1L << 32);
+        var NN = (long) (GreaseQuicBitEnabled ? 1 : 0);
+        NN = (long) (NN << 32);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getEcnEnabled() {
+    public boolean isEcnEnabled() {
         var N = getIsSetFlags();
-        return (long) ((N >> 33) & 0b1);
+        return ((N >> 33) & 0b1) == 1;
     }
 
-    public void setEcnEnabled(long EcnEnabled) {
+    public void setEcnEnabled(boolean EcnEnabled) {
         var N = getIsSetFlags();
-        long MASK = (long) (0b1 << 33);
-        EcnEnabled = (long) (EcnEnabled & 0b1);
-        EcnEnabled = (long) (EcnEnabled << 33);
-        N = (long) ((N & ~MASK) | (EcnEnabled & MASK));
+        long MASK = (long) (0b1L << 33);
+        var NN = (long) (EcnEnabled ? 1 : 0);
+        NN = (long) (NN << 33);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getHyStartEnabled() {
+    public boolean isHyStartEnabled() {
         var N = getIsSetFlags();
-        return (long) ((N >> 34) & 0b1);
+        return ((N >> 34) & 0b1) == 1;
     }
 
-    public void setHyStartEnabled(long HyStartEnabled) {
+    public void setHyStartEnabled(boolean HyStartEnabled) {
         var N = getIsSetFlags();
-        long MASK = (long) (0b1 << 34);
-        HyStartEnabled = (long) (HyStartEnabled & 0b1);
-        HyStartEnabled = (long) (HyStartEnabled << 34);
-        N = (long) ((N & ~MASK) | (HyStartEnabled & MASK));
+        long MASK = (long) (0b1L << 34);
+        var NN = (long) (HyStartEnabled ? 1 : 0);
+        NN = (long) (NN << 34);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getEncryptionOffloadAllowed() {
+    public boolean isEncryptionOffloadAllowed() {
         var N = getIsSetFlags();
-        return (long) ((N >> 35) & 0b1);
+        return ((N >> 35) & 0b1) == 1;
     }
 
-    public void setEncryptionOffloadAllowed(long EncryptionOffloadAllowed) {
+    public void setEncryptionOffloadAllowed(boolean EncryptionOffloadAllowed) {
         var N = getIsSetFlags();
-        long MASK = (long) (0b1 << 35);
-        EncryptionOffloadAllowed = (long) (EncryptionOffloadAllowed & 0b1);
-        EncryptionOffloadAllowed = (long) (EncryptionOffloadAllowed << 35);
-        N = (long) ((N & ~MASK) | (EncryptionOffloadAllowed & MASK));
+        long MASK = (long) (0b1L << 35);
+        var NN = (long) (EncryptionOffloadAllowed ? 1 : 0);
+        NN = (long) (NN << 35);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
-    public long getReliableResetEnabled() {
+    public boolean isReliableResetEnabled() {
         var N = getIsSetFlags();
-        return (long) ((N >> 36) & 0b1);
+        return ((N >> 36) & 0b1) == 1;
     }
 
-    public void setReliableResetEnabled(long ReliableResetEnabled) {
+    public void setReliableResetEnabled(boolean ReliableResetEnabled) {
         var N = getIsSetFlags();
-        long MASK = (long) (0b1 << 36);
-        ReliableResetEnabled = (long) (ReliableResetEnabled & 0b1);
-        ReliableResetEnabled = (long) (ReliableResetEnabled << 36);
-        N = (long) ((N & ~MASK) | (ReliableResetEnabled & MASK));
+        long MASK = (long) (0b1L << 36);
+        var NN = (long) (ReliableResetEnabled ? 1 : 0);
+        NN = (long) (NN << 36);
+        N = (long) ((N & ~MASK) | (NN & MASK));
         setIsSetFlags(N);
     }
 
@@ -574,79 +574,79 @@ public class QuicSettingsIsSet extends AbstractNativeObject implements NativeObj
             SB.append(" ".repeat(INDENT + 4)).append("IsSetFlags => ");
             SB.append(getIsSetFlags());
             SB.append(" {\n");
-            SB.append(" ".repeat(INDENT + 8)).append("MaxBytesPerKey:1 => ").append(getMaxBytesPerKey());
+            SB.append(" ".repeat(INDENT + 8)).append("MaxBytesPerKey:1 => ").append(isMaxBytesPerKey());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("HandshakeIdleTimeoutMs:1 => ").append(getHandshakeIdleTimeoutMs());
+            SB.append(" ".repeat(INDENT + 8)).append("HandshakeIdleTimeoutMs:1 => ").append(isHandshakeIdleTimeoutMs());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("IdleTimeoutMs:1 => ").append(getIdleTimeoutMs());
+            SB.append(" ".repeat(INDENT + 8)).append("IdleTimeoutMs:1 => ").append(isIdleTimeoutMs());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("MtuDiscoverySearchCompleteTimeoutUs:1 => ").append(getMtuDiscoverySearchCompleteTimeoutUs());
+            SB.append(" ".repeat(INDENT + 8)).append("MtuDiscoverySearchCompleteTimeoutUs:1 => ").append(isMtuDiscoverySearchCompleteTimeoutUs());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("TlsClientMaxSendBuffer:1 => ").append(getTlsClientMaxSendBuffer());
+            SB.append(" ".repeat(INDENT + 8)).append("TlsClientMaxSendBuffer:1 => ").append(isTlsClientMaxSendBuffer());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("TlsServerMaxSendBuffer:1 => ").append(getTlsServerMaxSendBuffer());
+            SB.append(" ".repeat(INDENT + 8)).append("TlsServerMaxSendBuffer:1 => ").append(isTlsServerMaxSendBuffer());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("StreamRecvWindowDefault:1 => ").append(getStreamRecvWindowDefault());
+            SB.append(" ".repeat(INDENT + 8)).append("StreamRecvWindowDefault:1 => ").append(isStreamRecvWindowDefault());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("StreamRecvBufferDefault:1 => ").append(getStreamRecvBufferDefault());
+            SB.append(" ".repeat(INDENT + 8)).append("StreamRecvBufferDefault:1 => ").append(isStreamRecvBufferDefault());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("ConnFlowControlWindow:1 => ").append(getConnFlowControlWindow());
+            SB.append(" ".repeat(INDENT + 8)).append("ConnFlowControlWindow:1 => ").append(isConnFlowControlWindow());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("MaxWorkerQueueDelayUs:1 => ").append(getMaxWorkerQueueDelayUs());
+            SB.append(" ".repeat(INDENT + 8)).append("MaxWorkerQueueDelayUs:1 => ").append(isMaxWorkerQueueDelayUs());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("MaxStatelessOperations:1 => ").append(getMaxStatelessOperations());
+            SB.append(" ".repeat(INDENT + 8)).append("MaxStatelessOperations:1 => ").append(isMaxStatelessOperations());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("InitialWindowPackets:1 => ").append(getInitialWindowPackets());
+            SB.append(" ".repeat(INDENT + 8)).append("InitialWindowPackets:1 => ").append(isInitialWindowPackets());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("SendIdleTimeoutMs:1 => ").append(getSendIdleTimeoutMs());
+            SB.append(" ".repeat(INDENT + 8)).append("SendIdleTimeoutMs:1 => ").append(isSendIdleTimeoutMs());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("InitialRttMs:1 => ").append(getInitialRttMs());
+            SB.append(" ".repeat(INDENT + 8)).append("InitialRttMs:1 => ").append(isInitialRttMs());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("MaxAckDelayMs:1 => ").append(getMaxAckDelayMs());
+            SB.append(" ".repeat(INDENT + 8)).append("MaxAckDelayMs:1 => ").append(isMaxAckDelayMs());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("DisconnectTimeoutMs:1 => ").append(getDisconnectTimeoutMs());
+            SB.append(" ".repeat(INDENT + 8)).append("DisconnectTimeoutMs:1 => ").append(isDisconnectTimeoutMs());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("KeepAliveIntervalMs:1 => ").append(getKeepAliveIntervalMs());
+            SB.append(" ".repeat(INDENT + 8)).append("KeepAliveIntervalMs:1 => ").append(isKeepAliveIntervalMs());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("CongestionControlAlgorithm:1 => ").append(getCongestionControlAlgorithm());
+            SB.append(" ".repeat(INDENT + 8)).append("CongestionControlAlgorithm:1 => ").append(isCongestionControlAlgorithm());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("PeerBidiStreamCount:1 => ").append(getPeerBidiStreamCount());
+            SB.append(" ".repeat(INDENT + 8)).append("PeerBidiStreamCount:1 => ").append(isPeerBidiStreamCount());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("PeerUnidiStreamCount:1 => ").append(getPeerUnidiStreamCount());
+            SB.append(" ".repeat(INDENT + 8)).append("PeerUnidiStreamCount:1 => ").append(isPeerUnidiStreamCount());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("MaxBindingStatelessOperations:1 => ").append(getMaxBindingStatelessOperations());
+            SB.append(" ".repeat(INDENT + 8)).append("MaxBindingStatelessOperations:1 => ").append(isMaxBindingStatelessOperations());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("StatelessOperationExpirationMs:1 => ").append(getStatelessOperationExpirationMs());
+            SB.append(" ".repeat(INDENT + 8)).append("StatelessOperationExpirationMs:1 => ").append(isStatelessOperationExpirationMs());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("MinimumMtu:1 => ").append(getMinimumMtu());
+            SB.append(" ".repeat(INDENT + 8)).append("MinimumMtu:1 => ").append(isMinimumMtu());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("MaximumMtu:1 => ").append(getMaximumMtu());
+            SB.append(" ".repeat(INDENT + 8)).append("MaximumMtu:1 => ").append(isMaximumMtu());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("SendBufferingEnabled:1 => ").append(getSendBufferingEnabled());
+            SB.append(" ".repeat(INDENT + 8)).append("SendBufferingEnabled:1 => ").append(isSendBufferingEnabled());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("PacingEnabled:1 => ").append(getPacingEnabled());
+            SB.append(" ".repeat(INDENT + 8)).append("PacingEnabled:1 => ").append(isPacingEnabled());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("MigrationEnabled:1 => ").append(getMigrationEnabled());
+            SB.append(" ".repeat(INDENT + 8)).append("MigrationEnabled:1 => ").append(isMigrationEnabled());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("DatagramReceiveEnabled:1 => ").append(getDatagramReceiveEnabled());
+            SB.append(" ".repeat(INDENT + 8)).append("DatagramReceiveEnabled:1 => ").append(isDatagramReceiveEnabled());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("ServerResumptionLevel:1 => ").append(getServerResumptionLevel());
+            SB.append(" ".repeat(INDENT + 8)).append("ServerResumptionLevel:1 => ").append(isServerResumptionLevel());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("MaxOperationsPerDrain:1 => ").append(getMaxOperationsPerDrain());
+            SB.append(" ".repeat(INDENT + 8)).append("MaxOperationsPerDrain:1 => ").append(isMaxOperationsPerDrain());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("MtuDiscoveryMissingProbeCount:1 => ").append(getMtuDiscoveryMissingProbeCount());
+            SB.append(" ".repeat(INDENT + 8)).append("MtuDiscoveryMissingProbeCount:1 => ").append(isMtuDiscoveryMissingProbeCount());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("DestCidUpdateIdleTimeoutMs:1 => ").append(getDestCidUpdateIdleTimeoutMs());
+            SB.append(" ".repeat(INDENT + 8)).append("DestCidUpdateIdleTimeoutMs:1 => ").append(isDestCidUpdateIdleTimeoutMs());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("GreaseQuicBitEnabled:1 => ").append(getGreaseQuicBitEnabled());
+            SB.append(" ".repeat(INDENT + 8)).append("GreaseQuicBitEnabled:1 => ").append(isGreaseQuicBitEnabled());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("EcnEnabled:1 => ").append(getEcnEnabled());
+            SB.append(" ".repeat(INDENT + 8)).append("EcnEnabled:1 => ").append(isEcnEnabled());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("HyStartEnabled:1 => ").append(getHyStartEnabled());
+            SB.append(" ".repeat(INDENT + 8)).append("HyStartEnabled:1 => ").append(isHyStartEnabled());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("EncryptionOffloadAllowed:1 => ").append(getEncryptionOffloadAllowed());
+            SB.append(" ".repeat(INDENT + 8)).append("EncryptionOffloadAllowed:1 => ").append(isEncryptionOffloadAllowed());
             SB.append(",\n");
-            SB.append(" ".repeat(INDENT + 8)).append("ReliableResetEnabled:1 => ").append(getReliableResetEnabled());
+            SB.append(" ".repeat(INDENT + 8)).append("ReliableResetEnabled:1 => ").append(isReliableResetEnabled());
             SB.append("\n");
             SB.append(" ".repeat(INDENT + 4)).append("}");
         }
@@ -724,5 +724,5 @@ public class QuicSettingsIsSet extends AbstractNativeObject implements NativeObj
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:0c5ea4f2ad4186b0bc349d2abee89648d4ba0c521af57746aa608af72c98a08d
+// metadata.generator-version: pni 21.0.0.18
+// sha256:b9c578f84e18e3be852e23f387177c9bfd14c9665ab8cce63c080affb4c97e99

@@ -29,17 +29,17 @@ public class QuicListenerEventStopComplete extends AbstractNativeObject implemen
         Field01VH.set(MEMORY, Field01);
     }
 
-    public byte getAppCloseInProgress() {
+    public boolean isAppCloseInProgress() {
         var N = getField01();
-        return (byte) ((N >> 0) & 0b1);
+        return ((N >> 0) & 0b1) == 1;
     }
 
-    public void setAppCloseInProgress(byte AppCloseInProgress) {
+    public void setAppCloseInProgress(boolean AppCloseInProgress) {
         var N = getField01();
         byte MASK = (byte) (0b1 << 0);
-        AppCloseInProgress = (byte) (AppCloseInProgress & 0b1);
-        AppCloseInProgress = (byte) (AppCloseInProgress << 0);
-        N = (byte) ((N & ~MASK) | (AppCloseInProgress & MASK));
+        var NN = (byte) (AppCloseInProgress ? 1 : 0);
+        NN = (byte) (NN << 0);
+        N = (byte) ((N & ~MASK) | (NN & MASK));
         setField01(N);
     }
 
@@ -65,7 +65,7 @@ public class QuicListenerEventStopComplete extends AbstractNativeObject implemen
             SB.append(" ".repeat(INDENT + 4)).append("Field01 => ");
             SB.append(getField01());
             SB.append(" {\n");
-            SB.append(" ".repeat(INDENT + 8)).append("AppCloseInProgress:1 => ").append(getAppCloseInProgress());
+            SB.append(" ".repeat(INDENT + 8)).append("AppCloseInProgress:1 => ").append(isAppCloseInProgress());
             SB.append("\n");
             SB.append(" ".repeat(INDENT + 4)).append("}");
         }
@@ -143,5 +143,5 @@ public class QuicListenerEventStopComplete extends AbstractNativeObject implemen
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.15
-// sha256:708d5ca6fd871e994481c44fcfd56d3a8ea505e4184b2aed2e4012069a872d6f
+// metadata.generator-version: pni 21.0.0.18
+// sha256:d67b4a9059851766b29aba044c90b734f27f483cd2833a1817b29a9b7f02f871

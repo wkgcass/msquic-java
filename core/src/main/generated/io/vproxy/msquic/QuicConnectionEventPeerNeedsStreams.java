@@ -21,7 +21,7 @@ public class QuicConnectionEventPeerNeedsStreams extends AbstractNativeObject im
         MemoryLayout.PathElement.groupElement("Bidirectional")
     );
 
-    public boolean getBidirectional() {
+    public boolean isBidirectional() {
         return (boolean) BidirectionalVH.get(MEMORY);
     }
 
@@ -49,7 +49,7 @@ public class QuicConnectionEventPeerNeedsStreams extends AbstractNativeObject im
         SB.append("QuicConnectionEventPeerNeedsStreams{\n");
         {
             SB.append(" ".repeat(INDENT + 4)).append("Bidirectional => ");
-            SB.append(getBidirectional());
+            SB.append(isBidirectional());
         }
         SB.append("\n");
         SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
@@ -125,5 +125,5 @@ public class QuicConnectionEventPeerNeedsStreams extends AbstractNativeObject im
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.15
-// sha256:22947f54e91ede501d57a20d78b4ad9ad8f83419d664fb728b30c30e839da917
+// metadata.generator-version: pni 21.0.0.18
+// sha256:0b29b8e1c667624e74ab0b18f870e244148ec6ef4ce88fd863f0a2d9966c1e59

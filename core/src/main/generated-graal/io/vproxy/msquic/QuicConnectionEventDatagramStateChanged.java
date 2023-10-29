@@ -28,7 +28,7 @@ public class QuicConnectionEventDatagramStateChanged extends AbstractNativeObjec
         MemoryLayout.PathElement.groupElement("SendEnabled")
     );
 
-    public boolean getSendEnabled() {
+    public boolean isSendEnabled() {
         return (boolean) SendEnabledVH.get(MEMORY);
     }
 
@@ -70,7 +70,7 @@ public class QuicConnectionEventDatagramStateChanged extends AbstractNativeObjec
         SB.append("QuicConnectionEventDatagramStateChanged{\n");
         {
             SB.append(" ".repeat(INDENT + 4)).append("SendEnabled => ");
-            SB.append(getSendEnabled());
+            SB.append(isSendEnabled());
         }
         SB.append(",\n");
         {
@@ -151,5 +151,5 @@ public class QuicConnectionEventDatagramStateChanged extends AbstractNativeObjec
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:8b1e146022a49263bfa07ffc92f1dd077c2498f1276cd7ae06a046c3e3579ccb
+// metadata.generator-version: pni 21.0.0.18
+// sha256:40a9c5ffff653a6e5a22ee9f4304e3351176125c791fb0fa918fd14958e640ea

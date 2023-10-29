@@ -21,7 +21,7 @@ public class QuicStreamEventSendShutdownComplete extends AbstractNativeObject im
         MemoryLayout.PathElement.groupElement("Graceful")
     );
 
-    public boolean getGraceful() {
+    public boolean isGraceful() {
         return (boolean) GracefulVH.get(MEMORY);
     }
 
@@ -49,7 +49,7 @@ public class QuicStreamEventSendShutdownComplete extends AbstractNativeObject im
         SB.append("QuicStreamEventSendShutdownComplete{\n");
         {
             SB.append(" ".repeat(INDENT + 4)).append("Graceful => ");
-            SB.append(getGraceful());
+            SB.append(isGraceful());
         }
         SB.append("\n");
         SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
@@ -125,5 +125,5 @@ public class QuicStreamEventSendShutdownComplete extends AbstractNativeObject im
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.15
-// sha256:6dfb71f997b1a425b750c52e7a492041105e899efbd5cb3d9e0c9c66d05a1de0
+// metadata.generator-version: pni 21.0.0.18
+// sha256:2920352c362e5c1b33c384118fffc52c4be7ed003c394fc3c762fb79b0b283e2
