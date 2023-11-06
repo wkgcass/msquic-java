@@ -9,6 +9,7 @@ import io.vproxy.pni.graal.GraalUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import static io.vproxy.msquic.MsQuicConsts.*;
 
@@ -94,34 +95,14 @@ public class Client {
         System.out.println("Init Configuration begin ...");
         {
             var confAllocator = Allocator.ofUnsafe();
-            var settings = new QuicSettings(confAllocator);
-            {
-                settings.getIsSet().setIdleTimeoutMs(true);
-                settings.setIdleTimeoutMs(60 * 60_000); // 1 hour
-                settings.getIsSet().setCongestionControlAlgorithm(true);
-                settings.setCongestionControlAlgorithm((short) QUIC_CONGESTION_CONTROL_ALGORITHM_BBR);
-                settings.getIsSet().setPeerBidiStreamCount(true);
-                settings.setPeerBidiStreamCount((short) 128);
-            }
-            var buffers = new QuicBuffer.Array(confAllocator, 1);
-            buffers.get(0).setBuffer(new PNIString(confAllocator, alpn).MEMORY);
-            buffers.get(0).setLength(alpn.length());
-            var conf_ = reg.opts.registrationQ.openConfiguration(buffers, 1, settings, null, null, confAllocator);
+            var settings = MsQuicUtils.newSettings(60 * 60_000, confAllocator);
+            var alpnBuffers = MsQuicUtils.newAlpnBuffers(List.of(alpn), confAllocator);
+            var conf_ = reg.opts.registrationQ.openConfiguration(alpnBuffers, 1, settings, null, null, confAllocator);
             if (conf_ == null) {
                 throw new RuntimeException("ConfigurationOpen failed");
             }
             conf = new Configuration(new Configuration.Options(reg, conf_, confAllocator));
-            var cred = new QuicCredentialConfig(confAllocator);
-            cred.setType(QUIC_CREDENTIAL_TYPE_NONE);
-            int flags = QUIC_CREDENTIAL_FLAG_CLIENT;
-            if (insecure) {
-                flags |= QUIC_CREDENTIAL_FLAG_NO_CERTIFICATE_VALIDATION;
-            }
-            cred.setFlags(flags);
-            cred.setAllowedCipherSuites(
-                QUIC_ALLOWED_CIPHER_SUITE_AES_128_GCM_SHA256 |
-                QUIC_ALLOWED_CIPHER_SUITE_AES_256_GCM_SHA384 |
-                QUIC_ALLOWED_CIPHER_SUITE_CHACHA20_POLY1305_SHA256);
+            var cred = MsQuicUtils.newClientCredential(insecure, confAllocator);
             if (caCertFile != null && !insecure) {
                 cred.setCaCertificateFile(caCertFile, confAllocator);
             }

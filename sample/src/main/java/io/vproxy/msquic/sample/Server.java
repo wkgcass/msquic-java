@@ -8,6 +8,8 @@ import io.vproxy.pni.Allocator;
 import io.vproxy.pni.PNIString;
 import io.vproxy.pni.graal.GraalUtils;
 
+import java.util.List;
+
 import static io.vproxy.msquic.MsQuicConsts.*;
 
 public class Server {
@@ -77,39 +79,14 @@ public class Server {
         System.out.println("Init Configuration begin ...");
         {
             var confAllocator = Allocator.ofUnsafe();
-            var settings = new QuicSettings(confAllocator);
-            {
-                settings.getIsSet().setIdleTimeoutMs(true);
-                settings.setIdleTimeoutMs(60 * 60_000); // 1 hour
-                settings.getIsSet().setCongestionControlAlgorithm(true);
-                settings.setCongestionControlAlgorithm((short) QUIC_CONGESTION_CONTROL_ALGORITHM_BBR);
-                settings.getIsSet().setServerResumptionLevel(true);
-                settings.setServerResumptionLevel((byte) QUIC_SERVER_RESUME_AND_ZERORTT);
-                settings.getIsSet().setPeerBidiStreamCount(true);
-                settings.setPeerBidiStreamCount((short) 128);
-            }
-            var alpnBuffers = new QuicBuffer.Array(confAllocator, 2);
-            {
-                alpnBuffers.get(0).setBuffer(new PNIString(confAllocator, "proto-x").MEMORY);
-                alpnBuffers.get(0).setLength(7);
-                alpnBuffers.get(1).setBuffer(new PNIString(confAllocator, "proto-y").MEMORY);
-                alpnBuffers.get(1).setLength(7);
-            }
+            var settings = MsQuicUtils.newSettings(60 * 60_000, confAllocator);
+            var alpnBuffers = MsQuicUtils.newAlpnBuffers(List.of("proto-x", "proto-y"), confAllocator);
             var conf_ = reg.opts.registrationQ.openConfiguration(alpnBuffers, 2, settings, null, null, confAllocator);
             if (conf_ == null) {
                 throw new RuntimeException("ConfigurationOpen failed");
             }
             conf = new Configuration(new Configuration.Options(reg, conf_, confAllocator));
-            var cred = new QuicCredentialConfig(confAllocator);
-            {
-                cred.setType(QUIC_CREDENTIAL_TYPE_CERTIFICATE_FILE);
-                cred.setFlags(QUIC_CREDENTIAL_FLAG_NONE);
-                var cf = new QuicCertificateFile(confAllocator);
-                cf.setCertificateFile(cert, confAllocator);
-                cf.setPrivateKeyFile(key, confAllocator);
-                cred.getCertificate().setCertificateFile(cf);
-                cred.setAllowedCipherSuites(QUIC_ALLOWED_CIPHER_SUITE_AES_256_GCM_SHA384);
-            }
+            var cred = MsQuicUtils.newServerCredential(cert, key, confAllocator);
             int err = conf.opts.configurationQ.loadCredential(cred);
             if (err != 0) {
                 conf.close();

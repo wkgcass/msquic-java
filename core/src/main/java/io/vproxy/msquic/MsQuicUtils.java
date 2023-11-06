@@ -1,10 +1,92 @@
 package io.vproxy.msquic;
 
+import io.vproxy.pni.Allocator;
+import io.vproxy.pni.PNIString;
+
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
+import java.util.List;
+
+import static io.vproxy.msquic.MsQuicConsts.*;
+import static io.vproxy.msquic.MsQuicConsts.QUIC_ALLOWED_CIPHER_SUITE_CHACHA20_POLY1305_SHA256;
 
 public class MsQuicUtils {
     private MsQuicUtils() {
+    }
+
+    public static QuicSettings newSettings(int timeoutMillis, Allocator allocator) {
+        var settings = new QuicSettings(allocator);
+        {
+            settings.getIsSet().setIdleTimeoutMs(true);
+            settings.setIdleTimeoutMs(timeoutMillis);
+
+            settings.getIsSet().setCongestionControlAlgorithm(true);
+            settings.setCongestionControlAlgorithm((short) QUIC_CONGESTION_CONTROL_ALGORITHM_BBR);
+
+            settings.getIsSet().setServerResumptionLevel(true);
+            settings.setServerResumptionLevel((byte) QUIC_SERVER_RESUME_AND_ZERORTT);
+
+            settings.getIsSet().setPeerBidiStreamCount(true);
+            settings.setPeerBidiStreamCount((short) 4096);
+
+            settings.getIsSet().setPeerUnidiStreamCount(true);
+            settings.setPeerUnidiStreamCount((short) 4096);
+        }
+        return settings;
+    }
+
+    public static QuicBuffer.Array newAlpnBuffers(List<String> alpn, Allocator allocator) {
+        var alpnBuffers = new QuicBuffer.Array(allocator, alpn.size());
+        for (int i = 0; i < alpn.size(); i++) {
+            var a = alpn.get(i);
+            var str = new PNIString(allocator, a);
+            alpnBuffers.get(i).setBuffer(str.MEMORY);
+            alpnBuffers.get(i).setLength((int) (str.MEMORY.byteSize() - 1));
+        }
+        return alpnBuffers;
+    }
+
+    public static QuicCredentialConfig newServerCredential(String certFile, String keyFile, Allocator allocator) {
+        var cred = new QuicCredentialConfig(allocator);
+        {
+            cred.setType(QUIC_CREDENTIAL_TYPE_CERTIFICATE_FILE);
+            cred.setFlags(QUIC_CREDENTIAL_FLAG_NONE);
+            var cf = new QuicCertificateFile(allocator);
+            cf.setCertificateFile(certFile, allocator);
+            cf.setPrivateKeyFile(keyFile, allocator);
+            cred.getCertificate().setCertificateFile(cf);
+            setAllowedCipherSuites(cred);
+        }
+        return cred;
+    }
+
+    public static QuicCredentialConfig newClientCredential(boolean noCAValidation, Allocator allocator) {
+        return newClientCredential(noCAValidation, null, allocator);
+    }
+
+    public static QuicCredentialConfig newClientCredential(boolean noCAValidation, String caFile, Allocator allocator) {
+        var cred = new QuicCredentialConfig(allocator);
+        {
+            cred.setType(QUIC_CREDENTIAL_TYPE_NONE);
+            int flags = QUIC_CREDENTIAL_FLAG_CLIENT;
+            if (noCAValidation) {
+                flags |= QUIC_CREDENTIAL_FLAG_NO_CERTIFICATE_VALIDATION;
+            }
+            cred.setFlags(flags);
+            if (caFile != null) {
+                cred.setCaCertificateFile(caFile, allocator);
+            }
+            setAllowedCipherSuites(cred);
+        }
+        return cred;
+    }
+
+    private static void setAllowedCipherSuites(QuicCredentialConfig cred) {
+        cred.setAllowedCipherSuites(
+            QUIC_ALLOWED_CIPHER_SUITE_AES_128_GCM_SHA256 |
+            QUIC_ALLOWED_CIPHER_SUITE_AES_256_GCM_SHA384 |
+            QUIC_ALLOWED_CIPHER_SUITE_CHACHA20_POLY1305_SHA256
+        );
     }
 
     public static String convertQuicTlsSecretToSSLKEYLOGFILE(QuicTLSSecret s) {
