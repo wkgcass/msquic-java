@@ -215,7 +215,7 @@ public class CommandLine {
                 }
                 int streamIndex = Integer.parseInt(ls.get(0));
                 var stream = getStream(streamIndex);
-                stream.streamQ.send(null, 0, QUIC_SEND_FLAG_FIN, null);
+                stream.sendFin();
             }
             case "close" -> {
                 if (ls.size() != 2 || !List.of("conn", "stream").contains(ls.get(0))) {

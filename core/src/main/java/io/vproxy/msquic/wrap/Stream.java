@@ -173,16 +173,20 @@ public abstract class Stream {
     }
 
     public int send(int flags, SendContext ctx, MemorySegment... dataArray) {
-        if (dataArray.length == 0)
+        if (dataArray.length == 0 && flags == QUIC_SEND_FLAG_NONE)
             return 0;
-        var qbufArray = new QuicBuffer.Array(ctx.allocator, dataArray.length);
-        for (int i = 0; i < dataArray.length; ++i) {
-            var qbuf = qbufArray.get(i);
-            var data = dataArray[i];
-            qbuf.setLength((int) data.byteSize());
-            qbuf.setBuffer(data);
+        QuicBuffer.Array qbufArray = null;
+        if (dataArray.length > 0) {
+            qbufArray = new QuicBuffer.Array(ctx.allocator, dataArray.length);
+            for (int i = 0; i < dataArray.length; ++i) {
+                var qbuf = qbufArray.get(i);
+                var data = dataArray[i];
+                qbuf.setLength((int) data.byteSize());
+                qbuf.setBuffer(data);
+            }
         }
-        int res = streamQ.send(qbufArray.get(0) /*address*/, dataArray.length, flags, PNIRef.of(ctx).MEMORY);
+        QuicBuffer qBufAddr = qbufArray == null ? null : qbufArray.get(0);
+        int res = streamQ.send(qBufAddr, dataArray.length, flags, PNIRef.of(ctx).MEMORY);
         if (res == 0) {
             pendingSendContexts.add(ctx);
             return 0;
@@ -190,6 +194,10 @@ public abstract class Stream {
         // failed
         finish(ctx, false);
         return res;
+    }
+
+    public int sendFin() {
+        return streamQ.send(null, 0, QUIC_SEND_FLAG_FIN, null);
     }
 
     // need to override
