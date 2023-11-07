@@ -16,7 +16,17 @@ public class MsQuicMod {
         return INSTANCE;
     }
 
-    private static final MethodHandle MsQuicSetEventLoopThreadDispatcherMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_MsQuicMod_MsQuicSetEventLoopThreadDispatcher", MemorySegment.class /* dispatcher */);
+    private static final MethodHandle MsQuicSetThreadCountLimitMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "MsQuicSetThreadCountLimit", int.class /* limit */);
+
+    public void MsQuicSetThreadCountLimit(int limit) {
+        try {
+            MsQuicSetThreadCountLimitMH.invokeExact(limit);
+        } catch (Throwable THROWABLE) {
+            throw PanamaUtils.convertInvokeExactException(THROWABLE);
+        }
+    }
+
+    private static final MethodHandle MsQuicSetEventLoopThreadDispatcherMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "MsQuicSetEventLoopThreadDispatcher", MemorySegment.class /* dispatcher */);
 
     public int MsQuicSetEventLoopThreadDispatcher(MemorySegment dispatcher) {
         int RESULT;
@@ -28,7 +38,7 @@ public class MsQuicMod {
         return RESULT;
     }
 
-    private static final MethodHandle CxPlatGetCurThreadMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_MsQuicMod_CxPlatGetCurThread", MemorySegment.class /* Thread */);
+    private static final MethodHandle CxPlatGetCurThreadMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "CxPlatGetCurThread", MemorySegment.class /* Thread */);
 
     public int CxPlatGetCurThread(MemorySegment Thread) {
         int RESULT;
@@ -50,5 +60,5 @@ public class MsQuicMod {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.17
-// sha256:97320be900997ed4af4ceb5d9ffe76ea460fa54109d96c4d3f86224f0721040f
+// metadata.generator-version: pni 21.0.0.18
+// sha256:93936cd472eadda6ea18b5a7bea793225da77790a5bb5ea6488c1526ec05d74c

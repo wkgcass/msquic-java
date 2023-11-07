@@ -18,13 +18,14 @@ extern "C" {
 extern "C" {
 #endif
 
-JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_MsQuicMod_MsQuicSetEventLoopThreadDispatcher(void * dispatcher);
-JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_MsQuicMod_CxPlatGetCurThread(void * Thread);
+JNIEXPORT void JNICALL MsQuicSetThreadCountLimit(uint32_t limit);
+JNIEXPORT QUIC_STATUS JNICALL MsQuicSetEventLoopThreadDispatcher(QUIC_EVENT_LOOP_THREAD_DISPATCH_FN dispatcher);
+JNIEXPORT QUIC_STATUS JNICALL CxPlatGetCurThread(CXPLAT_THREAD* Thread);
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_MsQuicMod_INVOKE_LPTHREAD_START_ROUTINE(void * Callback, void * Context);
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_MsQuicMod
-// metadata.generator-version: pni 21.0.0.16
-// sha256:54057ddec5c0a8be192d499f19a99c56c7852dab1f35a7ebb57294e120098d25
+// metadata.generator-version: pni 21.0.0.17
+// sha256:cb62af6d9a6eec9cd34956b68e4809cbee250c432dbe555a6917182436314a4f

@@ -29,23 +29,19 @@ class PNICXPLAT_THREAD_CONFIG {
 @Downcall
 @Include("msquic.h")
 interface PNIMsQuicMod {
-    @Impl(
-        // language="c"
-        c = """
-            return MsQuicSetEventLoopThreadDispatcher(dispatcher);
-            """
-    )
     @Style(Styles.critical)
-    int MsQuicSetEventLoopThreadDispatcher(MemorySegment dispatcher);
+    @Name("MsQuicSetThreadCountLimit")
+    void MsQuicSetThreadCountLimit(@Unsigned int limit);
 
-    @Impl(
-        // language="c"
-        c = """
-            return CxPlatGetCurThread((CXPLAT_THREAD*) Thread);
-            """
-    )
     @Style(Styles.critical)
-    int CxPlatGetCurThread(MemorySegment Thread);
+    @Name("MsQuicSetEventLoopThreadDispatcher")
+    @NativeReturnType("QUIC_STATUS")
+    int MsQuicSetEventLoopThreadDispatcher(@NativeType("QUIC_EVENT_LOOP_THREAD_DISPATCH_FN") MemorySegment dispatcher);
+
+    @Style(Styles.critical)
+    @Name("CxPlatGetCurThread")
+    @NativeReturnType("QUIC_STATUS")
+    int CxPlatGetCurThread(@NativeType("CXPLAT_THREAD*") MemorySegment Thread);
 
     @Impl(
         // language="c"

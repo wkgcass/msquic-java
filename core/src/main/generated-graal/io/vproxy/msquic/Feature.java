@@ -28,10 +28,13 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
         /* JavaCritical_io_vproxy_msquic_MsQuic_buildQuicAddr */
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(boolean.class, String.class /* addr */, int.class /* port */, MemoryLayout.class /* io.vproxy.msquic.QuicAddr.LAYOUT.getClass() */ /* result */));
 
-        /* JavaCritical_io_vproxy_msquic_MsQuicMod_MsQuicSetEventLoopThreadDispatcher */
+        /* MsQuicSetThreadCountLimit */
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, int.class /* limit */));
+
+        /* MsQuicSetEventLoopThreadDispatcher */
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class, MemorySegment.class /* dispatcher */));
 
-        /* JavaCritical_io_vproxy_msquic_MsQuicMod_CxPlatGetCurThread */
+        /* CxPlatGetCurThread */
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class, MemorySegment.class /* Thread */));
 
         /* JavaCritical_io_vproxy_msquic_MsQuicMod_INVOKE_LPTHREAD_START_ROUTINE */
@@ -179,4 +182,4 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
     }
 }
 // metadata.generator-version: pni 21.0.0.17
-// sha256:03e863cabaa9293c24fe04ab430a16a602beabeb7b120998906605dba39f283f
+// sha256:cbebcbd4734f7d9a1746fa0698b1810bf91b2daad6c105d20836faba601d2132

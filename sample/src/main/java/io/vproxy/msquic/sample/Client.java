@@ -31,6 +31,7 @@ public class Client {
     public static void main(String[] args) {
         System.loadLibrary("msquic");
         System.loadLibrary("msquic-java");
+        MsQuicMod.get().MsQuicSetThreadCountLimit(2);
         MsQuicUpcall.setImpl(MsQuicUpcallImpl.get());
         MsQuicModUpcall.setImpl(MsQuicModUpcallImpl.get());
         MsQuicMod.get().MsQuicSetEventLoopThreadDispatcher(MsQuicModUpcall.dispatch);
