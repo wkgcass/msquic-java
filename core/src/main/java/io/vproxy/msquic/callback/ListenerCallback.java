@@ -8,6 +8,10 @@ import io.vproxy.msquic.wrap.Listener;
 import static io.vproxy.msquic.MsQuicConsts.QUIC_STATUS_NOT_SUPPORTED;
 
 public interface ListenerCallback {
+    default boolean remove(Listener listener) {
+        return false;
+    }
+
     default int newConnection(Listener listener, QuicListenerEventNewConnection data) {
         return QUIC_STATUS_NOT_SUPPORTED;
     }

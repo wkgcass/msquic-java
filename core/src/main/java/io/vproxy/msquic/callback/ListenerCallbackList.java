@@ -44,8 +44,12 @@ public class ListenerCallbackList implements ListenerCallback {
     @Override
     public int newConnection(Listener listener, QuicListenerEventNewConnection data) {
         int state = QUIC_STATUS_NOT_SUPPORTED;
-        for (var cb : callbacks) {
+        for (var ite = callbacks.iterator(); ite.hasNext(); ) {
+            var cb = ite.next();
             int s = cb.newConnection(listener, data);
+            if (cb.remove(listener)) {
+                ite.remove();
+            }
             if (s != QUIC_STATUS_NOT_SUPPORTED)
                 state = s;
             if (invalidState(state))
@@ -57,8 +61,12 @@ public class ListenerCallbackList implements ListenerCallback {
     @Override
     public int stopComplete(Listener listener, QuicListenerEventStopComplete data) {
         int state = QUIC_STATUS_NOT_SUPPORTED;
-        for (var cb : callbacks) {
+        for (var ite = callbacks.iterator(); ite.hasNext(); ) {
+            var cb = ite.next();
             int s = cb.stopComplete(listener, data);
+            if (cb.remove(listener)) {
+                ite.remove();
+            }
             if (s != QUIC_STATUS_NOT_SUPPORTED)
                 state = s;
             if (invalidState(state))
@@ -70,8 +78,12 @@ public class ListenerCallbackList implements ListenerCallback {
     @Override
     public int unknown(Listener listener, QuicListenerEvent event) {
         int state = QUIC_STATUS_NOT_SUPPORTED;
-        for (var cb : callbacks) {
+        for (var ite = callbacks.iterator(); ite.hasNext(); ) {
+            var cb = ite.next();
             int s = cb.unknown(listener, event);
+            if (cb.remove(listener)) {
+                ite.remove();
+            }
             if (s != QUIC_STATUS_NOT_SUPPORTED)
                 state = s;
             if (invalidState(state))
@@ -82,8 +94,12 @@ public class ListenerCallbackList implements ListenerCallback {
 
     @Override
     public void closed(Listener listener) {
-        for (var cb : callbacks) {
+        for (var ite = callbacks.iterator(); ite.hasNext(); ) {
+            var cb = ite.next();
             cb.closed(listener);
+            if (cb.remove(listener)) {
+                ite.remove();
+            }
         }
     }
 }

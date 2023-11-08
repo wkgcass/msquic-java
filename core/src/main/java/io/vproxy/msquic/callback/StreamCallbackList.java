@@ -42,8 +42,12 @@ public class StreamCallbackList implements StreamCallback {
     @Override
     public int startComplete(Stream stream, QuicStreamEventStartComplete data) {
         int state = QUIC_STATUS_NOT_SUPPORTED;
-        for (var cb : callbacks) {
+        for (var ite = callbacks.iterator(); ite.hasNext(); ) {
+            var cb = ite.next();
             int s = cb.startComplete(stream, data);
+            if (cb.remove(stream)) {
+                ite.remove();
+            }
             if (s != QUIC_STATUS_NOT_SUPPORTED)
                 state = s;
             if (invalidState(state))
@@ -55,8 +59,12 @@ public class StreamCallbackList implements StreamCallback {
     @Override
     public int receive(Stream stream, QuicStreamEventReceive data) {
         int state = QUIC_STATUS_NOT_SUPPORTED;
-        for (var cb : callbacks) {
+        for (var ite = callbacks.iterator(); ite.hasNext(); ) {
+            var cb = ite.next();
             int s = cb.receive(stream, data);
+            if (cb.remove(stream)) {
+                ite.remove();
+            }
             if (s != QUIC_STATUS_NOT_SUPPORTED)
                 state = s;
             if (invalidState(state))
@@ -68,8 +76,12 @@ public class StreamCallbackList implements StreamCallback {
     @Override
     public int sendComplete(Stream stream, QuicStreamEventSendComplete data) {
         int state = QUIC_STATUS_NOT_SUPPORTED;
-        for (var cb : callbacks) {
+        for (var ite = callbacks.iterator(); ite.hasNext(); ) {
+            var cb = ite.next();
             int s = cb.sendComplete(stream, data);
+            if (cb.remove(stream)) {
+                ite.remove();
+            }
             if (s != QUIC_STATUS_NOT_SUPPORTED)
                 state = s;
             if (invalidState(state))
@@ -81,8 +93,12 @@ public class StreamCallbackList implements StreamCallback {
     @Override
     public int peerSendShutdown(Stream stream) {
         int state = QUIC_STATUS_NOT_SUPPORTED;
-        for (var cb : callbacks) {
+        for (var ite = callbacks.iterator(); ite.hasNext(); ) {
+            var cb = ite.next();
             int s = cb.peerSendShutdown(stream);
+            if (cb.remove(stream)) {
+                ite.remove();
+            }
             if (s != QUIC_STATUS_NOT_SUPPORTED)
                 state = s;
             if (invalidState(state))
@@ -94,8 +110,12 @@ public class StreamCallbackList implements StreamCallback {
     @Override
     public int peerSendAborted(Stream stream, QuicStreamEventPeerSendAborted data) {
         int state = QUIC_STATUS_NOT_SUPPORTED;
-        for (var cb : callbacks) {
+        for (var ite = callbacks.iterator(); ite.hasNext(); ) {
+            var cb = ite.next();
             int s = cb.peerSendAborted(stream, data);
+            if (cb.remove(stream)) {
+                ite.remove();
+            }
             if (s != QUIC_STATUS_NOT_SUPPORTED)
                 state = s;
             if (invalidState(state))
@@ -107,8 +127,12 @@ public class StreamCallbackList implements StreamCallback {
     @Override
     public int peerReceiveAborted(Stream stream, QuicStreamEventPeerReceiveAborted data) {
         int state = QUIC_STATUS_NOT_SUPPORTED;
-        for (var cb : callbacks) {
+        for (var ite = callbacks.iterator(); ite.hasNext(); ) {
+            var cb = ite.next();
             int s = cb.peerReceiveAborted(stream, data);
+            if (cb.remove(stream)) {
+                ite.remove();
+            }
             if (s != QUIC_STATUS_NOT_SUPPORTED)
                 state = s;
             if (invalidState(state))
@@ -120,8 +144,12 @@ public class StreamCallbackList implements StreamCallback {
     @Override
     public int sendShutdownComplete(Stream stream, QuicStreamEventSendShutdownComplete data) {
         int state = QUIC_STATUS_NOT_SUPPORTED;
-        for (var cb : callbacks) {
+        for (var ite = callbacks.iterator(); ite.hasNext(); ) {
+            var cb = ite.next();
             int s = cb.sendShutdownComplete(stream, data);
+            if (cb.remove(stream)) {
+                ite.remove();
+            }
             if (s != QUIC_STATUS_NOT_SUPPORTED)
                 state = s;
             if (invalidState(state))
@@ -133,8 +161,12 @@ public class StreamCallbackList implements StreamCallback {
     @Override
     public int shutdownComplete(Stream stream, QuicStreamEventShutdownComplete data) {
         int state = QUIC_STATUS_NOT_SUPPORTED;
-        for (var cb : callbacks) {
+        for (var ite = callbacks.iterator(); ite.hasNext(); ) {
+            var cb = ite.next();
             int s = cb.shutdownComplete(stream, data);
+            if (cb.remove(stream)) {
+                ite.remove();
+            }
             if (s != QUIC_STATUS_NOT_SUPPORTED)
                 state = s;
             if (invalidState(state))
@@ -146,8 +178,12 @@ public class StreamCallbackList implements StreamCallback {
     @Override
     public int idealSendBufferSize(Stream stream, QuicStreamEventIdealSendBufferSize data) {
         int state = QUIC_STATUS_NOT_SUPPORTED;
-        for (var cb : callbacks) {
+        for (var ite = callbacks.iterator(); ite.hasNext(); ) {
+            var cb = ite.next();
             int s = cb.idealSendBufferSize(stream, data);
+            if (cb.remove(stream)) {
+                ite.remove();
+            }
             if (s != QUIC_STATUS_NOT_SUPPORTED)
                 state = s;
             if (invalidState(state))
@@ -159,8 +195,12 @@ public class StreamCallbackList implements StreamCallback {
     @Override
     public int peerAccepted(Stream stream) {
         int state = QUIC_STATUS_NOT_SUPPORTED;
-        for (var cb : callbacks) {
+        for (var ite = callbacks.iterator(); ite.hasNext(); ) {
+            var cb = ite.next();
             int s = cb.peerAccepted(stream);
+            if (cb.remove(stream)) {
+                ite.remove();
+            }
             if (s != QUIC_STATUS_NOT_SUPPORTED)
                 state = s;
             if (invalidState(state))
@@ -172,8 +212,12 @@ public class StreamCallbackList implements StreamCallback {
     @Override
     public int unknown(Stream stream, QuicStreamEvent event) {
         int state = QUIC_STATUS_NOT_SUPPORTED;
-        for (var cb : callbacks) {
+        for (var ite = callbacks.iterator(); ite.hasNext(); ) {
+            var cb = ite.next();
             int s = cb.unknown(stream, event);
+            if (cb.remove(stream)) {
+                ite.remove();
+            }
             if (s != QUIC_STATUS_NOT_SUPPORTED)
                 state = s;
             if (invalidState(state))
@@ -184,8 +228,12 @@ public class StreamCallbackList implements StreamCallback {
 
     @Override
     public void closed(Stream stream) {
-        for (var cb : callbacks) {
+        for (var ite = callbacks.iterator(); ite.hasNext(); ) {
+            var cb = ite.next();
             cb.closed(stream);
+            if (cb.remove(stream)) {
+                ite.remove();
+            }
         }
     }
 }

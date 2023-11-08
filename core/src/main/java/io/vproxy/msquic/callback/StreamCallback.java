@@ -6,6 +6,10 @@ import io.vproxy.msquic.wrap.Stream;
 import static io.vproxy.msquic.MsQuicConsts.QUIC_STATUS_NOT_SUPPORTED;
 
 public interface StreamCallback {
+    default boolean remove(Stream stream) {
+        return false;
+    }
+
     default int startComplete(Stream stream, QuicStreamEventStartComplete data) {
         return QUIC_STATUS_NOT_SUPPORTED;
     }

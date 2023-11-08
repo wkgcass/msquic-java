@@ -6,6 +6,10 @@ import io.vproxy.msquic.wrap.Connection;
 import static io.vproxy.msquic.MsQuicConsts.QUIC_STATUS_NOT_SUPPORTED;
 
 public interface ConnectionCallback {
+    default boolean remove(Connection conn) {
+        return false;
+    }
+
     default int connected(Connection conn, QuicConnectionEventConnected data) {
         return QUIC_STATUS_NOT_SUPPORTED;
     }
