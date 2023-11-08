@@ -1,10 +1,11 @@
 package io.vproxy.msquic.sample;
 
 import io.vproxy.msquic.*;
+import io.vproxy.msquic.callback.ConnectionCallbackList;
 import io.vproxy.msquic.wrap.*;
 import io.vproxy.pni.Allocator;
-import io.vproxy.pni.PNIString;
 import io.vproxy.pni.graal.GraalUtils;
+import io.vproxy.vfd.IPPort;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -85,6 +86,7 @@ public class Client {
             var config = new QuicRegistrationConfig(regAllocator);
             config.setAppName("sample:client", regAllocator);
             config.setExecutionProfile(QUIC_EXECUTION_PROFILE_LOW_LATENCY);
+
             var reg_ = api.opts.apiTableQ.openRegistration(config, null, regAllocator);
             if (reg_ == null) {
                 throw new RuntimeException("RegistrationOpen failed");
@@ -98,15 +100,20 @@ public class Client {
             var confAllocator = Allocator.ofUnsafe();
             var settings = MsQuicUtils.newSettings(60 * 60_000, confAllocator);
             var alpnBuffers = MsQuicUtils.newAlpnBuffers(List.of(alpn), confAllocator);
-            var conf_ = reg.opts.registrationQ.openConfiguration(alpnBuffers, 1, settings, null, null, confAllocator);
+
+            var conf_ = reg.opts.registrationQ.openConfiguration(
+                alpnBuffers, 1, settings, null, null, confAllocator);
+
             if (conf_ == null) {
                 throw new RuntimeException("ConfigurationOpen failed");
             }
             conf = new Configuration(new Configuration.Options(reg, conf_, confAllocator));
+
             var cred = MsQuicUtils.newClientCredential(insecure, confAllocator);
             if (caCertFile != null && !insecure) {
                 cred.setCaCertificateFile(caCertFile, confAllocator);
             }
+
             var err = conf.opts.configurationQ.loadCredential(cred);
             if (err != 0) {
                 throw new RuntimeException("ConfigurationLoadCredential failed");
@@ -136,14 +143,18 @@ public class Client {
                 return;
             }
         }
-        System.out.println("SSLKEYLOGFILE for current process: " + path);
+        System.out.println(STR."SSLKEYLOGFILE for current process: \{path}");
         var cli = new CommandLine(true, reg, conf, path);
 
         System.out.println("Init Connection begin ...");
         {
             var connAllocator = Allocator.ofUnsafe();
-            var conn = new SampleConnection(cli, new Connection.Options(reg, connAllocator, ref ->
-                reg.opts.registrationQ.openConnection(MsQuicUpcall.connectionCallback, ref.MEMORY, null, connAllocator)));
+            var conn = new Connection(new Connection.Options(reg, connAllocator,
+                new ConnectionCallbackList()
+                    .add(new SampleLogConnectionCallback(cli))
+                    .add(new SampleConnectionCallback(cli)),
+                ref -> reg.opts.registrationQ.openConnection(
+                    MsQuicUpcall.connectionCallback, ref.MEMORY, null, connAllocator)));
             if (conn.connectionQ == null) {
                 conn.close();
                 throw new RuntimeException("ConnectionOpen failed");
@@ -152,7 +163,7 @@ public class Client {
             if (err != 0) {
                 System.out.println("failed to set QuicTlsSecret for debugging");
             }
-            err = conn.connectionQ.start(conf.opts.configurationQ, QUIC_ADDRESS_FAMILY_INET, new PNIString(connAllocator, host), port);
+            err = conn.start(conf, QUIC_ADDRESS_FAMILY_INET, new IPPort(host, port));
             if (err != 0) {
                 conn.close();
                 throw new RuntimeException("ConnectionStart failed");

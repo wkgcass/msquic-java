@@ -1,20 +1,25 @@
 package io.vproxy.msquic.wrap;
 
+import io.vproxy.base.util.LogType;
 import io.vproxy.base.util.Logger;
-import io.vproxy.msquic.*;
+import io.vproxy.msquic.QuicBuffer;
+import io.vproxy.msquic.QuicStream;
+import io.vproxy.msquic.QuicStreamEvent;
+import io.vproxy.msquic.callback.StreamCallback;
 import io.vproxy.pni.Allocator;
 import io.vproxy.pni.PNIRef;
 import io.vproxy.pni.array.IntArray;
 import io.vproxy.pni.array.LongArray;
 
 import java.lang.foreign.MemorySegment;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 
 import static io.vproxy.msquic.MsQuicConsts.*;
 
-public abstract class Stream {
+public class Stream {
     public final PNIRef<Stream> ref;
     public final Options opts;
     public final QuicStream streamQ;
@@ -34,10 +39,18 @@ public abstract class Stream {
         opts.streamSupplier = null; // gc
 
         if (opts.streamQ != null) {
+            // opts.streamQ != null means it's accepted
             this.canCallClose = false;
+            getIdFromStream(streamQ);
         }
+    }
 
-        getIdFromStream(streamQ);
+    public int start(int flags) {
+        int res = streamQ.start(flags);
+        if (res == 0) {
+            canCallClose = false;
+        }
+        return res;
     }
 
     public static class OptionsBase extends Connection.OptionsBase {
@@ -60,16 +73,19 @@ public abstract class Stream {
     public static class Options extends OptionsBase {
         private final Allocator allocator;
         private Function<PNIRef<Stream>, QuicStream> streamSupplier;
+        public final StreamCallback callback;
 
-        public Options(Connection connection, Allocator allocator, QuicStream streamQ) {
+        public Options(Connection connection, Allocator allocator, StreamCallback callback, QuicStream streamQ) {
             super(connection, streamQ);
             this.allocator = allocator;
+            this.callback = callback;
             this.streamSupplier = null;
         }
 
-        public Options(Connection connection, Allocator allocator, Function<PNIRef<Stream>, QuicStream> streamSupplier) {
+        public Options(Connection connection, Allocator allocator, StreamCallback callback, Function<PNIRef<Stream>, QuicStream> streamSupplier) {
             super(connection);
             this.allocator = allocator;
+            this.callback = callback;
             this.streamSupplier = streamSupplier;
         }
     }
@@ -79,6 +95,7 @@ public abstract class Stream {
             try (var tmpAllocator = Allocator.ofConfined()) {
                 var idPtr = new LongArray(tmpAllocator, 1);
                 var lenPtr = new IntArray(tmpAllocator, 1);
+                lenPtr.set(0, 8);
                 opts.apiTable.opts.apiTableQ.getParam(stream.getStream(), QUIC_PARAM_STREAM_ID, lenPtr, idPtr.MEMORY);
                 id = idPtr.get(0);
             }
@@ -90,8 +107,8 @@ public abstract class Stream {
     }
 
     private volatile boolean closed = false;
-    private volatile boolean streamIsClosed = false;
-    private volatile boolean streamIsShutdown = false;
+    private volatile boolean streamCloseIsCalled = false;
+    private volatile boolean streamShutdownIsCalled = false;
     private volatile boolean canCallClose = true;
 
     public boolean isClosed() {
@@ -106,24 +123,28 @@ public abstract class Stream {
             if (closed) {
                 return;
             }
-            closed = true;
+            if (canCallClose) {
+                closed = true;
+            }
         }
 
-        closeStream();
+        shutdown();
+        if (!canCallClose) {
+            return;
+        }
         opts.allocator.close();
         ref.close();
-        for (var ctx : pendingSendContexts) {
-            finish(ctx, false);
+        if (!pendingSendContexts.isEmpty()) {
+            for (var ctx : new ArrayList<>(pendingSendContexts)) {
+                finish(ctx, false);
+            }
         }
-        close0();
+        opts.callback.closed(this);
     }
 
     private void finish(SendContext ctx, boolean succeeded) {
         pendingSendContexts.remove(ctx);
         ctx.onSendComplete.onSendComplete(ctx, succeeded);
-    }
-
-    protected void close0() {
     }
 
     /**
@@ -133,16 +154,16 @@ public abstract class Stream {
      * But if `shutdown` is called, `close` still can be called by re-invoking this method.
      * `close` and `shutdown` would each only be called once.
      */
-    public void closeStream() {
-        if (streamIsClosed) {
+    protected void shutdown() {
+        if (streamCloseIsCalled) {
             return;
         }
         synchronized (this) {
-            if (streamIsClosed) {
+            if (streamCloseIsCalled) {
                 return;
             }
             if (canCallClose) {
-                streamIsClosed = true;
+                streamCloseIsCalled = true;
             }
         }
         if (canCallClose) {
@@ -151,14 +172,17 @@ public abstract class Stream {
             }
             return;
         }
-        if (streamIsShutdown) {
+        if (streamShutdownIsCalled) {
             return;
         }
         synchronized (this) {
-            if (streamIsShutdown) {
+            if (streamShutdownIsCalled) {
                 return;
             }
-            streamIsShutdown = true;
+            streamShutdownIsCalled = true;
+        }
+        if (streamQ == null) {
+            return;
         }
         streamQ.shutdown(QUIC_STREAM_SHUTDOWN_FLAG_ABORT_RECEIVE |
                          QUIC_STREAM_SHUTDOWN_FLAG_ABORT_SEND, 0);
@@ -202,20 +226,26 @@ public abstract class Stream {
 
     // need to override
     public int callback(QuicStreamEvent event) {
-        if (requireEventLogging()) {
-            logEvent(event);
-        }
-
         return switch (event.getType()) {
             case QUIC_STREAM_EVENT_START_COMPLETE -> {
                 var data = event.getUnion().getSTART_COMPLETE();
                 if (data.getStatus() != 0) {
-                    closeStream();
+                    Logger.error(LogType.CONN_ERROR, STR."StreamStart failed, status: \{data.getStatus()}, stream: \{this}");
+                    canCallClose = true;
+                    shutdown();
                     yield 0;
                 }
-                canCallClose = false;
                 id = data.getID();
-                yield 0;
+
+                int status = opts.callback.startComplete(this, data);
+                if (status == QUIC_STATUS_NOT_SUPPORTED) {
+                    status = 0;
+                }
+                yield status;
+            }
+            case QUIC_STREAM_EVENT_RECEIVE -> {
+                var data = event.getUnion().getRECEIVE();
+                yield opts.callback.receive(this, data);
             }
             case QUIC_STREAM_EVENT_SEND_COMPLETE -> {
                 var data = event.getUnion().getSEND_COMPLETE();
@@ -226,113 +256,45 @@ public abstract class Stream {
                     ctxRef.close();
                     finish(ctx, !data.isCanceled());
                 }
-                yield 0;
+                var status = opts.callback.sendComplete(this, data);
+                if (status == QUIC_STATUS_NOT_SUPPORTED) {
+                    status = 0;
+                }
+                yield status;
+            }
+            case QUIC_STREAM_EVENT_PEER_SEND_SHUTDOWN -> opts.callback.peerSendShutdown(this);
+            case QUIC_STREAM_EVENT_PEER_SEND_ABORTED -> {
+                var data = event.getUnion().getPEER_SEND_ABORTED();
+                yield opts.callback.peerSendAborted(this, data);
+            }
+            case QUIC_STREAM_EVENT_PEER_RECEIVE_ABORTED -> {
+                var data = event.getUnion().getPEER_RECEIVE_ABORTED();
+                yield opts.callback.peerReceiveAborted(this, data);
+            }
+            case QUIC_STREAM_EVENT_SEND_SHUTDOWN_COMPLETE -> {
+                var data = event.getUnion().getSEND_SHUTDOWN_COMPLETE();
+                yield opts.callback.sendShutdownComplete(this, data);
             }
             case QUIC_STREAM_EVENT_SHUTDOWN_COMPLETE -> {
+                var data = event.getUnion().getSHUTDOWN_COMPLETE();
+                var status = opts.callback.shutdownComplete(this, data);
+                if (status == QUIC_STATUS_NOT_SUPPORTED) {
+                    status = 0;
+                }
                 canCallClose = true;
                 close();
-                yield 0;
+                yield status;
             }
-            default -> QUIC_STATUS_NOT_SUPPORTED;
+            case QUIC_STREAM_EVENT_IDEAL_SEND_BUFFER_SIZE -> {
+                var data = event.getUnion().getIDEAL_SEND_BUFFER_SIZE();
+                yield opts.callback.idealSendBufferSize(this, data);
+            }
+            case QUIC_STREAM_EVENT_PEER_ACCEPTED -> opts.callback.peerAccepted(this);
+            default -> opts.callback.unknown(this, event);
         };
     }
 
-    protected boolean requireEventLogging() {
-        return Logger.debugOn();
-    }
-
-    protected void logEvent(QuicStreamEvent event) {
-        Logger.alert("---------- " + Thread.currentThread() + " ----------");
-        switch (event.getType()) {
-            case QUIC_STREAM_EVENT_START_COMPLETE -> {
-                Logger.alert("QUIC_STREAM_EVENT_START_COMPLETE");
-                var data = event.getUnion().getSTART_COMPLETE();
-                {
-                    Logger.alert("Status: " + data.getStatus());
-                    Logger.alert("ID: " + data.getID());
-                    Logger.alert("PeerAccepted: " + data.isPeerAccepted());
-                }
-            }
-            case QUIC_STREAM_EVENT_RECEIVE -> {
-                Logger.alert("QUIC_STREAM_EVENT_RECEIVE");
-                var data = event.getUnion().getRECEIVE();
-                {
-                    Logger.alert("AbsoluteOffset: " + data.getAbsoluteOffset());
-                    Logger.alert("TotalBufferLength: " + data.getTotalBufferLength());
-                    Logger.alert("Flags: " + data.getFlags());
-                }
-                {
-                    int count = data.getBufferCount();
-                    var bufMem = data.getBuffers().MEMORY;
-                    bufMem = bufMem.reinterpret(QuicBuffer.LAYOUT.byteSize() * count);
-                    var bufs = new QuicBuffer.Array(bufMem);
-                    for (int i = 0; i < count; ++i) {
-                        var buf = bufs.get(i);
-                        var seg = buf.getBuffer().reinterpret(buf.getLength());
-                        Logger.alert("Buffer[" + i + "]");
-                        Utils.hexDump(seg);
-                    }
-                }
-            }
-            case QUIC_STREAM_EVENT_SEND_COMPLETE -> {
-                Logger.alert("QUIC_STREAM_EVENT_SEND_COMPLETE");
-                var data = event.getUnion().getSEND_COMPLETE();
-                {
-                    Logger.alert("Canceled: " + data.isCanceled());
-                    Logger.alert("ClientContext: " + data.getClientContext());
-                }
-            }
-            case QUIC_STREAM_EVENT_PEER_SEND_SHUTDOWN -> {
-                Logger.alert("QUIC_STREAM_EVENT_PEER_SEND_SHUTDOWN");
-                var data = event.getUnion().getPEER_SEND_ABORTED();
-                {
-                    Logger.alert("ErrorCode: " + data.getErrorCode());
-                }
-            }
-            case QUIC_STREAM_EVENT_PEER_SEND_ABORTED -> {
-                Logger.alert("QUIC_STREAM_EVENT_PEER_SEND_ABORTED");
-                var data = event.getUnion().getPEER_SEND_ABORTED();
-                {
-                    Logger.alert("ErrorCode: " + data.getErrorCode());
-                }
-            }
-            case QUIC_STREAM_EVENT_PEER_RECEIVE_ABORTED -> {
-                Logger.alert("QUIC_STREAM_EVENT_PEER_RECEIVE_ABORTED");
-                var data = event.getUnion().getPEER_RECEIVE_ABORTED();
-                {
-                    Logger.alert("ErrorCode: " + data.getErrorCode());
-                }
-            }
-            case QUIC_STREAM_EVENT_SEND_SHUTDOWN_COMPLETE -> {
-                Logger.alert("QUIC_STREAM_EVENT_SEND_SHUTDOWN_COMPLETE");
-                var data = event.getUnion().getSEND_SHUTDOWN_COMPLETE();
-                {
-                    Logger.alert("Graceful: " + data.isGraceful());
-                }
-            }
-            case QUIC_STREAM_EVENT_SHUTDOWN_COMPLETE -> {
-                Logger.alert("QUIC_STREAM_EVENT_SHUTDOWN_COMPLETE");
-                var data = event.getUnion().getSHUTDOWN_COMPLETE();
-                {
-                    Logger.alert("ConnectionShutdown: " + data.isConnectionShutdown());
-                    Logger.alert("AppCloseInProgress: " + data.isAppCloseInProgress());
-                    Logger.alert("ConnectionShutdownByApp: " + data.isConnectionShutdownByApp());
-                    Logger.alert("ConnectionClosedRemotely: " + data.isConnectionClosedRemotely());
-                    Logger.alert("ConnectionErrorCode: " + data.getConnectionErrorCode());
-                    Logger.alert("ConnectionCloseStatus: " + data.getConnectionCloseStatus());
-                }
-            }
-            case QUIC_STREAM_EVENT_IDEAL_SEND_BUFFER_SIZE -> {
-                Logger.alert("QUIC_STREAM_EVENT_IDEAL_SEND_BUFFER_SIZE");
-                var data = event.getUnion().getIDEAL_SEND_BUFFER_SIZE();
-                {
-                    Logger.alert("ByteCount: " + data.getByteCount());
-                }
-            }
-            default -> Logger.alert("UNKNOWN STREAM EVENT: " + event.getType());
-        }
-    }
-
+    @SuppressWarnings("StringTemplateMigration")
     public String toString() {
         return "Stream[id=" + id
                + " conn=" + opts.connection

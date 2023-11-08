@@ -2,6 +2,7 @@ package io.vproxy.msquic;
 
 import io.vproxy.pni.Allocator;
 import io.vproxy.pni.PNIString;
+import io.vproxy.vfd.IPPort;
 
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -27,10 +28,10 @@ public class MsQuicUtils {
             settings.setServerResumptionLevel((byte) QUIC_SERVER_RESUME_AND_ZERORTT);
 
             settings.getIsSet().setPeerBidiStreamCount(true);
-            settings.setPeerBidiStreamCount((short) 4096);
+            settings.setPeerBidiStreamCount(Short.MAX_VALUE);
 
             settings.getIsSet().setPeerUnidiStreamCount(true);
-            settings.setPeerUnidiStreamCount((short) 4096);
+            settings.setPeerUnidiStreamCount(Short.MAX_VALUE);
         }
         return settings;
     }
@@ -89,6 +90,23 @@ public class MsQuicUtils {
         );
     }
 
+    @SuppressWarnings("resource")
+    private static final ThreadLocal<PNIString> quicAddrToIPPortHelper = ThreadLocal.withInitial(
+        () -> new PNIString(Allocator.ofAuto().allocate(64))
+    );
+
+    public static IPPort convertQuicAddrToIPPort(QuicAddr addr) {
+        var str = quicAddrToIPPortHelper.get();
+        addr.toString(str);
+        return new IPPort(str.toString());
+    }
+
+    public static QuicAddr convertIPPortToQuicAddr(IPPort ipport, Allocator allocator) {
+        var quicAddr = new QuicAddr(allocator);
+        MsQuic.get().buildQuicAddr(new PNIString(allocator, ipport.getAddress().formatToIPString()), ipport.getPort(), quicAddr);
+        return quicAddr;
+    }
+
     public static String convertQuicTlsSecretToSSLKEYLOGFILE(QuicTLSSecret s) {
         var sb = new StringBuilder();
         int len = s.getSecretLength() & 0xff;
@@ -116,7 +134,7 @@ public class MsQuicUtils {
         return sb.toString();
     }
 
-    public static String convertToHexString(MemorySegment seg, int len) {
+    private static String convertToHexString(MemorySegment seg, int len) {
         var sb = new StringBuilder();
         for (int i = 0, size = (int) seg.byteSize(); i < size && i < len; ++i) {
             int n = seg.get(ValueLayout.JAVA_BYTE, i) & 0xff;

@@ -1,12 +1,17 @@
 package io.vproxy.msquic.sample;
 
+import io.vproxy.base.util.Logger;
 import io.vproxy.msquic.MsQuicUpcall;
+import io.vproxy.msquic.callback.ConnectionCallbackList;
+import io.vproxy.msquic.callback.LogStreamCallback;
+import io.vproxy.msquic.callback.StreamCallbackList;
 import io.vproxy.msquic.wrap.Configuration;
 import io.vproxy.msquic.wrap.Connection;
 import io.vproxy.msquic.wrap.Registration;
 import io.vproxy.msquic.wrap.Stream;
 import io.vproxy.pni.Allocator;
 import io.vproxy.pni.PNIString;
+import io.vproxy.vfd.IPPort;
 
 import java.lang.foreign.MemorySegment;
 import java.nio.file.Path;
@@ -67,7 +72,7 @@ public class CommandLine {
         MemorySegment.ofArray(b).copyFrom(ticket);
         var t = new ResumptionTicket(b, remote);
         resumptionTickets.add(t);
-        System.out.println("[" + (resumptionTickets.size() - 1) + "] " + t);
+        Logger.alert(STR."[\{resumptionTickets.size() - 1}] \{t}");
     }
 
     public synchronized void removeResumptionTicket(int index) {
@@ -280,8 +285,12 @@ public class CommandLine {
 
     private void newConn(String host, int port, ResumptionTicket ticket, String zrttData) {
         var allocator = Allocator.ofUnsafe();
-        var conn = new SampleConnection(this, new Connection.Options(registration, allocator, ref ->
-            registration.opts.registrationQ.openConnection(MsQuicUpcall.connectionCallback, ref.MEMORY, null, allocator)));
+        var conn = new Connection(new Connection.Options(registration, allocator,
+            new ConnectionCallbackList()
+                .add(new SampleLogConnectionCallback(this))
+                .add(new SampleConnectionCallback(this)),
+            ref -> registration.opts.registrationQ.openConnection(
+                MsQuicUpcall.connectionCallback, ref.MEMORY, null, allocator)));
         if (conn.connectionQ == null) {
             conn.close();
             throw new RuntimeException("ConnectionOpen failed");
@@ -307,8 +316,7 @@ public class CommandLine {
             stream.send(QUIC_SEND_FLAG_ALLOW_0_RTT, alloc,
                 str.MEMORY.reinterpret(str.MEMORY.byteSize() - 1));
         }
-        var host_ = new PNIString(allocator, host);
-        err = conn.connectionQ.start(configuration.opts.configurationQ, QUIC_ADDRESS_FAMILY_INET, host_, port);
+        err = conn.start(configuration, QUIC_ADDRESS_FAMILY_INET, new IPPort(host, port));
         if (err != 0) {
             conn.close();
             throw new RuntimeException("ConnectionStart failed");
@@ -317,20 +325,24 @@ public class CommandLine {
 
     private Stream newStream(Connection conn, boolean immediate, boolean zrtt) {
         var allocator = Allocator.ofUnsafe();
-        var stream = new SampleStream(this, new Stream.Options(conn, allocator, ref ->
-            conn.connectionQ.openStream(QUIC_STREAM_OPEN_FLAG_NONE, MsQuicUpcall.streamCallback, ref.MEMORY, null, allocator)));
+        var stream = new Stream(new Stream.Options(conn, allocator,
+            new StreamCallbackList()
+                .add(new LogStreamCallback())
+                .add(new SampleStreamCallback(this)),
+            ref -> conn.connectionQ.openStream(
+                QUIC_STREAM_OPEN_FLAG_NONE, MsQuicUpcall.streamCallback, ref.MEMORY, null, allocator)));
         if (stream.streamQ == null) {
             stream.close();
             throw new RuntimeException("StreamOpen failed");
         }
-        int flags = QUIC_STREAM_OPEN_FLAG_NONE;
+        int flags = QUIC_STREAM_START_FLAG_FAIL_BLOCKED;
         if (immediate) {
             flags |= QUIC_STREAM_START_FLAG_IMMEDIATE;
         }
         if (zrtt) {
             flags |= QUIC_STREAM_OPEN_FLAG_0_RTT;
         }
-        var err = stream.streamQ.start(flags);
+        var err = stream.start(flags);
         if (err != 0) {
             stream.close();
             throw new RuntimeException("StreamStart failed");
@@ -372,11 +384,11 @@ public class CommandLine {
     }
 
     private void closeConn(Connection conn) {
-        conn.closeConnection();
+        conn.close();
     }
 
     private void closeStream(Stream stream) {
-        stream.closeStream();
+        stream.close();
     }
 
     private void shutdownConn(Connection connection, long errorCode) {

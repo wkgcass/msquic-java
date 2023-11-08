@@ -3,14 +3,18 @@ package io.vproxy.msquic.sample;
 import io.vproxy.base.util.LogType;
 import io.vproxy.base.util.Logger;
 import io.vproxy.msquic.*;
+import io.vproxy.msquic.callback.ConnectionCallbackList;
+import io.vproxy.msquic.callback.ListenerCallback;
+import io.vproxy.msquic.callback.ListenerCallbackList;
+import io.vproxy.msquic.callback.LogListenerCallback;
 import io.vproxy.msquic.wrap.*;
 import io.vproxy.pni.Allocator;
-import io.vproxy.pni.PNIString;
 import io.vproxy.pni.graal.GraalUtils;
+import io.vproxy.vfd.IPPort;
 
 import java.util.List;
 
-import static io.vproxy.msquic.MsQuicConsts.*;
+import static io.vproxy.msquic.MsQuicConsts.QUIC_EXECUTION_PROFILE_LOW_LATENCY;
 
 public class Server {
     private static final String HELP_STR = """
@@ -69,8 +73,10 @@ public class Server {
             var config = new QuicRegistrationConfig(regAllocator);
             config.setAppName("sample:server", regAllocator);
             config.setExecutionProfile(QUIC_EXECUTION_PROFILE_LOW_LATENCY);
+
             var reg_ = api.opts.apiTableQ.openRegistration(config, null, regAllocator);
             if (reg_ == null) {
+                reg.close();
                 throw new RuntimeException("RegistrationOpen failed");
             }
             reg = new Registration(new Registration.Options(api, reg_, regAllocator));
@@ -81,9 +87,13 @@ public class Server {
         {
             var confAllocator = Allocator.ofUnsafe();
             var settings = MsQuicUtils.newSettings(60 * 60_000, confAllocator);
-            var alpnBuffers = MsQuicUtils.newAlpnBuffers(List.of("proto-x", "proto-y"), confAllocator);
-            var conf_ = reg.opts.registrationQ.openConfiguration(alpnBuffers, 2, settings, null, null, confAllocator);
+            var alpnBuffers = MsQuicUtils.newAlpnBuffers(List.of("sample", "proto-x", "proto-y"), confAllocator);
+
+            var conf_ = reg.opts.registrationQ.openConfiguration(
+                alpnBuffers, 2, settings, null, null, confAllocator);
+
             if (conf_ == null) {
+                confAllocator.close();
                 throw new RuntimeException("ConfigurationOpen failed");
             }
             conf = new Configuration(new Configuration.Options(reg, conf_, confAllocator));
@@ -101,21 +111,19 @@ public class Server {
         System.out.println("Init Listener begin ...");
         {
             var listenerAllocator = Allocator.ofUnsafe();
-            lsn = new ServerListener(cli, new Listener.Options(reg, listenerAllocator, ref ->
-                reg.opts.registrationQ.openListener(MsQuicUpcall.listenerCallback, ref.MEMORY, null, listenerAllocator)));
+            lsn = new Listener(new Listener.Options(reg, listenerAllocator,
+                new ListenerCallbackList()
+                    .add(new LogListenerCallback())
+                    .add(new ServerListenerCallback(cli)),
+                ref -> reg.opts.registrationQ.openListener(
+                    MsQuicUpcall.listenerCallback, ref.MEMORY, null, listenerAllocator)));
             if (lsn.listenerQ == null) {
                 lsn.close();
                 throw new RuntimeException("failed creating listener");
             }
-            var alpnBuffers = new QuicBuffer.Array(listenerAllocator, 2);
-            alpnBuffers.get(0).setBuffer(new PNIString(listenerAllocator, "proto-x").MEMORY);
-            alpnBuffers.get(0).setLength(7);
-            alpnBuffers.get(1).setBuffer(new PNIString(listenerAllocator, "proto-y").MEMORY);
-            alpnBuffers.get(1).setLength(7);
-            var quicAddr = new QuicAddr(listenerAllocator);
-            MsQuic.get().buildQuicAddr(new PNIString(listenerAllocator, "0.0.0.0"), port, quicAddr);
-            var err = lsn.listenerQ.start(alpnBuffers, 2, quicAddr);
+            var err = lsn.start(new IPPort("0.0.0.0", port), "sample", "proto-x", "proto-y");
             if (err != 0) {
+                lsn.close();
                 throw new RuntimeException("ListenerStart failed");
             }
         }
@@ -124,44 +132,29 @@ public class Server {
         cli.run();
     }
 
-    private static class ServerListener extends Listener {
-        private final CommandLine cli;
-
-        public ServerListener(CommandLine cli, Listener.Options opts) {
-            super(opts);
-            this.cli = cli;
-        }
-
+    private record ServerListenerCallback(CommandLine cli) implements ListenerCallback {
         @Override
-        protected boolean requireEventLogging() {
-            return true;
-        }
-
-        @Override
-        public int callback(QuicListenerEvent event) {
-            return switch (event.getType()) {
-                case QUIC_LISTENER_EVENT_NEW_CONNECTION -> {
-                    var data = event.getUnion().getNEW_CONNECTION();
-                    var connHQUIC = data.getConnection();
-                    var connectionAllocator = Allocator.ofUnsafe();
-                    var conn_ = new QuicConnection(connectionAllocator);
-                    {
-                        conn_.setApi(opts.apiTableQ.getApi());
-                        conn_.setConn(connHQUIC);
-                    }
-                    var conn = new SampleConnection(cli, new Connection.Options(this, connectionAllocator, conn_));
-                    opts.apiTableQ.setCallbackHandler(connHQUIC, MsQuicUpcall.connectionCallback, conn.ref.MEMORY);
-                    var err = conn_.setConfiguration(conf.opts.configurationQ);
-                    if (err != 0) {
-                        Logger.error(LogType.ALERT, "set configuration to connection failed: " + err);
-                        conn.close();
-                        yield err;
-                    }
-                    yield 0;
-                }
-                case QUIC_LISTENER_EVENT_STOP_COMPLETE -> 0;
-                default -> QUIC_STATUS_NOT_SUPPORTED;
-            };
+        public int newConnection(Listener listener, QuicListenerEventNewConnection data) {
+            var connHQUIC = data.getConnection();
+            var connectionAllocator = Allocator.ofUnsafe();
+            var conn_ = new QuicConnection(connectionAllocator);
+            {
+                conn_.setApi(listener.opts.apiTableQ.getApi());
+                conn_.setConn(connHQUIC);
+            }
+            var conn = new Connection(new Connection.Options(listener, connectionAllocator,
+                new ConnectionCallbackList()
+                    .add(new SampleLogConnectionCallback(cli))
+                    .add(new SampleConnectionCallback(cli)),
+                conn_));
+            listener.opts.apiTableQ.setCallbackHandler(connHQUIC, MsQuicUpcall.connectionCallback, conn.ref.MEMORY);
+            var err = conn_.setConfiguration(conf.opts.configurationQ);
+            if (err != 0) {
+                Logger.error(LogType.ALERT, STR."set configuration to connection failed: \{err}");
+                conn.close();
+                return err;
+            }
+            return 0;
         }
     }
 }

@@ -7,4 +7,5 @@ module io.vproxy.msquic {
 
     exports io.vproxy.msquic;
     exports io.vproxy.msquic.wrap;
+    exports io.vproxy.msquic.callback;
 }

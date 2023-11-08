@@ -1,27 +1,52 @@
 package io.vproxy.msquic.wrap;
 
-import io.vproxy.base.util.Logger;
-import io.vproxy.msquic.*;
+import io.vproxy.msquic.MsQuicUtils;
+import io.vproxy.msquic.QuicListener;
+import io.vproxy.msquic.QuicListenerEvent;
+import io.vproxy.msquic.callback.ListenerCallback;
 import io.vproxy.pni.Allocator;
 import io.vproxy.pni.PNIRef;
-import io.vproxy.pni.PNIString;
+import io.vproxy.vfd.IPPort;
 
-import java.lang.foreign.MemorySegment;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 
-import static io.vproxy.msquic.MsQuicConsts.QUIC_LISTENER_EVENT_NEW_CONNECTION;
-import static io.vproxy.msquic.MsQuicConsts.QUIC_LISTENER_EVENT_STOP_COMPLETE;
+import static io.vproxy.msquic.MsQuicConsts.*;
 
-public abstract class Listener {
+public class Listener {
     public final PNIRef<Listener> ref;
     public final Options opts;
     public final QuicListener listenerQ;
+    private IPPort bindAddress;
 
     public Listener(Options opts) {
         this.ref = PNIRef.of(this);
         this.opts = opts;
         this.listenerQ = opts.listenerSupplier.apply(ref);
         opts.listenerSupplier = null; // gc
+    }
+
+    public int start(IPPort bindIPPort, String... alpn) {
+        return start(bindIPPort, Arrays.asList(alpn));
+    }
+
+    public int start(IPPort bindIPPort, List<String> alpn) {
+        if (alpn.isEmpty())
+            throw new IllegalArgumentException("alpn must be specified");
+
+        int res;
+        try (var tmpAllocator = Allocator.ofConfined()) {
+            var bindAddr = MsQuicUtils.convertIPPortToQuicAddr(bindIPPort, tmpAllocator);
+            var alpnBuffers = MsQuicUtils.newAlpnBuffers(alpn, tmpAllocator);
+
+            res = listenerQ.start(alpnBuffers, (int) alpnBuffers.length(), bindAddr);
+        }
+        if (res == 0) {
+            this.bindAddress = bindIPPort;
+            canReleaseResources = false;
+        }
+        return res;
     }
 
     public static class OptionsBase extends Registration.OptionsBase {
@@ -35,18 +60,22 @@ public abstract class Listener {
 
     public static class Options extends OptionsBase {
         private final Allocator allocator;
+        public final ListenerCallback callback;
         private Function<PNIRef<Listener>, QuicListener> listenerSupplier;
 
         public Options(Registration registration, Allocator allocator,
+                       ListenerCallback callback,
                        Function<PNIRef<Listener>, QuicListener> listenerSupplier) {
             super(registration);
             this.allocator = allocator;
+            this.callback = callback;
             this.listenerSupplier = listenerSupplier;
         }
     }
 
     private volatile boolean closed = false;
-    private volatile boolean lsnIsClosed = false;
+    private volatile boolean lsnCloseIsCalled = false;
+    private volatile boolean canReleaseResources = true;
 
     public boolean isClosed() {
         return closed;
@@ -60,27 +89,29 @@ public abstract class Listener {
             if (closed) {
                 return;
             }
-            closed = true;
+            if (canReleaseResources) {
+                closed = true;
+            }
         }
 
-        closeListener();
+        stop();
+        if (!canReleaseResources) {
+            return;
+        }
         opts.allocator.close();
         ref.close();
-        close0();
+        opts.callback.closed(this);
     }
 
-    protected void close0() {
-    }
-
-    public void closeListener() {
-        if (lsnIsClosed) {
+    protected void stop() {
+        if (lsnCloseIsCalled) {
             return;
         }
         synchronized (this) {
-            if (lsnIsClosed) {
+            if (lsnCloseIsCalled) {
                 return;
             }
-            lsnIsClosed = true;
+            lsnCloseIsCalled = true;
         }
         if (listenerQ != null) {
             listenerQ.close();
@@ -89,78 +120,30 @@ public abstract class Listener {
 
     // need to override
     public int callback(QuicListenerEvent event) {
-        if (requireEventLogging()) {
-            logEvent(event);
-        }
-
-        //noinspection SwitchStatementWithTooFewBranches
         return switch (event.getType()) {
             case QUIC_LISTENER_EVENT_STOP_COMPLETE -> {
+                var data = event.getUnion().getSTOP_COMPLETE();
+                var status = opts.callback.stopComplete(this, data);
+                if (status == QUIC_STATUS_NOT_SUPPORTED)
+                    status = 0;
+
+                canReleaseResources = true;
                 close();
-                yield 0;
+                yield status;
             }
-            default -> MsQuicConsts.QUIC_STATUS_NOT_SUPPORTED;
+            case QUIC_LISTENER_EVENT_NEW_CONNECTION -> {
+                var data = event.getUnion().getNEW_CONNECTION();
+                yield opts.callback.newConnection(this, data);
+            }
+            default -> opts.callback.unknown(this, event);
         };
     }
 
-    protected boolean requireEventLogging() {
-        return Logger.debugOn();
-    }
-
-    protected void logEvent(QuicListenerEvent event) {
-        Logger.alert("---------- " + Thread.currentThread() + " ----------");
-        switch (event.getType()) {
-            case QUIC_LISTENER_EVENT_NEW_CONNECTION -> {
-                Logger.alert("QUIC_LISTENER_EVENT_NEW_CONNECTION");
-                var data = event.getUnion().getNEW_CONNECTION();
-                var info = data.getInfo();
-                {
-                    Logger.alert("QuicVersion: " + info.getQuicVersion());
-                }
-                try (var allocator = Allocator.ofConfined()) {
-                    var addr = new PNIString(allocator.allocate(64));
-                    info.getLocalAddress().toString(addr);
-                    Logger.alert("LocalAddress: " + addr);
-                }
-                try (var allocator = Allocator.ofConfined()) {
-                    var addr = new PNIString(allocator.allocate(64));
-                    info.getRemoteAddress().toString(addr);
-                    Logger.alert("RemoteAddress: " + addr);
-                }
-                {
-                    var buffer = info.getCryptoBuffer().reinterpret(info.getCryptoBufferLength());
-                    Logger.alert("CryptoBuffer:");
-                    Utils.hexDump(buffer);
-                }
-                {
-                    var alpn = info.getClientAlpnList().reinterpret(info.getClientAlpnListLength());
-                    Logger.alert("ClientAlpnList:");
-                    Utils.hexDump(alpn);
-                }
-                {
-                    var serverName = info.getServerName().MEMORY.reinterpret(info.getServerNameLength());
-                    byte[] bytes = new byte[(int) serverName.byteSize()];
-                    MemorySegment.ofArray(bytes).copyFrom(serverName);
-                    Logger.alert("ServerName: " + new String(bytes));
-                }
-                {
-                    var negotiatedAlpn = info.getNegotiatedAlpn().reinterpret(info.getNegotiatedAlpnLength());
-                    Logger.alert("NegotiatedAlpn:");
-                    Utils.hexDump(negotiatedAlpn);
-                }
-                {
-                    var conn = data.getConnection();
-                    Logger.alert("Connection: " + conn);
-                }
-            }
-            case QUIC_LISTENER_EVENT_STOP_COMPLETE -> {
-                Logger.alert("QUIC_LISTENER_EVENT_STOP_COMPLETE");
-                {
-                    var appCloseInProgress = event.getUnion().getSTOP_COMPLETE().isAppCloseInProgress();
-                    Logger.alert("AppCloseInProgress: " + appCloseInProgress);
-                }
-            }
-            default -> Logger.alert("UNKNOWN LISTENER EVENT: " + event.getType());
-        }
+    @SuppressWarnings("StringTemplateMigration")
+    public String toString() {
+        return "Listener["
+               + "bind=" + bindAddress
+               + "]@" + Long.toString(listenerQ.getLsn().address(), 16)
+               + (isClosed() ? "[closed]" : "[open]");
     }
 }
