@@ -46,9 +46,11 @@ public class Stream {
     }
 
     public int start(int flags) {
+        canCallClose = false; // set first, in case the callback immediately calls close()
+
         int res = streamQ.start(flags);
-        if (res == 0) {
-            canCallClose = false;
+        if (res != 0) { // res != 0 means starting failed, the callbacks will never be called
+            canCallClose = true;
         }
         return res;
     }
@@ -119,6 +121,7 @@ public class Stream {
         if (closed) {
             return;
         }
+        final var canCallClose = this.canCallClose;
         synchronized (this) {
             if (closed) {
                 return;
@@ -158,6 +161,7 @@ public class Stream {
         if (streamCloseIsCalled) {
             return;
         }
+        final var canCallClose = this.canCallClose;
         synchronized (this) {
             if (streamCloseIsCalled) {
                 return;

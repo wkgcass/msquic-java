@@ -47,13 +47,15 @@ public class Connection {
     }
 
     public int start(Configuration conf, int addressFamily, IPPort target) {
+        canCallClose = false; // set first, in case the callback immediately calls close()
+
         int res;
         try (var allocator = Allocator.ofConfined()) {
             res = connectionQ.start(conf.opts.configurationQ, addressFamily,
                 new PNIString(allocator, target.getAddress().formatToIPString()), target.getPort());
         }
-        if (res == 0) {
-            canCallClose = false;
+        if (res != 0) { // res != 0 means starting failed, the callbacks will never be called
+            canCallClose = true;
         }
         return res;
     }
@@ -114,6 +116,7 @@ public class Connection {
         if (closed) {
             return;
         }
+        final var canCallClose = this.canCallClose;
         synchronized (this) {
             if (closed) {
                 return;
@@ -136,6 +139,7 @@ public class Connection {
         if (connCloseIsCalled) {
             return;
         }
+        final var canCallClose = this.canCallClose;
         synchronized (this) {
             if (connCloseIsCalled) {
                 return;

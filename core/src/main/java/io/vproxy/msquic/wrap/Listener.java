@@ -35,6 +35,8 @@ public class Listener {
         if (alpn.isEmpty())
             throw new IllegalArgumentException("alpn must be specified");
 
+        canReleaseResources = false; // set first, in case the callback immediately calls close()
+
         int res;
         try (var tmpAllocator = Allocator.ofConfined()) {
             var bindAddr = MsQuicUtils.convertIPPortToQuicAddr(bindIPPort, tmpAllocator);
@@ -44,7 +46,8 @@ public class Listener {
         }
         if (res == 0) {
             this.bindAddress = bindIPPort;
-            canReleaseResources = false;
+        } else { // res != 0 means starting failed, the callbacks will never be called
+            canReleaseResources = true;
         }
         return res;
     }
@@ -85,6 +88,7 @@ public class Listener {
         if (closed) {
             return;
         }
+        final var canReleaseResources = this.canReleaseResources;
         synchronized (this) {
             if (closed) {
                 return;
