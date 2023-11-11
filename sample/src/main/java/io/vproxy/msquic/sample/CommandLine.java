@@ -328,7 +328,7 @@ public class CommandLine {
         var allocator = Allocator.ofUnsafe();
         var stream = new Stream(new Stream.Options(conn, allocator,
             new StreamCallbackList()
-                .add(new LogStreamCallback())
+                .add(new LogStreamCallback(true))
                 .add(new SampleStreamCallback(this)),
             ref -> conn.connectionQ.openStream(
                 QUIC_STREAM_OPEN_FLAG_NONE, MsQuicUpcall.streamCallback, ref.MEMORY, null, allocator)));

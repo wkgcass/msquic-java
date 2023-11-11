@@ -113,7 +113,7 @@ public class Server {
             var listenerAllocator = Allocator.ofUnsafe();
             lsn = new Listener(new Listener.Options(reg, listenerAllocator,
                 new ListenerCallbackList()
-                    .add(new LogListenerCallback())
+                    .add(new LogListenerCallback(true))
                     .add(new ServerListenerCallback(cli)),
                 ref -> reg.opts.registrationQ.openListener(
                     MsQuicUpcall.listenerCallback, ref.MEMORY, null, listenerAllocator)));

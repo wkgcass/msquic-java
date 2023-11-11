@@ -1,6 +1,5 @@
 package io.vproxy.msquic.callback;
 
-import io.vproxy.base.util.Logger;
 import io.vproxy.msquic.*;
 import io.vproxy.msquic.wrap.Stream;
 
@@ -13,8 +12,12 @@ public class StreamCallbackList implements StreamCallback {
     private final List<StreamCallback> callbacks = new ArrayList<>(4);
 
     public static StreamCallbackList withLog(StreamCallback cb) {
+        return withLog(cb, LogStreamCallback.DEFAULT_VALUE_FOR_WITH_DATA);
+    }
+
+    public static StreamCallbackList withLog(StreamCallback cb, boolean withLog) {
         if (cb instanceof StreamCallbackList cbls) {
-            cbls.callbacks.addFirst(new LogStreamCallback());
+            cbls.callbacks.addFirst(new LogStreamCallback(withLog));
             return cbls;
         } else {
             return new StreamCallbackList()
@@ -23,9 +26,13 @@ public class StreamCallbackList implements StreamCallback {
         }
     }
 
-    public static StreamCallback withLogIfDebugEnabled(StreamCallback cb) {
-        if (Logger.debugOn()) {
-            return withLog(cb);
+    public static StreamCallback withLogIf(boolean checkRes, StreamCallback cb) {
+        return withLogIf(checkRes, cb, LogStreamCallback.DEFAULT_VALUE_FOR_WITH_DATA);
+    }
+
+    public static StreamCallback withLogIf(boolean checkRes, StreamCallback cb, boolean withLog) {
+        if (checkRes) {
+            return withLog(cb, withLog);
         }
         return cb;
     }

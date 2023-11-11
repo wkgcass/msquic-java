@@ -8,6 +8,7 @@ public class SampleLogConnectionCallback extends LogConnectionCallback {
     private final CommandLine cli;
 
     public SampleLogConnectionCallback(CommandLine cli) {
+        super(true);
         this.cli = cli;
     }
 

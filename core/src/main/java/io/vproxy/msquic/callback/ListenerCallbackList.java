@@ -1,6 +1,5 @@
 package io.vproxy.msquic.callback;
 
-import io.vproxy.base.util.Logger;
 import io.vproxy.msquic.QuicListenerEvent;
 import io.vproxy.msquic.QuicListenerEventNewConnection;
 import io.vproxy.msquic.QuicListenerEventStopComplete;
@@ -15,8 +14,12 @@ public class ListenerCallbackList implements ListenerCallback {
     private final List<ListenerCallback> callbacks = new ArrayList<>(4);
 
     public static ListenerCallbackList withLog(ListenerCallback cb) {
+        return withLog(cb, LogListenerCallback.DEFAULT_VALUE_FOR_WITH_DATA);
+    }
+
+    public static ListenerCallbackList withLog(ListenerCallback cb, boolean withData) {
         if (cb instanceof ListenerCallbackList cbls) {
-            cbls.callbacks.addFirst(new LogListenerCallback());
+            cbls.callbacks.addFirst(new LogListenerCallback(withData));
             return cbls;
         } else {
             return new ListenerCallbackList()
@@ -25,9 +28,13 @@ public class ListenerCallbackList implements ListenerCallback {
         }
     }
 
-    public static ListenerCallback withLogIfDebugEnabled(ListenerCallback cb) {
-        if (Logger.debugOn()) {
-            return withLog(cb);
+    public static ListenerCallback withLogIf(boolean checkRes, ListenerCallback cb) {
+        return withLogIf(checkRes, cb, LogListenerCallback.DEFAULT_VALUE_FOR_WITH_DATA);
+    }
+
+    public static ListenerCallback withLogIf(boolean checkRes, ListenerCallback cb, boolean withData) {
+        if (checkRes) {
+            return withLog(cb, withData);
         }
         return cb;
     }

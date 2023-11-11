@@ -1,6 +1,5 @@
 package io.vproxy.msquic.callback;
 
-import io.vproxy.base.util.Logger;
 import io.vproxy.msquic.*;
 import io.vproxy.msquic.wrap.Connection;
 
@@ -13,8 +12,12 @@ public class ConnectionCallbackList implements ConnectionCallback {
     private final List<ConnectionCallback> callbacks = new ArrayList<>(4);
 
     public static ConnectionCallbackList withLog(ConnectionCallback cb) {
+        return withLog(cb, LogConnectionCallback.DEFAULT_VALUE_FOR_WITH_DATA);
+    }
+
+    public static ConnectionCallbackList withLog(ConnectionCallback cb, boolean withData) {
         if (cb instanceof ConnectionCallbackList cbls) {
-            cbls.callbacks.addFirst(new LogConnectionCallback());
+            cbls.callbacks.addFirst(new LogConnectionCallback(withData));
             return cbls;
         } else {
             return new ConnectionCallbackList()
@@ -23,9 +26,13 @@ public class ConnectionCallbackList implements ConnectionCallback {
         }
     }
 
-    public static ConnectionCallback withLogIfDebugEnabled(ConnectionCallback cb) {
-        if (Logger.debugOn()) {
-            return withLog(cb);
+    public static ConnectionCallback withLogIf(boolean checkRes, ConnectionCallback cb) {
+        return withLogIf(checkRes, cb, LogConnectionCallback.DEFAULT_VALUE_FOR_WITH_DATA);
+    }
+
+    public static ConnectionCallback withLogIf(boolean checkRes, ConnectionCallback cb, boolean withData) {
+        if (checkRes) {
+            return withLog(cb, withData);
         }
         return cb;
     }

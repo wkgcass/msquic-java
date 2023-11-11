@@ -1,8 +1,8 @@
 package io.vproxy.msquic.callback;
 
-import io.vproxy.base.util.ByteArray;
 import io.vproxy.base.util.LogType;
 import io.vproxy.base.util.Logger;
+import io.vproxy.base.util.bytearray.MemorySegmentByteArray;
 import io.vproxy.msquic.*;
 import io.vproxy.msquic.wrap.Connection;
 import io.vproxy.pni.Allocator;
@@ -10,7 +10,6 @@ import io.vproxy.pni.PNIString;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.foreign.ValueLayout;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -18,6 +17,18 @@ import java.nio.file.StandardOpenOption;
 import static io.vproxy.msquic.MsQuicConsts.QUIC_STATUS_NOT_SUPPORTED;
 
 public class LogConnectionCallback implements ConnectionCallback {
+    public static final boolean DEFAULT_VALUE_FOR_WITH_DATA = false;
+
+    private final boolean withData;
+
+    public LogConnectionCallback() {
+        this(DEFAULT_VALUE_FOR_WITH_DATA);
+    }
+
+    public LogConnectionCallback(boolean withData) {
+        this.withData = withData;
+    }
+
     protected Path getSSLKeyLogFilePath() {
         var v = System.getenv("SSLKEYLOGFILE");
         if (v == null)
@@ -32,12 +43,15 @@ public class LogConnectionCallback implements ConnectionCallback {
         Logger.alert(STR."QUIC_CONNECTION_EVENT_CONNECTED: \{conn}");
         Logger.alert(STR."\{data}");
 
+        if (!withData) {
+            return QUIC_STATUS_NOT_SUPPORTED;
+        }
+
         var SSLKEYLOGFILE = getSSLKeyLogFilePath();
         if (SSLKEYLOGFILE != null) {
             if (conn.getQuicTLSSecret() != null) {
                 var s = conn.getQuicTLSSecret();
-                var bytes = s.MEMORY.toArray(ValueLayout.JAVA_BYTE);
-                Logger.alert(STR."QuicTLSSecret\n\{ByteArray.from(bytes).hexDump()}");
+                Logger.alert(STR."QuicTLSSecret\n\{new MemorySegmentByteArray(s.MEMORY).hexDump()}");
                 try {
                     Files.writeString(SSLKEYLOGFILE,
                         MsQuicUtils.convertQuicTlsSecretToSSLKEYLOGFILE(s),
@@ -142,10 +156,13 @@ public class LogConnectionCallback implements ConnectionCallback {
         Logger.alert(STR."QUIC_CONNECTION_EVENT_DATAGRAM_RECEIVED: \{conn}");
         Logger.alert(STR."\{data}");
 
+        if (!withData) {
+            return QUIC_STATUS_NOT_SUPPORTED;
+        }
+
         var buffer = data.getBuffer();
         var seg = buffer.getBuffer().reinterpret(buffer.getLength());
-        var bytes = seg.toArray(ValueLayout.JAVA_BYTE);
-        Logger.alert(STR."Buffer\n\{ByteArray.from(bytes).hexDump()}");
+        Logger.alert(STR."Buffer\n\{new MemorySegmentByteArray(seg).hexDump()}");
 
         return QUIC_STATUS_NOT_SUPPORTED;
     }
@@ -162,13 +179,16 @@ public class LogConnectionCallback implements ConnectionCallback {
         Logger.alert(STR."QUIC_CONNECTION_EVENT_RESUMED: \{conn}");
         Logger.alert(STR."\{data}");
 
+        if (!withData) {
+            return QUIC_STATUS_NOT_SUPPORTED;
+        }
+
         int len = data.getResumptionStateLength() & 0xffff;
         if (len == 0) {
             Logger.alert("ResumptionState: null");
         } else {
             var state = data.getResumptionState().reinterpret(len);
-            var bytes = state.toArray(ValueLayout.JAVA_BYTE);
-            Logger.alert(STR."ResumptionState\n\{ByteArray.from(bytes).hexDump()}");
+            Logger.alert(STR."ResumptionState\n\{new MemorySegmentByteArray(state).hexDump()}");
         }
         return QUIC_STATUS_NOT_SUPPORTED;
     }
@@ -178,9 +198,12 @@ public class LogConnectionCallback implements ConnectionCallback {
         Logger.alert(STR."QUIC_CONNECTION_EVENT_RESUMPTION_TICKET_RECEIVED: \{conn}");
         Logger.alert(STR."\{data}");
 
+        if (!withData) {
+            return QUIC_STATUS_NOT_SUPPORTED;
+        }
+
         var seg = data.getResumptionTicket().reinterpret(data.getResumptionTicketLength() & 0xffff);
-        var bytes = seg.toArray(ValueLayout.JAVA_BYTE);
-        Logger.alert(STR."ResumptionTicket\n\{ByteArray.from(bytes).hexDump()}");
+        Logger.alert(STR."ResumptionTicket\n\{new MemorySegmentByteArray(seg).hexDump()}");
 
         return QUIC_STATUS_NOT_SUPPORTED;
     }

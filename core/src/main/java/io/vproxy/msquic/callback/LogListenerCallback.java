@@ -1,18 +1,28 @@
 package io.vproxy.msquic.callback;
 
-import io.vproxy.base.util.ByteArray;
 import io.vproxy.base.util.Logger;
+import io.vproxy.base.util.bytearray.MemorySegmentByteArray;
 import io.vproxy.msquic.MsQuicUtils;
 import io.vproxy.msquic.QuicListenerEvent;
 import io.vproxy.msquic.QuicListenerEventNewConnection;
 import io.vproxy.msquic.QuicListenerEventStopComplete;
 import io.vproxy.msquic.wrap.Listener;
 
-import java.lang.foreign.ValueLayout;
-
 import static io.vproxy.msquic.MsQuicConsts.QUIC_STATUS_NOT_SUPPORTED;
 
 public class LogListenerCallback implements ListenerCallback {
+    public static final boolean DEFAULT_VALUE_FOR_WITH_DATA = false;
+
+    private final boolean withData;
+
+    public LogListenerCallback() {
+        this(DEFAULT_VALUE_FOR_WITH_DATA);
+    }
+
+    public LogListenerCallback(boolean withData) {
+        this.withData = withData;
+    }
+
     @Override
     public int newConnection(Listener listener, QuicListenerEventNewConnection data) {
         Logger.alert(STR."QUIC_LISTENER_EVENT_NEW_CONNECTION: \{listener}");
@@ -24,20 +34,22 @@ public class LogListenerCallback implements ListenerCallback {
         {
             Logger.alert(STR."RemoteAddress: \{MsQuicUtils.convertQuicAddrToIPPort(info.getRemoteAddress())}");
         }
+
+        if (!withData) {
+            return QUIC_STATUS_NOT_SUPPORTED;
+        }
+
         {
             var buffer = info.getCryptoBuffer().reinterpret(info.getCryptoBufferLength());
-            var bytes = buffer.toArray(ValueLayout.JAVA_BYTE);
-            Logger.alert(STR."CryptoBuffer:\n\{ByteArray.from(bytes).hexDump()}");
+            Logger.alert(STR."CryptoBuffer:\n\{new MemorySegmentByteArray(buffer).hexDump()}");
         }
         {
             var alpn = info.getClientAlpnList().reinterpret(info.getClientAlpnListLength());
-            var bytes = alpn.toArray(ValueLayout.JAVA_BYTE);
-            Logger.alert(STR."ClientAlpnList:\n\{ByteArray.from(bytes).hexDump()}");
+            Logger.alert(STR."ClientAlpnList:\n\{new MemorySegmentByteArray(alpn).hexDump()}");
         }
         {
             var negotiatedAlpn = info.getNegotiatedAlpn().reinterpret(info.getNegotiatedAlpnLength());
-            var bytes = negotiatedAlpn.toArray(ValueLayout.JAVA_BYTE);
-            Logger.alert(STR."NegotiatedAlpn:\n\{ByteArray.from(bytes).hexDump()}");
+            Logger.alert(STR."NegotiatedAlpn:\n\{new MemorySegmentByteArray(negotiatedAlpn).hexDump()}");
         }
         return QUIC_STATUS_NOT_SUPPORTED;
     }

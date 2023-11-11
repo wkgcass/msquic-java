@@ -1,15 +1,25 @@
 package io.vproxy.msquic.callback;
 
-import io.vproxy.base.util.ByteArray;
 import io.vproxy.base.util.Logger;
+import io.vproxy.base.util.bytearray.MemorySegmentByteArray;
 import io.vproxy.msquic.*;
 import io.vproxy.msquic.wrap.Stream;
-
-import java.lang.foreign.ValueLayout;
 
 import static io.vproxy.msquic.MsQuicConsts.QUIC_STATUS_NOT_SUPPORTED;
 
 public class LogStreamCallback implements StreamCallback {
+    public static final boolean DEFAULT_VALUE_FOR_WITH_DATA = false;
+
+    private final boolean withData;
+
+    public LogStreamCallback() {
+        this(DEFAULT_VALUE_FOR_WITH_DATA);
+    }
+
+    public LogStreamCallback(boolean withData) {
+        this.withData = withData;
+    }
+
     @Override
     public int startComplete(Stream stream, QuicStreamEventStartComplete data) {
         Logger.alert(STR."QUIC_STREAM_EVENT_START_COMPLETE: \{stream}");
@@ -19,6 +29,10 @@ public class LogStreamCallback implements StreamCallback {
 
     @Override
     public int receive(Stream stream, QuicStreamEventReceive data) {
+        if (!withData) {
+            return QUIC_STATUS_NOT_SUPPORTED;
+        }
+
         Logger.alert(STR."QUIC_STREAM_EVENT_RECEIVE: \{stream}");
         Logger.alert(STR."\{data}");
         int count = data.getBufferCount();
@@ -28,14 +42,17 @@ public class LogStreamCallback implements StreamCallback {
         for (int i = 0; i < count; ++i) {
             var buf = bufs.get(i);
             var seg = buf.getBuffer().reinterpret(buf.getLength());
-            var bytes = seg.toArray(ValueLayout.JAVA_BYTE);
-            Logger.alert(STR."Buffer[\{i}]\n\{ByteArray.from(bytes).hexDump()}");
+            Logger.alert(STR."Buffer[\{i}]\n\{new MemorySegmentByteArray(seg).hexDump()}");
         }
         return QUIC_STATUS_NOT_SUPPORTED;
     }
 
     @Override
     public int sendComplete(Stream stream, QuicStreamEventSendComplete data) {
+        if (!withData) {
+            return QUIC_STATUS_NOT_SUPPORTED;
+        }
+
         Logger.alert(STR."QUIC_STREAM_EVENT_SEND_COMPLETE: \{stream}");
         Logger.alert(STR."\{data}");
         return QUIC_STATUS_NOT_SUPPORTED;
