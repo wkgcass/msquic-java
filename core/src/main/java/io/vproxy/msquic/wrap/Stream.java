@@ -302,7 +302,7 @@ public class Stream {
     public String toString() {
         return "Stream[id=" + id
                + " conn=" + opts.connection
-               + "]@" + Long.toString(streamQ.getHandle().address(), 16)
+               + "]@" + Long.toString(streamQ.MEMORY.address(), 16)
                + (isClosed() ? "[closed]" : "[open]");
     }
 }

@@ -311,7 +311,7 @@ public class Connection {
     public String toString() {
         return "Connection[local=" + (localAddress == null ? "null" : localAddress.formatToIPPortString())
                + " remote=" + (remoteAddress == null ? "null" : remoteAddress.formatToIPPortString())
-               + "]@" + Long.toString(connectionQ.getHandle().address(), 16)
+               + "]@" + Long.toString(connectionQ.MEMORY.address(), 16)
                + (isClosed() ? "[closed]" : "[open]");
     }
 }
