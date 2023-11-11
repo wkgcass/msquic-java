@@ -31,16 +31,11 @@ struct QuicApiTable {
 };
 
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicApiTable_close(QuicApiTable * self);
-JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicApiTable_setContext(QuicApiTable * self, void * Handle, void * Context);
-JNIEXPORT void * JNICALL JavaCritical_io_vproxy_msquic_QuicApiTable_getContext(QuicApiTable * self, void * Handle);
-JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicApiTable_setCallbackHandler(QuicApiTable * self, void * Handle, void * Handler, void * Context);
-JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_QuicApiTable_setParam(QuicApiTable * self, void * Handle, int32_t Param, int32_t BufferLength, void * Buffer);
-JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_QuicApiTable_getParam(QuicApiTable * self, void * Handle, int32_t Param, uint32_t * BufferLength, void * Buffer);
 JNIEXPORT QuicRegistration * JNICALL JavaCritical_io_vproxy_msquic_QuicApiTable_openRegistration(QuicApiTable * self, QUIC_REGISTRATION_CONFIG * Config, int32_t * returnStatus, QuicRegistration * return_);
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicApiTable
-// metadata.generator-version: pni 21.0.0.16
-// sha256:d39985ad330bdf597693314d559b81ff0750ca6b4f7906f35b87fbdf8af1e570
+// metadata.generator-version: pni 21.0.0.17
+// sha256:908c02c135b7f09f95eb650d00e7f712b93f08ddb341f55a678c435d2e2ae47d

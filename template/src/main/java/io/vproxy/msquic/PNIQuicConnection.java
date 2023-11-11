@@ -7,15 +7,12 @@ import java.lang.foreign.MemorySegment;
 @Struct
 @AlwaysAligned
 @Include("msquic.h")
-public abstract class PNIQuicConnection {
-    MemorySegment Api; // QUIC_API_TABLE
-    MemorySegment Conn; // HQUIC
-
+public abstract class PNIQuicConnection extends PNIQuicObjectBase {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC conn = self->Conn;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC conn = self->SUPER.Handle;
             api->ConnectionClose(conn);
             """
     )
@@ -25,8 +22,8 @@ public abstract class PNIQuicConnection {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC conn = self->Conn;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC conn = self->SUPER.Handle;
                         
             api->ConnectionShutdown(conn, Flags, ErrorCode);
             """
@@ -37,9 +34,9 @@ public abstract class PNIQuicConnection {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC conn = self->Conn;
-            HQUIC conf = Conf->Conf;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC conn = self->SUPER.Handle;
+            HQUIC conf = Conf->SUPER.Handle;
                         
             QUIC_STATUS res = api->ConnectionStart(conn, conf, Family, ServerName, ServerPort);
             if (QUIC_SUCCEEDED(res)) {
@@ -54,9 +51,9 @@ public abstract class PNIQuicConnection {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC conn = self->Conn;
-            HQUIC conf = Conf->Conf;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC conn = self->SUPER.Handle;
+            HQUIC conf = Conf->SUPER.Handle;
                         
             QUIC_STATUS res = api->ConnectionSetConfiguration(conn, conf);
             if (QUIC_SUCCEEDED(res)) {
@@ -71,8 +68,8 @@ public abstract class PNIQuicConnection {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC conn = self->Conn;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC conn = self->SUPER.Handle;
                         
             QUIC_STATUS res = api->ConnectionSendResumptionTicket(conn, Flags, DataLength, ResumptionData);
             if (QUIC_SUCCEEDED(res)) {
@@ -87,8 +84,8 @@ public abstract class PNIQuicConnection {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC conn = self->Conn;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC conn = self->SUPER.Handle;
                         
             HQUIC stream;
             QUIC_STATUS res = api->StreamOpen(conn, Flags,
@@ -97,8 +94,8 @@ public abstract class PNIQuicConnection {
             if (returnStatus != NULL)
                 *returnStatus = res;
             if (QUIC_SUCCEEDED(res)) {
-                return_->Api = api;
-                return_->Stream = stream;
+                return_->SUPER.Api = api;
+                return_->SUPER.Handle = stream;
                 return return_;
             }
             return NULL;
@@ -110,8 +107,8 @@ public abstract class PNIQuicConnection {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC conn = self->Conn;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC conn = self->SUPER.Handle;
                         
             QUIC_STATUS res = api->DatagramSend(conn, Buffers, BufferCount, Flags, ClientSendContext);
             if (QUIC_SUCCEEDED(res)) {
@@ -126,8 +123,8 @@ public abstract class PNIQuicConnection {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC conn = self->Conn;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC conn = self->SUPER.Handle;
                         
             QUIC_STATUS res = api->ConnectionResumptionTicketValidationComplete(conn, Result);
             if (QUIC_SUCCEEDED(res)) {
@@ -142,8 +139,8 @@ public abstract class PNIQuicConnection {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC conn = self->Conn;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC conn = self->SUPER.Handle;
                         
             QUIC_STATUS res = api->ConnectionCertificateValidationComplete(conn, Result, TlsAlert);
             if (QUIC_SUCCEEDED(res)) {

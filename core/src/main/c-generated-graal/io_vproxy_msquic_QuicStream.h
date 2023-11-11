@@ -16,6 +16,7 @@ typedef struct QuicStream QuicStream;
 #include <jni.h>
 #include <pni.h>
 #include "msquic.h"
+#include "io_vproxy_msquic_QuicObjectBase.h"
 #include "io_vproxy_msquic_QuicBuffer.h"
 
 #ifdef __cplusplus
@@ -26,8 +27,7 @@ PNIEnvExpand(QuicStream, QuicStream *)
 PNIBufExpand(QuicStream, QuicStream, 16)
 
 struct QuicStream {
-    void * Api;
-    void * Stream;
+    QuicObjectBase SUPER;
 };
 
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicStream_close(QuicStream * self);
@@ -41,5 +41,5 @@ JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_QuicStream_receiveSetEna
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicStream
-// metadata.generator-version: pni 21.0.0.16
-// sha256:01ca89134c9b9b6bdcbcc67ced9408ea8673e1064026cc6e43aad3dfe7795e23
+// metadata.generator-version: pni 21.0.0.17
+// sha256:f98d393cf9de31f6ce4230f96d24b53af00101c28551b7dbf7b3129cc7ffd1c8

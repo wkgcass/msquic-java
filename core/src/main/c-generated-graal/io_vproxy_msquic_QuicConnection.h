@@ -16,6 +16,7 @@ typedef struct QuicConnection QuicConnection;
 #include <jni.h>
 #include <pni.h>
 #include "msquic.h"
+#include "io_vproxy_msquic_QuicObjectBase.h"
 #include "io_vproxy_msquic_QuicConfiguration.h"
 #include "io_vproxy_msquic_QuicStream.h"
 #include "io_vproxy_msquic_QuicBuffer.h"
@@ -28,8 +29,7 @@ PNIEnvExpand(QuicConnection, QuicConnection *)
 PNIBufExpand(QuicConnection, QuicConnection, 16)
 
 struct QuicConnection {
-    void * Api;
-    void * Conn;
+    QuicObjectBase SUPER;
 };
 
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicConnection_close(QuicConnection * self);
@@ -46,5 +46,5 @@ JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_QuicConnection_certifica
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicConnection
-// metadata.generator-version: pni 21.0.0.16
-// sha256:f630ad8c0057554059b5776451e114aac81ef428da700ecd79d940e47cdc74e7
+// metadata.generator-version: pni 21.0.0.17
+// sha256:428a2ddafd363bafbc0e52e9426184201a007c6573e7acbb9627352a0b51bf27

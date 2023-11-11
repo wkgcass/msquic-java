@@ -16,6 +16,7 @@ typedef struct QuicConfiguration QuicConfiguration;
 #include <jni.h>
 #include <pni.h>
 #include "msquic.h"
+#include "io_vproxy_msquic_QuicObjectBase.h"
 #include "io_vproxy_msquic_QuicCredentialConfig.h"
 
 #ifdef __cplusplus
@@ -26,8 +27,7 @@ PNIEnvExpand(QuicConfiguration, QuicConfiguration *)
 PNIBufExpand(QuicConfiguration, QuicConfiguration, 16)
 
 struct QuicConfiguration {
-    void * Api;
-    void * Conf;
+    QuicObjectBase SUPER;
 };
 
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicConfiguration_close(QuicConfiguration * self);
@@ -37,5 +37,5 @@ JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_QuicConfiguration_loadCr
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicConfiguration
-// metadata.generator-version: pni 21.0.0.13
-// sha256:3ca9e3152a54f385d357aa7304087ff1acdc6397c849e048543f5b9f43d59f06
+// metadata.generator-version: pni 21.0.0.17
+// sha256:5eba8cf201afbeb2e49bd40e44a7a0618fd711cdecfdbf5c85246d820815660b

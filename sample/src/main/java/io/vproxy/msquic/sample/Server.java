@@ -140,14 +140,14 @@ public class Server {
             var conn_ = new QuicConnection(connectionAllocator);
             {
                 conn_.setApi(listener.opts.apiTableQ.getApi());
-                conn_.setConn(connHQUIC);
+                conn_.setHandle(connHQUIC);
             }
             var conn = new Connection(new Connection.Options(listener, connectionAllocator,
                 new ConnectionCallbackList()
                     .add(new SampleLogConnectionCallback(cli))
                     .add(new SampleConnectionCallback(cli)),
                 conn_));
-            listener.opts.apiTableQ.setCallbackHandler(connHQUIC, MsQuicUpcall.connectionCallback, conn.ref.MEMORY);
+            conn_.setCallbackHandler(MsQuicUpcall.connectionCallback, conn.ref.MEMORY);
             var err = conn_.setConfiguration(conf.opts.configurationQ);
             if (err != 0) {
                 Logger.error(LogType.ALERT, STR."set configuration to connection failed: \{err}");

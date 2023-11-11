@@ -17,6 +17,7 @@ typedef struct QuicRegistration QuicRegistration;
 #include <pni.h>
 #include "msquic.h"
 #include "io_vproxy_msquic_MsQuicUpcall.h"
+#include "io_vproxy_msquic_QuicObjectBase.h"
 #include "io_vproxy_msquic_QuicConfiguration.h"
 #include "io_vproxy_msquic_QuicBuffer.h"
 #include "io_vproxy_msquic_QuicSettings.h"
@@ -31,8 +32,7 @@ PNIEnvExpand(QuicRegistration, QuicRegistration *)
 PNIBufExpand(QuicRegistration, QuicRegistration, 16)
 
 struct QuicRegistration {
-    void * Api;
-    void * Reg;
+    QuicObjectBase SUPER;
 };
 
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicRegistration_close(QuicRegistration * self);
@@ -45,5 +45,5 @@ JNIEXPORT QuicConnection * JNICALL JavaCritical_io_vproxy_msquic_QuicRegistratio
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicRegistration
-// metadata.generator-version: pni 21.0.0.16
-// sha256:0e9573032806503e4a2bf99bb2b43b6faba1d22104c6daf4a8e5ab3249d37524
+// metadata.generator-version: pni 21.0.0.17
+// sha256:6d7160e87c63da887d6efa04e54751fc0882a6b902d43ee334242252b75ef9b6

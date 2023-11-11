@@ -98,7 +98,7 @@ public class Stream {
                 var idPtr = new LongArray(tmpAllocator, 1);
                 var lenPtr = new IntArray(tmpAllocator, 1);
                 lenPtr.set(0, 8);
-                opts.apiTable.opts.apiTableQ.getParam(stream.getStream(), QUIC_PARAM_STREAM_ID, lenPtr, idPtr.MEMORY);
+                stream.getParam(QUIC_PARAM_STREAM_ID, lenPtr, idPtr.MEMORY);
                 id = idPtr.get(0);
             }
         }
@@ -302,7 +302,7 @@ public class Stream {
     public String toString() {
         return "Stream[id=" + id
                + " conn=" + opts.connection
-               + "]@" + Long.toString(streamQ.getStream().address(), 16)
+               + "]@" + Long.toString(streamQ.getHandle().address(), 16)
                + (isClosed() ? "[closed]" : "[open]");
     }
 }

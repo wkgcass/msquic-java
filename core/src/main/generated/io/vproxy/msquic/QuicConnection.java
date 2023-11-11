@@ -6,10 +6,10 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicConnection extends AbstractNativeObject implements NativeObject {
+public class QuicConnection extends io.vproxy.msquic.QuicObjectBase implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.ADDRESS.withName("Api"),
-        ValueLayout.ADDRESS.withName("Conn")
+        io.vproxy.msquic.QuicObjectBase.LAYOUT
+
     ).withByteAlignment(8);
     public final MemorySegment MEMORY;
 
@@ -18,48 +18,12 @@ public class QuicConnection extends AbstractNativeObject implements NativeObject
         return MEMORY;
     }
 
-    private static final VarHandle ApiVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Api")
-    );
-
-    public MemorySegment getApi() {
-        var SEG = (MemorySegment) ApiVH.get(MEMORY);
-        if (SEG.address() == 0) return null;
-        return SEG;
-    }
-
-    public void setApi(MemorySegment Api) {
-        if (Api == null) {
-            ApiVH.set(MEMORY, MemorySegment.NULL);
-        } else {
-            ApiVH.set(MEMORY, Api);
-        }
-    }
-
-    private static final VarHandle ConnVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Conn")
-    );
-
-    public MemorySegment getConn() {
-        var SEG = (MemorySegment) ConnVH.get(MEMORY);
-        if (SEG.address() == 0) return null;
-        return SEG;
-    }
-
-    public void setConn(MemorySegment Conn) {
-        if (Conn == null) {
-            ConnVH.set(MEMORY, MemorySegment.NULL);
-        } else {
-            ConnVH.set(MEMORY, Conn);
-        }
-    }
-
     public QuicConnection(MemorySegment MEMORY) {
+        super(MEMORY);
         MEMORY = MEMORY.reinterpret(LAYOUT.byteSize());
         this.MEMORY = MEMORY;
         long OFFSET = 0;
-        OFFSET += ValueLayout.ADDRESS_UNALIGNED.byteSize();
-        OFFSET += ValueLayout.ADDRESS_UNALIGNED.byteSize();
+        OFFSET += io.vproxy.msquic.QuicObjectBase.LAYOUT.byteSize();
     }
 
     public QuicConnection(Allocator ALLOCATOR) {
@@ -178,16 +142,25 @@ public class QuicConnection extends AbstractNativeObject implements NativeObject
             return;
         }
         SB.append("QuicConnection{\n");
+        SB.append(" ".repeat(INDENT + 4)).append("SUPER => ");
         {
-            SB.append(" ".repeat(INDENT + 4)).append("Api => ");
-            SB.append(PanamaUtils.memorySegmentToString(getApi()));
+            INDENT += 4;
+            SB.append("QuicObjectBase{\n");
+            {
+                SB.append(" ".repeat(INDENT + 4)).append("Api => ");
+                SB.append(PanamaUtils.memorySegmentToString(getApi()));
+            }
+            SB.append(",\n");
+            {
+                SB.append(" ".repeat(INDENT + 4)).append("Handle => ");
+                SB.append(PanamaUtils.memorySegmentToString(getHandle()));
+            }
+            SB.append("\n");
+            SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
+            INDENT -= 4;
+            SB.append("\n");
+
         }
-        SB.append(",\n");
-        {
-            SB.append(" ".repeat(INDENT + 4)).append("Conn => ");
-            SB.append(PanamaUtils.memorySegmentToString(getConn()));
-        }
-        SB.append("\n");
         SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
@@ -261,5 +234,5 @@ public class QuicConnection extends AbstractNativeObject implements NativeObject
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.17
-// sha256:3974aa7578f95c289c8b8654af50247565b38704e52ed39824e8453b70383995
+// metadata.generator-version: pni 21.0.0.18
+// sha256:61a05f942ee9996c14da21e9439d2d3e5e1a807ae241a031bfb412e4a7c7b0f5

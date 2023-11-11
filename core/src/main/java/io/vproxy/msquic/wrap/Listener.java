@@ -147,7 +147,7 @@ public class Listener {
     public String toString() {
         return "Listener["
                + "bind=" + bindAddress
-               + "]@" + Long.toString(listenerQ.getLsn().address(), 16)
+               + "]@" + Long.toString(listenerQ.getHandle().address(), 16)
                + (isClosed() ? "[closed]" : "[open]");
     }
 }

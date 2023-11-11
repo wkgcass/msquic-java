@@ -7,15 +7,12 @@ import java.lang.foreign.MemorySegment;
 @Struct
 @AlwaysAligned
 @Include("msquic.h")
-public abstract class PNIQuicStream {
-    MemorySegment Api; // QUIC_API_TABLE
-    MemorySegment Stream; // HQUIC
-
+public abstract class PNIQuicStream extends PNIQuicObjectBase {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC stream = self->Stream;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC stream = self->SUPER.Handle;
             api->StreamClose(stream);
             """
     )
@@ -25,8 +22,8 @@ public abstract class PNIQuicStream {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC stream = self->Stream;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC stream = self->SUPER.Handle;
                         
             QUIC_STATUS res = api->StreamStart(stream, Flags);
             if (QUIC_SUCCEEDED(res)) {
@@ -41,8 +38,8 @@ public abstract class PNIQuicStream {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC stream = self->Stream;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC stream = self->SUPER.Handle;
                         
             QUIC_STATUS res = api->StreamShutdown(stream, Flags, ErrorCode);
             if (QUIC_SUCCEEDED(res)) {
@@ -57,8 +54,8 @@ public abstract class PNIQuicStream {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC stream = self->Stream;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC stream = self->SUPER.Handle;
                         
             QUIC_STATUS res = api->StreamSend(stream, Buffers, BufferCount, Flags, ClientSendContext);
             if (QUIC_SUCCEEDED(res)) {
@@ -72,8 +69,8 @@ public abstract class PNIQuicStream {
 
     @Impl(
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC stream = self->Stream;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC stream = self->SUPER.Handle;
                         
             api->StreamReceiveComplete(stream, BufferLength);
             """
@@ -84,8 +81,8 @@ public abstract class PNIQuicStream {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC stream = self->Stream;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC stream = self->SUPER.Handle;
                         
             QUIC_STATUS res = api->StreamReceiveSetEnabled(stream, IsEnabled);
             if (QUIC_SUCCEEDED(res)) {

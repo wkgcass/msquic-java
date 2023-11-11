@@ -45,6 +45,8 @@
 #include "io_vproxy_msquic_QuicListenerEventStopComplete.h"
 #include "io_vproxy_msquic_QuicListenerEventUnion.h"
 #include "io_vproxy_msquic_QuicNewConnectionInfo.h"
+#include "io_vproxy_msquic_QuicObjectBase.h"
+#include "io_vproxy_msquic_QuicObjectBase.impl.h"
 #include "io_vproxy_msquic_QuicRegistration.h"
 #include "io_vproxy_msquic_QuicRegistration.impl.h"
 #include "io_vproxy_msquic_QuicRegistrationConfig.h"

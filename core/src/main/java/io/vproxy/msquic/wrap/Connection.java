@@ -54,7 +54,7 @@ public class Connection {
         try (var allocator = Allocator.ofConfined()) {
             var remoteAddress = MsQuicUtils.convertIPPortToQuicAddr(target, allocator);
 
-            opts.apiTableQ.setParam(connectionQ.getConn(),
+            connectionQ.setParam(
                 QUIC_PARAM_CONN_REMOTE_ADDRESS,
                 (int) remoteAddress.MEMORY.byteSize(), remoteAddress.MEMORY);
 
@@ -191,17 +191,17 @@ public class Connection {
                     var addr = new QuicAddr(allocator);
                     var size = new IntArray(allocator, 1);
                     size.set(0, (int) QuicAddr.LAYOUT.byteSize());
-                    var ok = opts.apiTable.opts.apiTableQ.getParam(connectionQ.getConn(), QUIC_PARAM_CONN_LOCAL_ADDRESS, size, addr.MEMORY);
+                    var ok = connectionQ.getParam(QUIC_PARAM_CONN_LOCAL_ADDRESS, size, addr.MEMORY);
                     if (ok == 0) {
                         localAddress = MsQuicUtils.convertQuicAddrToIPPort(addr);
                     } else {
-                        Logger.error(LogType.CONN_ERROR, STR."[MsQuicJava] failed to retrieve local address from connection \{connectionQ.getConn().address()}");
+                        Logger.error(LogType.CONN_ERROR, STR."[MsQuicJava] failed to retrieve local address from connection \{connectionQ.getHandle().address()}");
                     }
-                    ok = opts.apiTable.opts.apiTableQ.getParam(connectionQ.getConn(), QUIC_PARAM_CONN_REMOTE_ADDRESS, size, addr.MEMORY);
+                    ok = connectionQ.getParam(QUIC_PARAM_CONN_REMOTE_ADDRESS, size, addr.MEMORY);
                     if (ok == 0) {
                         remoteAddress = MsQuicUtils.convertQuicAddrToIPPort(addr);
                     } else {
-                        Logger.error(LogType.CONN_ERROR, STR."[MsQuicJava] failed to retrieve remote address from connection \{connectionQ.getConn().address()}");
+                        Logger.error(LogType.CONN_ERROR, STR."[MsQuicJava] failed to retrieve remote address from connection \{connectionQ.getHandle().address()}");
                     }
                 }
 
@@ -298,7 +298,7 @@ public class Connection {
 
     public int enableTlsSecretDebug() {
         quicTLSSecret = new QuicTLSSecret(opts.allocator.allocate(QuicTLSSecret.LAYOUT.byteSize()));
-        return opts.apiTable.opts.apiTableQ.setParam(connectionQ.getConn(), QUIC_PARAM_CONN_TLS_SECRETS,
+        return connectionQ.setParam(QUIC_PARAM_CONN_TLS_SECRETS,
             (int) QuicTLSSecret.LAYOUT.byteSize(), quicTLSSecret.MEMORY);
     }
 
@@ -311,7 +311,7 @@ public class Connection {
     public String toString() {
         return "Connection[local=" + (localAddress == null ? "null" : localAddress.formatToIPPortString())
                + " remote=" + (remoteAddress == null ? "null" : remoteAddress.formatToIPPortString())
-               + "]@" + Long.toString(connectionQ.getConn().address(), 16)
+               + "]@" + Long.toString(connectionQ.getHandle().address(), 16)
                + (isClosed() ? "[closed]" : "[open]");
     }
 }

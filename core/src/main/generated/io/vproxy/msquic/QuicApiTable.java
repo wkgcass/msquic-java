@@ -56,63 +56,6 @@ public class QuicApiTable extends AbstractNativeObject implements NativeObject {
         }
     }
 
-    private static final MethodHandle setContextMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "JavaCritical_io_vproxy_msquic_QuicApiTable_setContext", MemorySegment.class /* self */, MemorySegment.class /* Handle */, MemorySegment.class /* Context */);
-
-    public void setContext(MemorySegment Handle, MemorySegment Context) {
-        try {
-            setContextMH.invokeExact(MEMORY, (MemorySegment) (Handle == null ? MemorySegment.NULL : Handle), (MemorySegment) (Context == null ? MemorySegment.NULL : Context));
-        } catch (Throwable THROWABLE) {
-            throw PanamaUtils.convertInvokeExactException(THROWABLE);
-        }
-    }
-
-    private static final MethodHandle getContextMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), MemorySegment.class, "JavaCritical_io_vproxy_msquic_QuicApiTable_getContext", MemorySegment.class /* self */, MemorySegment.class /* Handle */);
-
-    public MemorySegment getContext(MemorySegment Handle) {
-        MemorySegment RESULT;
-        try {
-            RESULT = (MemorySegment) getContextMH.invokeExact(MEMORY, (MemorySegment) (Handle == null ? MemorySegment.NULL : Handle));
-        } catch (Throwable THROWABLE) {
-            throw PanamaUtils.convertInvokeExactException(THROWABLE);
-        }
-        if (RESULT.address() == 0) return null;
-        return RESULT;
-    }
-
-    private static final MethodHandle setCallbackHandlerMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "JavaCritical_io_vproxy_msquic_QuicApiTable_setCallbackHandler", MemorySegment.class /* self */, MemorySegment.class /* Handle */, MemorySegment.class /* Handler */, MemorySegment.class /* Context */);
-
-    public void setCallbackHandler(MemorySegment Handle, MemorySegment Handler, MemorySegment Context) {
-        try {
-            setCallbackHandlerMH.invokeExact(MEMORY, (MemorySegment) (Handle == null ? MemorySegment.NULL : Handle), (MemorySegment) (Handler == null ? MemorySegment.NULL : Handler), (MemorySegment) (Context == null ? MemorySegment.NULL : Context));
-        } catch (Throwable THROWABLE) {
-            throw PanamaUtils.convertInvokeExactException(THROWABLE);
-        }
-    }
-
-    private static final MethodHandle setParamMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_QuicApiTable_setParam", MemorySegment.class /* self */, MemorySegment.class /* Handle */, int.class /* Param */, int.class /* BufferLength */, MemorySegment.class /* Buffer */);
-
-    public int setParam(MemorySegment Handle, int Param, int BufferLength, MemorySegment Buffer) {
-        int RESULT;
-        try {
-            RESULT = (int) setParamMH.invokeExact(MEMORY, (MemorySegment) (Handle == null ? MemorySegment.NULL : Handle), Param, BufferLength, (MemorySegment) (Buffer == null ? MemorySegment.NULL : Buffer));
-        } catch (Throwable THROWABLE) {
-            throw PanamaUtils.convertInvokeExactException(THROWABLE);
-        }
-        return RESULT;
-    }
-
-    private static final MethodHandle getParamMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_QuicApiTable_getParam", MemorySegment.class /* self */, MemorySegment.class /* Handle */, int.class /* Param */, MemorySegment.class /* BufferLength */, MemorySegment.class /* Buffer */);
-
-    public int getParam(MemorySegment Handle, int Param, IntArray BufferLength, MemorySegment Buffer) {
-        int RESULT;
-        try {
-            RESULT = (int) getParamMH.invokeExact(MEMORY, (MemorySegment) (Handle == null ? MemorySegment.NULL : Handle), Param, (MemorySegment) (BufferLength == null ? MemorySegment.NULL : BufferLength.MEMORY), (MemorySegment) (Buffer == null ? MemorySegment.NULL : Buffer));
-        } catch (Throwable THROWABLE) {
-            throw PanamaUtils.convertInvokeExactException(THROWABLE);
-        }
-        return RESULT;
-    }
-
     private static final MethodHandle openRegistrationMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), io.vproxy.msquic.QuicRegistration.LAYOUT.getClass(), "JavaCritical_io_vproxy_msquic_QuicApiTable_openRegistration", MemorySegment.class /* self */, io.vproxy.msquic.QuicRegistrationConfig.LAYOUT.getClass() /* Config */, MemorySegment.class /* returnStatus */, MemorySegment.class /* return */);
 
     public io.vproxy.msquic.QuicRegistration openRegistration(io.vproxy.msquic.QuicRegistrationConfig Config, IntArray returnStatus, Allocator ALLOCATOR) {
@@ -211,5 +154,5 @@ public class QuicApiTable extends AbstractNativeObject implements NativeObject {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.17
-// sha256:ba3e109ac4bc734f1f99147a38ee471f7c22e54febee4ea1e19d70aae1a64d92
+// metadata.generator-version: pni 21.0.0.18
+// sha256:8512b66a9088118fc0a8f28ef67f1838fd6ffa54a0baaff08e57f72b2c2454cc

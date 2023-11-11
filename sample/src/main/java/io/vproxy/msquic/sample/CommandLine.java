@@ -302,7 +302,8 @@ public class CommandLine {
         if (ticket != null) {
             var t = allocator.allocate(ticket.ticket.length);
             t.copyFrom(MemorySegment.ofArray(ticket.ticket));
-            err = conn.opts.apiTableQ.setParam(conn.connectionQ.getConn(), QUIC_PARAM_CONN_RESUMPTION_TICKET,
+            err = conn.connectionQ.setParam(
+                QUIC_PARAM_CONN_RESUMPTION_TICKET,
                 ticket.ticket.length, t);
             if (err != 0) {
                 conn.close();

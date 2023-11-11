@@ -34,14 +34,14 @@ class SampleConnectionCallback implements ConnectionCallback {
         var stream_ = new QuicStream(allocator);
         {
             stream_.setApi(conn.opts.apiTableQ.getApi());
-            stream_.setStream(streamHQUIC);
+            stream_.setHandle(streamHQUIC);
         }
         var stream = new Stream(new Stream.Options(conn, allocator,
             new StreamCallbackList()
                 .add(new LogStreamCallback())
                 .add(new SampleStreamCallback(cli)),
             stream_));
-        conn.opts.apiTableQ.setCallbackHandler(streamHQUIC, MsQuicUpcall.streamCallback, stream.ref.MEMORY);
+        stream_.setCallbackHandler(MsQuicUpcall.streamCallback, stream.ref.MEMORY);
         cli.registerStream(stream);
         return 0;
     }

@@ -10,15 +10,12 @@ import java.lang.foreign.MemorySegment;
     "msquic.h",
     "io_vproxy_msquic_MsQuicUpcall.h",
 })
-public abstract class PNIQuicRegistration {
-    MemorySegment Api; // QUIC_API_TABLE
-    MemorySegment Reg; // HQUIC
-
+public abstract class PNIQuicRegistration extends PNIQuicObjectBase {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC reg = self->Reg;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC reg = self->SUPER.Handle;
             api->RegistrationClose(reg);
             """
     )
@@ -28,8 +25,8 @@ public abstract class PNIQuicRegistration {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC reg = self->Reg;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC reg = self->SUPER.Handle;
                         
             api->RegistrationShutdown(reg, Flags, ErrorCode);
             """
@@ -40,8 +37,8 @@ public abstract class PNIQuicRegistration {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC reg = self->Reg;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC reg = self->SUPER.Handle;
                         
             HQUIC configuration;
             QUIC_STATUS res = api->ConfigurationOpen(
@@ -49,8 +46,8 @@ public abstract class PNIQuicRegistration {
             if (returnStatus != NULL)
                 *returnStatus = res;
             if (QUIC_SUCCEEDED(res)) {
-                return_->Api = api;
-                return_->Conf = configuration;
+                return_->SUPER.Api = api;
+                return_->SUPER.Handle = configuration;
                 return return_;
             }
             return NULL;
@@ -66,8 +63,8 @@ public abstract class PNIQuicRegistration {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC reg = self->Reg;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC reg = self->SUPER.Handle;
                         
             HQUIC lsn;
             QUIC_STATUS res = api->ListenerOpen(reg,
@@ -76,8 +73,8 @@ public abstract class PNIQuicRegistration {
             if (returnStatus != NULL)
                 *returnStatus = res;
             if (QUIC_SUCCEEDED(res)) {
-                return_->Api = api;
-                return_->Lsn = lsn;
+                return_->SUPER.Api = api;
+                return_->SUPER.Handle = lsn;
                 return return_;
             }
             return NULL;
@@ -89,8 +86,8 @@ public abstract class PNIQuicRegistration {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC reg = self->Reg;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC reg = self->SUPER.Handle;
                         
             HQUIC conn;
             QUIC_STATUS res = api->ConnectionOpen(reg,
@@ -99,8 +96,8 @@ public abstract class PNIQuicRegistration {
             if (returnStatus != NULL)
                 *returnStatus = res;
             if (QUIC_SUCCEEDED(res)) {
-                return_->Api = api;
-                return_->Conn = conn;
+                return_->SUPER.Api = api;
+                return_->SUPER.Handle = conn;
                 return return_;
             }
             return NULL;

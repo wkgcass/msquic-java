@@ -90,21 +90,6 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
         /* JavaCritical_io_vproxy_msquic_QuicApiTable_close */
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class /* self */));
 
-        /* JavaCritical_io_vproxy_msquic_QuicApiTable_setContext */
-        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class /* self */, MemorySegment.class /* Handle */, MemorySegment.class /* Context */));
-
-        /* JavaCritical_io_vproxy_msquic_QuicApiTable_getContext */
-        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(MemorySegment.class, MemorySegment.class /* self */, MemorySegment.class /* Handle */));
-
-        /* JavaCritical_io_vproxy_msquic_QuicApiTable_setCallbackHandler */
-        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class /* self */, MemorySegment.class /* Handle */, MemorySegment.class /* Handler */, MemorySegment.class /* Context */));
-
-        /* JavaCritical_io_vproxy_msquic_QuicApiTable_setParam */
-        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class, MemorySegment.class /* self */, MemorySegment.class /* Handle */, int.class /* Param */, int.class /* BufferLength */, MemorySegment.class /* Buffer */));
-
-        /* JavaCritical_io_vproxy_msquic_QuicApiTable_getParam */
-        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class, MemorySegment.class /* self */, MemorySegment.class /* Handle */, int.class /* Param */, MemorySegment.class /* BufferLength */, MemorySegment.class /* Buffer */));
-
         /* JavaCritical_io_vproxy_msquic_QuicApiTable_openRegistration */
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(MemoryLayout.class /* io.vproxy.msquic.QuicRegistration.LAYOUT.getClass() */, MemorySegment.class /* self */, MemoryLayout.class /* io.vproxy.msquic.QuicRegistrationConfig.LAYOUT.getClass() */ /* Config */, MemorySegment.class /* returnStatus */, MemorySegment.class /* return */));
 
@@ -150,6 +135,21 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
         /* JavaCritical_io_vproxy_msquic_QuicListener_stop */
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class /* self */));
 
+        /* JavaCritical_io_vproxy_msquic_QuicObjectBase_setContext */
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class /* self */, MemorySegment.class /* Context */));
+
+        /* JavaCritical_io_vproxy_msquic_QuicObjectBase_getContext */
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(MemorySegment.class, MemorySegment.class /* self */));
+
+        /* JavaCritical_io_vproxy_msquic_QuicObjectBase_setCallbackHandler */
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class /* self */, MemorySegment.class /* Handler */, MemorySegment.class /* Context */));
+
+        /* JavaCritical_io_vproxy_msquic_QuicObjectBase_setParam */
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class, MemorySegment.class /* self */, int.class /* Param */, int.class /* BufferLength */, MemorySegment.class /* Buffer */));
+
+        /* JavaCritical_io_vproxy_msquic_QuicObjectBase_getParam */
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class, MemorySegment.class /* self */, int.class /* Param */, MemorySegment.class /* BufferLength */, MemorySegment.class /* Buffer */));
+
         /* JavaCritical_io_vproxy_msquic_QuicRegistration_close */
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class /* self */));
 
@@ -185,4 +185,4 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
     }
 }
 // metadata.generator-version: pni 21.0.0.17
-// sha256:f0d837dfc695729186538a9c5d8f030c3c1da2341e1c07fb9c3e5caf5bef6796
+// sha256:3f9d2a4265351641923134d8cf35574d37bc61e4c444d2906c1df370686c2db2

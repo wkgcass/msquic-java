@@ -7,15 +7,12 @@ import java.lang.foreign.MemorySegment;
 @Struct
 @AlwaysAligned
 @Include("msquic.h")
-public abstract class PNIQuicConfiguration {
-    MemorySegment Api; // QUIC_API_TABLE
-    MemorySegment Conf; // HQUIC
-
+public abstract class PNIQuicConfiguration extends PNIQuicObjectBase {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC conf = self->Conf;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC conf = self->SUPER.Handle;
             api->ConfigurationClose(conf);
             """
     )
@@ -25,8 +22,8 @@ public abstract class PNIQuicConfiguration {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC conf = self->Conf;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC conf = self->SUPER.Handle;
                         
             QUIC_STATUS res = api->ConfigurationLoadCredential(conf, CredConfig);
             if (QUIC_SUCCEEDED(res)) {

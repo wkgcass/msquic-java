@@ -7,15 +7,12 @@ import java.lang.foreign.MemorySegment;
 @Struct
 @AlwaysAligned
 @Include("msquic.h")
-public abstract class PNIQuicListener {
-    MemorySegment Api; // QUIC_API_TABLE
-    MemorySegment Lsn; // HQUIC
-
+public abstract class PNIQuicListener extends PNIQuicObjectBase {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC lsn = self->Lsn;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC lsn = self->SUPER.Handle;
             api->ListenerClose(lsn);
             """
     )
@@ -25,8 +22,8 @@ public abstract class PNIQuicListener {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC lsn = self->Lsn;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC lsn = self->SUPER.Handle;
                         
             QUIC_STATUS res = api->ListenerStart(lsn, AlpnBuffers, AlpnBufferCount, Addr);
             if (QUIC_SUCCEEDED(res)) {
@@ -41,8 +38,8 @@ public abstract class PNIQuicListener {
     @Impl(
         // language="c"
         c = """
-            QUIC_API_TABLE* api = self->Api;
-            HQUIC lsn = self->Lsn;
+            QUIC_API_TABLE* api = self->SUPER.Api;
+            HQUIC lsn = self->SUPER.Handle;
             api->ListenerStop(lsn);
             """
     )

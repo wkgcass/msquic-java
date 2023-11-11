@@ -6,10 +6,10 @@ import java.lang.foreign.*;
 import java.lang.invoke.*;
 import java.nio.ByteBuffer;
 
-public class QuicStream extends AbstractNativeObject implements NativeObject {
+public class QuicStream extends io.vproxy.msquic.QuicObjectBase implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.ADDRESS.withName("Api"),
-        ValueLayout.ADDRESS.withName("Stream")
+        io.vproxy.msquic.QuicObjectBase.LAYOUT
+
     ).withByteAlignment(8);
     public final MemorySegment MEMORY;
 
@@ -18,48 +18,12 @@ public class QuicStream extends AbstractNativeObject implements NativeObject {
         return MEMORY;
     }
 
-    private static final VarHandle ApiVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Api")
-    );
-
-    public MemorySegment getApi() {
-        var SEG = (MemorySegment) ApiVH.get(MEMORY);
-        if (SEG.address() == 0) return null;
-        return SEG;
-    }
-
-    public void setApi(MemorySegment Api) {
-        if (Api == null) {
-            ApiVH.set(MEMORY, MemorySegment.NULL);
-        } else {
-            ApiVH.set(MEMORY, Api);
-        }
-    }
-
-    private static final VarHandle StreamVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Stream")
-    );
-
-    public MemorySegment getStream() {
-        var SEG = (MemorySegment) StreamVH.get(MEMORY);
-        if (SEG.address() == 0) return null;
-        return SEG;
-    }
-
-    public void setStream(MemorySegment Stream) {
-        if (Stream == null) {
-            StreamVH.set(MEMORY, MemorySegment.NULL);
-        } else {
-            StreamVH.set(MEMORY, Stream);
-        }
-    }
-
     public QuicStream(MemorySegment MEMORY) {
+        super(MEMORY);
         MEMORY = MEMORY.reinterpret(LAYOUT.byteSize());
         this.MEMORY = MEMORY;
         long OFFSET = 0;
-        OFFSET += ValueLayout.ADDRESS_UNALIGNED.byteSize();
-        OFFSET += ValueLayout.ADDRESS_UNALIGNED.byteSize();
+        OFFSET += io.vproxy.msquic.QuicObjectBase.LAYOUT.byteSize();
     }
 
     public QuicStream(Allocator ALLOCATOR) {
@@ -141,16 +105,25 @@ public class QuicStream extends AbstractNativeObject implements NativeObject {
             return;
         }
         SB.append("QuicStream{\n");
+        SB.append(" ".repeat(INDENT + 4)).append("SUPER => ");
         {
-            SB.append(" ".repeat(INDENT + 4)).append("Api => ");
-            SB.append(PanamaUtils.memorySegmentToString(getApi()));
+            INDENT += 4;
+            SB.append("QuicObjectBase{\n");
+            {
+                SB.append(" ".repeat(INDENT + 4)).append("Api => ");
+                SB.append(PanamaUtils.memorySegmentToString(getApi()));
+            }
+            SB.append(",\n");
+            {
+                SB.append(" ".repeat(INDENT + 4)).append("Handle => ");
+                SB.append(PanamaUtils.memorySegmentToString(getHandle()));
+            }
+            SB.append("\n");
+            SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
+            INDENT -= 4;
+            SB.append("\n");
+
         }
-        SB.append(",\n");
-        {
-            SB.append(" ".repeat(INDENT + 4)).append("Stream => ");
-            SB.append(PanamaUtils.memorySegmentToString(getStream()));
-        }
-        SB.append("\n");
         SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
@@ -224,5 +197,5 @@ public class QuicStream extends AbstractNativeObject implements NativeObject {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.17
-// sha256:dc261730a2456530f7324da69c4c9f7db861bd0b4f0b5d79c2f2447ab4850339
+// metadata.generator-version: pni 21.0.0.18
+// sha256:63d9f2f30bb65e83d5c25dde8c252c48f1e1130662b8d9d8ff7383054e7a2344

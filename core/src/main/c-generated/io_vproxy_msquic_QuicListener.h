@@ -16,6 +16,7 @@ typedef struct QuicListener QuicListener;
 #include <jni.h>
 #include <pni.h>
 #include "msquic.h"
+#include "io_vproxy_msquic_QuicObjectBase.h"
 #include "io_vproxy_msquic_QuicBuffer.h"
 #include "io_vproxy_msquic_QuicAddr.h"
 
@@ -27,8 +28,7 @@ PNIEnvExpand(QuicListener, QuicListener *)
 PNIBufExpand(QuicListener, QuicListener, 16)
 
 struct QuicListener {
-    void * Api;
-    void * Lsn;
+    QuicObjectBase SUPER;
 };
 
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicListener_close(QuicListener * self);
@@ -39,5 +39,5 @@ JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicListener_stop(QuicListe
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicListener
-// metadata.generator-version: pni 21.0.0.13
-// sha256:a6421de0c2214d38d04b12300c9dc36d661abf48635fdb0d728047a205ec6c0d
+// metadata.generator-version: pni 21.0.0.17
+// sha256:bb27eaac2026863e730e8c013663340cc0891d641144ee05427af26655c381f8

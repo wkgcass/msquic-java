@@ -11,10 +11,10 @@ import org.graalvm.nativeimage.c.function.*;
 import org.graalvm.nativeimage.c.type.VoidPointer;
 import org.graalvm.word.WordFactory;
 
-public class QuicRegistration extends AbstractNativeObject implements NativeObject {
+public class QuicRegistration extends io.vproxy.msquic.QuicObjectBase implements NativeObject {
     public static final MemoryLayout LAYOUT = MemoryLayout.structLayout(
-        ValueLayout.ADDRESS.withName("Api"),
-        ValueLayout.ADDRESS.withName("Reg")
+        io.vproxy.msquic.QuicObjectBase.LAYOUT
+
     ).withByteAlignment(8);
     public final MemorySegment MEMORY;
 
@@ -23,48 +23,12 @@ public class QuicRegistration extends AbstractNativeObject implements NativeObje
         return MEMORY;
     }
 
-    private static final VarHandle ApiVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Api")
-    );
-
-    public MemorySegment getApi() {
-        var SEG = (MemorySegment) ApiVH.get(MEMORY);
-        if (SEG.address() == 0) return null;
-        return SEG;
-    }
-
-    public void setApi(MemorySegment Api) {
-        if (Api == null) {
-            ApiVH.set(MEMORY, MemorySegment.NULL);
-        } else {
-            ApiVH.set(MEMORY, Api);
-        }
-    }
-
-    private static final VarHandle RegVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Reg")
-    );
-
-    public MemorySegment getReg() {
-        var SEG = (MemorySegment) RegVH.get(MEMORY);
-        if (SEG.address() == 0) return null;
-        return SEG;
-    }
-
-    public void setReg(MemorySegment Reg) {
-        if (Reg == null) {
-            RegVH.set(MEMORY, MemorySegment.NULL);
-        } else {
-            RegVH.set(MEMORY, Reg);
-        }
-    }
-
     public QuicRegistration(MemorySegment MEMORY) {
+        super(MEMORY);
         MEMORY = MEMORY.reinterpret(LAYOUT.byteSize());
         this.MEMORY = MEMORY;
         long OFFSET = 0;
-        OFFSET += ValueLayout.ADDRESS_UNALIGNED.byteSize();
-        OFFSET += ValueLayout.ADDRESS_UNALIGNED.byteSize();
+        OFFSET += io.vproxy.msquic.QuicObjectBase.LAYOUT.byteSize();
     }
 
     public QuicRegistration(Allocator ALLOCATOR) {
@@ -137,16 +101,25 @@ public class QuicRegistration extends AbstractNativeObject implements NativeObje
             return;
         }
         SB.append("QuicRegistration{\n");
+        SB.append(" ".repeat(INDENT + 4)).append("SUPER => ");
         {
-            SB.append(" ".repeat(INDENT + 4)).append("Api => ");
-            SB.append(PanamaUtils.memorySegmentToString(getApi()));
+            INDENT += 4;
+            SB.append("QuicObjectBase{\n");
+            {
+                SB.append(" ".repeat(INDENT + 4)).append("Api => ");
+                SB.append(PanamaUtils.memorySegmentToString(getApi()));
+            }
+            SB.append(",\n");
+            {
+                SB.append(" ".repeat(INDENT + 4)).append("Handle => ");
+                SB.append(PanamaUtils.memorySegmentToString(getHandle()));
+            }
+            SB.append("\n");
+            SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
+            INDENT -= 4;
+            SB.append("\n");
+
         }
-        SB.append(",\n");
-        {
-            SB.append(" ".repeat(INDENT + 4)).append("Reg => ");
-            SB.append(PanamaUtils.memorySegmentToString(getReg()));
-        }
-        SB.append("\n");
         SB.append(" ".repeat(INDENT)).append("}@").append(Long.toString(MEMORY.address(), 16));
     }
 
@@ -220,5 +193,5 @@ public class QuicRegistration extends AbstractNativeObject implements NativeObje
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.17
-// sha256:59bec9c82e0901f43a76124b81c7de2e79c4d623a8bbced20a24b5b28406ad80
+// metadata.generator-version: pni 21.0.0.18
+// sha256:2848cdb3f4af4d2afa2409ba3414a80eb6caf2e82c7aec49b0db3a8517d8bc7c
