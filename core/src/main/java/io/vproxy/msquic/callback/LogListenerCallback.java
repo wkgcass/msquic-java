@@ -1,5 +1,6 @@
 package io.vproxy.msquic.callback;
 
+import io.vproxy.base.util.LogType;
 import io.vproxy.base.util.Logger;
 import io.vproxy.base.util.bytearray.MemorySegmentByteArray;
 import io.vproxy.msquic.MsQuicUtils;
@@ -25,14 +26,14 @@ public class LogListenerCallback implements ListenerCallback {
 
     @Override
     public int newConnection(Listener listener, QuicListenerEventNewConnection data) {
-        Logger.alert(STR."QUIC_LISTENER_EVENT_NEW_CONNECTION: \{listener}");
-        Logger.alert(STR."\{data}");
+        Logger.trace(LogType.ALERT, STR."QUIC_LISTENER_EVENT_NEW_CONNECTION: \{listener}");
+        Logger.trace(LogType.ALERT, STR."\{data}");
         var info = data.getInfo();
         {
-            Logger.alert(STR."LocalAddress: \{MsQuicUtils.convertQuicAddrToIPPort(info.getLocalAddress())}");
+            Logger.trace(LogType.ALERT, STR."LocalAddress: \{MsQuicUtils.convertQuicAddrToIPPort(info.getLocalAddress())}");
         }
         {
-            Logger.alert(STR."RemoteAddress: \{MsQuicUtils.convertQuicAddrToIPPort(info.getRemoteAddress())}");
+            Logger.trace(LogType.ALERT, STR."RemoteAddress: \{MsQuicUtils.convertQuicAddrToIPPort(info.getRemoteAddress())}");
         }
 
         if (!withData) {
@@ -41,34 +42,34 @@ public class LogListenerCallback implements ListenerCallback {
 
         {
             var buffer = info.getCryptoBuffer().reinterpret(info.getCryptoBufferLength());
-            Logger.alert(STR."CryptoBuffer:\n\{new MemorySegmentByteArray(buffer).hexDump()}");
+            Logger.trace(LogType.ALERT, STR."CryptoBuffer:\n\{new MemorySegmentByteArray(buffer).hexDump()}");
         }
         {
             var alpn = info.getClientAlpnList().reinterpret(info.getClientAlpnListLength());
-            Logger.alert(STR."ClientAlpnList:\n\{new MemorySegmentByteArray(alpn).hexDump()}");
+            Logger.trace(LogType.ALERT, STR."ClientAlpnList:\n\{new MemorySegmentByteArray(alpn).hexDump()}");
         }
         {
             var negotiatedAlpn = info.getNegotiatedAlpn().reinterpret(info.getNegotiatedAlpnLength());
-            Logger.alert(STR."NegotiatedAlpn:\n\{new MemorySegmentByteArray(negotiatedAlpn).hexDump()}");
+            Logger.trace(LogType.ALERT, STR."NegotiatedAlpn:\n\{new MemorySegmentByteArray(negotiatedAlpn).hexDump()}");
         }
         return QUIC_STATUS_NOT_SUPPORTED;
     }
 
     @Override
     public int stopComplete(Listener listener, QuicListenerEventStopComplete data) {
-        Logger.alert(STR."QUIC_LISTENER_EVENT_STOP_COMPLETE: \{listener}");
-        Logger.alert(STR."\{data}");
+        Logger.trace(LogType.ALERT, STR."QUIC_LISTENER_EVENT_STOP_COMPLETE: \{listener}");
+        Logger.trace(LogType.ALERT, STR."\{data}");
         return QUIC_STATUS_NOT_SUPPORTED;
     }
 
     @Override
     public int unknown(Listener listener, QuicListenerEvent event) {
-        Logger.alert(STR."QUIC_LISTENER_EVENT: UNKNOWN \{event.getType()}: \{listener}");
+        Logger.trace(LogType.ALERT, STR."QUIC_LISTENER_EVENT: UNKNOWN \{event.getType()}: \{listener}");
         return QUIC_STATUS_NOT_SUPPORTED;
     }
 
     @Override
     public void closed(Listener listener) {
-        Logger.alert(STR."QUIC_LISTENER: CLOSED: \{listener}");
+        Logger.trace(LogType.ALERT, STR."QUIC_LISTENER: CLOSED: \{listener}");
     }
 }
