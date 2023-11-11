@@ -22,10 +22,11 @@ JNIEXPORT void JNICALL MsQuicSetThreadCountLimit(uint32_t limit);
 JNIEXPORT QUIC_STATUS JNICALL MsQuicSetEventLoopThreadDispatcher(QUIC_EVENT_LOOP_THREAD_DISPATCH_FN dispatcher);
 JNIEXPORT QUIC_STATUS JNICALL CxPlatGetCurThread(CXPLAT_THREAD* Thread);
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_MsQuicMod_INVOKE_LPTHREAD_START_ROUTINE(void * Callback, void * Context);
+JNIEXPORT void JNICALL MsQuicSetIsWorker(uint8_t isWorker);
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_MsQuicMod
 // metadata.generator-version: pni 21.0.0.17
-// sha256:cb62af6d9a6eec9cd34956b68e4809cbee250c432dbe555a6917182436314a4f
+// sha256:b987d2d8f9f40321d08c71d20ebedc7eb03e55506a92b52424ae71676faeb861

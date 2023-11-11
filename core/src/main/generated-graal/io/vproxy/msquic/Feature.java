@@ -40,6 +40,9 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
         /* JavaCritical_io_vproxy_msquic_MsQuicMod_INVOKE_LPTHREAD_START_ROUTINE */
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class /* Callback */, MemorySegment.class /* Context */));
 
+        /* MsQuicSetIsWorker */
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, boolean.class /* isWorker */));
+
         /* graal upcall for io.vproxy.msquic.MsQuicModUpcall */
         RuntimeClassInitialization.initializeAtBuildTime(io.vproxy.msquic.MsQuicModUpcall.class);
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class), PanamaHack.getCriticalOption());
@@ -182,4 +185,4 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
     }
 }
 // metadata.generator-version: pni 21.0.0.17
-// sha256:cbebcbd4734f7d9a1746fa0698b1810bf91b2daad6c105d20836faba601d2132
+// sha256:f0d837dfc695729186538a9c5d8f030c3c1da2341e1c07fb9c3e5caf5bef6796

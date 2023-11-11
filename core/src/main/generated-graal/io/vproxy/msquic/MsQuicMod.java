@@ -64,6 +64,16 @@ public class MsQuicMod {
             throw PanamaUtils.convertInvokeExactException(THROWABLE);
         }
     }
+
+    private static final MethodHandle MsQuicSetIsWorkerMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "MsQuicSetIsWorker", boolean.class /* isWorker */);
+
+    public void MsQuicSetIsWorker(boolean isWorker) {
+        try {
+            MsQuicSetIsWorkerMH.invokeExact(isWorker);
+        } catch (Throwable THROWABLE) {
+            throw PanamaUtils.convertInvokeExactException(THROWABLE);
+        }
+    }
 }
 // metadata.generator-version: pni 21.0.0.18
-// sha256:20431be468f585ee49cbafdd2d7d43fad6f425859a8a4a49bf5093ca1102859e
+// sha256:7134426a86c6cc7ba2fc45296e0117391bd05623112989cf487630a826ad7690

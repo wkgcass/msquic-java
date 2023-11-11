@@ -51,6 +51,10 @@ interface PNIMsQuicMod {
     )
     @Style(Styles.critical)
     void INVOKE_LPTHREAD_START_ROUTINE(MemorySegment Callback, MemorySegment Context);
+
+    @Style(Styles.critical)
+    @Name("MsQuicSetIsWorker")
+    void MsQuicSetIsWorker(boolean isWorker);
 }
 
 @Upcall
