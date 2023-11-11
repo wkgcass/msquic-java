@@ -169,7 +169,7 @@ project(':core') {
     dependencies {
         api 'io.vproxy:pni-api-jdk21:' + PNI_API_VERSION
         api 'io.vproxy:pni-api-graal:' + PNI_API_VERSION
-        api 'io.vproxy:commons:1.2.0'
+        api 'io.vproxy:commons:1.2.1'
         compileOnly group: 'io.vproxy', name: 'graal-sdk-mock-nativeimage', version: '1.2.1'
         runtimeOnly group: 'io.vproxy', name: 'graal-sdk-mock-runtime', version: '1.2.1'
     }

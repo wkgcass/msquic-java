@@ -163,7 +163,7 @@ public class Client {
             if (err != 0) {
                 System.out.println("failed to set QuicTlsSecret for debugging");
             }
-            err = conn.start(conf, QUIC_ADDRESS_FAMILY_INET, new IPPort(host, port));
+            err = conn.start(conf, new IPPort(host, port));
             if (err != 0) {
                 conn.close();
                 throw new RuntimeException("ConnectionStart failed");

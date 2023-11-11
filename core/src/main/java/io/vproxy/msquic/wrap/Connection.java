@@ -9,6 +9,7 @@ import io.vproxy.pni.PNIRef;
 import io.vproxy.pni.PNIString;
 import io.vproxy.pni.array.IntArray;
 import io.vproxy.vfd.IPPort;
+import io.vproxy.vfd.IPv4;
 
 import java.util.function.Function;
 
@@ -46,13 +47,25 @@ public class Connection {
         }
     }
 
-    public int start(Configuration conf, int addressFamily, IPPort target) {
+    public int start(Configuration conf, IPPort target) {
         canCallClose = false; // set first, in case the callback immediately calls close()
 
         int res;
         try (var allocator = Allocator.ofConfined()) {
+            var remoteAddress = MsQuicUtils.convertIPPortToQuicAddr(target, allocator);
+
+            opts.apiTableQ.setParam(connectionQ.getConn(),
+                QUIC_PARAM_CONN_REMOTE_ADDRESS,
+                (int) remoteAddress.MEMORY.byteSize(), remoteAddress.MEMORY);
+
+            int addressFamily = target.getAddress() instanceof IPv4
+                ? QUIC_ADDRESS_FAMILY_INET
+                : QUIC_ADDRESS_FAMILY_INET6;
             res = connectionQ.start(conf.opts.configurationQ, addressFamily,
-                new PNIString(allocator, target.getAddress().formatToIPString()), target.getPort());
+                target.getAddress().getHostName() == null
+                    ? null
+                    : new PNIString(allocator, target.getAddress().getHostName()),
+                target.getPort());
         }
         if (res != 0) { // res != 0 means starting failed, the callbacks will never be called
             canCallClose = true;

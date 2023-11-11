@@ -316,7 +316,7 @@ public class CommandLine {
             stream.send(QUIC_SEND_FLAG_ALLOW_0_RTT, alloc,
                 str.MEMORY.reinterpret(str.MEMORY.byteSize() - 1));
         }
-        err = conn.start(configuration, QUIC_ADDRESS_FAMILY_INET, new IPPort(host, port));
+        err = conn.start(configuration, new IPPort(host, port));
         if (err != 0) {
             conn.close();
             throw new RuntimeException("ConnectionStart failed");
