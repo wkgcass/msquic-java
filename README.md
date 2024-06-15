@@ -1,5 +1,11 @@
 # msquic-java
 
+## prerequists
+
+1. At least JDK 21
+2. Follow the instructions [modify-gradle-compiler-args](https://github.com/vproxy-tools/modify-gradle-compiler-args) to install the java-agent for Gradle
+3. Clone and compile the [modified msquic](https://github.com/wkgcass/msquic/blob/modified/README_MODIFIED.md)
+
 ## tasks
 
 * `pniGenerate`: generate files
