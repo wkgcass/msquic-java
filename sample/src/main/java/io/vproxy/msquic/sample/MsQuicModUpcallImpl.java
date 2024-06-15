@@ -28,7 +28,7 @@ public class MsQuicModUpcallImpl implements MsQuicModUpcall.Interface {
 
         new Thread(() -> {
             GraalUtils.setThread();
-            Logger.alert(STR."new msquic thread spawn: \{java.lang.Thread.currentThread()}");
+            Logger.alert("new msquic thread spawn: " + java.lang.Thread.currentThread());
 
             MsQuicMod.get().CxPlatGetCurThread(Thread);
             latch.countDown();

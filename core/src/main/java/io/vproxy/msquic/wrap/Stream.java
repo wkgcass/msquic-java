@@ -234,7 +234,7 @@ public class Stream {
             case QUIC_STREAM_EVENT_START_COMPLETE -> {
                 var data = event.getUnion().getSTART_COMPLETE();
                 if (data.getStatus() != 0) {
-                    Logger.error(LogType.CONN_ERROR, STR."StreamStart failed, status: \{data.getStatus()}, stream: \{this}");
+                    Logger.error(LogType.CONN_ERROR, "StreamStart failed, status: " + data.getStatus() + ", stream: " + this);
                     canCallClose = true;
                     shutdown();
                     yield 0;

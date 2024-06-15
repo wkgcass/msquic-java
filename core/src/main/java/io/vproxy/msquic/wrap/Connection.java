@@ -195,13 +195,13 @@ public class Connection {
                     if (ok == 0) {
                         localAddress = MsQuicUtils.convertQuicAddrToIPPort(addr);
                     } else {
-                        Logger.error(LogType.CONN_ERROR, STR."[MsQuicJava] failed to retrieve local address from connection \{connectionQ.getHandle().address()}");
+                        Logger.error(LogType.CONN_ERROR, "[MsQuicJava] failed to retrieve local address from connection " + connectionQ.getHandle().address());
                     }
                     ok = connectionQ.getParam(QUIC_PARAM_CONN_REMOTE_ADDRESS, size, addr.MEMORY);
                     if (ok == 0) {
                         remoteAddress = MsQuicUtils.convertQuicAddrToIPPort(addr);
                     } else {
-                        Logger.error(LogType.CONN_ERROR, STR."[MsQuicJava] failed to retrieve remote address from connection \{connectionQ.getHandle().address()}");
+                        Logger.error(LogType.CONN_ERROR, "[MsQuicJava] failed to retrieve remote address from connection " + connectionQ.getHandle().address());
                     }
                 }
 

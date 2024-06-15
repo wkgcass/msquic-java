@@ -44,7 +44,7 @@ public class SampleStreamCallback implements StreamCallback {
                 Thread.sleep(2_000);
             } catch (InterruptedException ignore) {
             }
-            Logger.warn(LogType.ALERT, STR."calling StreamReceiveComplete with len \{len}");
+            Logger.warn(LogType.ALERT, "calling StreamReceiveComplete with len " + len);
             stream.streamQ.receiveComplete(len);
         }).start();
         data.setTotalBufferLength(0);

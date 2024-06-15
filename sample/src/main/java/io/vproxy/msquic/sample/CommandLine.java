@@ -72,7 +72,7 @@ public class CommandLine {
         MemorySegment.ofArray(b).copyFrom(ticket);
         var t = new ResumptionTicket(b, remote);
         resumptionTickets.add(t);
-        Logger.alert(STR."[\{resumptionTickets.size() - 1}] \{t}");
+        Logger.alert("[" + (resumptionTickets.size() - 1) + " + ] " + t);
     }
 
     public synchronized void removeResumptionTicket(int index) {

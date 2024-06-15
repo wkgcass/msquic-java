@@ -26,14 +26,14 @@ public class LogListenerCallback implements ListenerCallback {
 
     @Override
     public int newConnection(Listener listener, QuicListenerEventNewConnection data) {
-        Logger.trace(LogType.ALERT, STR."QUIC_LISTENER_EVENT_NEW_CONNECTION: \{listener}");
-        Logger.trace(LogType.ALERT, STR."\{data}");
+        Logger.trace(LogType.ALERT, "QUIC_LISTENER_EVENT_NEW_CONNECTION: " + listener);
+        Logger.trace(LogType.ALERT, "" + data);
         var info = data.getInfo();
         {
-            Logger.trace(LogType.ALERT, STR."LocalAddress: \{MsQuicUtils.convertQuicAddrToIPPort(info.getLocalAddress())}");
+            Logger.trace(LogType.ALERT, "LocalAddress: " + MsQuicUtils.convertQuicAddrToIPPort(info.getLocalAddress()));
         }
         {
-            Logger.trace(LogType.ALERT, STR."RemoteAddress: \{MsQuicUtils.convertQuicAddrToIPPort(info.getRemoteAddress())}");
+            Logger.trace(LogType.ALERT, "RemoteAddress: " + MsQuicUtils.convertQuicAddrToIPPort(info.getRemoteAddress()));
         }
 
         if (!withData) {
@@ -42,34 +42,34 @@ public class LogListenerCallback implements ListenerCallback {
 
         {
             var buffer = info.getCryptoBuffer().reinterpret(info.getCryptoBufferLength());
-            Logger.trace(LogType.ALERT, STR."CryptoBuffer:\n\{new MemorySegmentByteArray(buffer).hexDump()}");
+            Logger.trace(LogType.ALERT, "CryptoBuffer:\n" + new MemorySegmentByteArray(buffer).hexDump());
         }
         {
             var alpn = info.getClientAlpnList().reinterpret(info.getClientAlpnListLength());
-            Logger.trace(LogType.ALERT, STR."ClientAlpnList:\n\{new MemorySegmentByteArray(alpn).hexDump()}");
+            Logger.trace(LogType.ALERT, "ClientAlpnList:\n" + new MemorySegmentByteArray(alpn).hexDump());
         }
         {
             var negotiatedAlpn = info.getNegotiatedAlpn().reinterpret(info.getNegotiatedAlpnLength());
-            Logger.trace(LogType.ALERT, STR."NegotiatedAlpn:\n\{new MemorySegmentByteArray(negotiatedAlpn).hexDump()}");
+            Logger.trace(LogType.ALERT, "NegotiatedAlpn:\n" + new MemorySegmentByteArray(negotiatedAlpn).hexDump());
         }
         return QUIC_STATUS_NOT_SUPPORTED;
     }
 
     @Override
     public int stopComplete(Listener listener, QuicListenerEventStopComplete data) {
-        Logger.trace(LogType.ALERT, STR."QUIC_LISTENER_EVENT_STOP_COMPLETE: \{listener}");
-        Logger.trace(LogType.ALERT, STR."\{data}");
+        Logger.trace(LogType.ALERT, "QUIC_LISTENER_EVENT_STOP_COMPLETE: " + listener);
+        Logger.trace(LogType.ALERT, "" + data);
         return QUIC_STATUS_NOT_SUPPORTED;
     }
 
     @Override
     public int unknown(Listener listener, QuicListenerEvent event) {
-        Logger.trace(LogType.ALERT, STR."QUIC_LISTENER_EVENT: UNKNOWN \{event.getType()}: \{listener}");
+        Logger.trace(LogType.ALERT, "QUIC_LISTENER_EVENT: UNKNOWN " + event.getType() + ": " + listener);
         return QUIC_STATUS_NOT_SUPPORTED;
     }
 
     @Override
     public void closed(Listener listener) {
-        Logger.trace(LogType.ALERT, STR."QUIC_LISTENER: CLOSED: \{listener}");
+        Logger.trace(LogType.ALERT, "QUIC_LISTENER: CLOSED: " + listener);
     }
 }

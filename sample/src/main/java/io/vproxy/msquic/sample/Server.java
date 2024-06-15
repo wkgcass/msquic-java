@@ -150,7 +150,7 @@ public class Server {
             conn_.setCallbackHandler(MsQuicUpcall.connectionCallback, conn.ref.MEMORY);
             var err = conn_.setConfiguration(conf.opts.configurationQ);
             if (err != 0) {
-                Logger.error(LogType.ALERT, STR."set configuration to connection failed: \{err}");
+                Logger.error(LogType.ALERT, "set configuration to connection failed: " + err);
                 conn.close();
                 return err;
             }

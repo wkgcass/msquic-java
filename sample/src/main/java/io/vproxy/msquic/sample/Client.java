@@ -143,7 +143,7 @@ public class Client {
                 return;
             }
         }
-        System.out.println(STR."SSLKEYLOGFILE for current process: \{path}");
+        System.out.println("SSLKEYLOGFILE for current process: " + path);
         var cli = new CommandLine(true, reg, conf, path);
 
         System.out.println("Init Connection begin ...");
