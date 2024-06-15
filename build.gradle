@@ -1,7 +1,7 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 buildscript {
-    def PNI_VERSION = '21.0.0.18'
+    def PNI_VERSION = '21.0.0.20'
     ext.set("PNI_VERSION", PNI_VERSION)
 
     repositories {
