@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.graal.*;
 import io.vproxy.r.org.graalvm.nativeimage.*;
 import java.lang.foreign.*;
@@ -16,6 +17,8 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
         RuntimeClassInitialization.initializeAtBuildTime(GraalPNIFunc.class);
         RuntimeClassInitialization.initializeAtBuildTime(GraalPNIRef.class);
         RuntimeClassInitialization.initializeAtBuildTime(PanamaHack.class);
+        RuntimeClassInitialization.initializeAtBuildTime(GetSetUtf8String.implClass());
+        RuntimeClassInitialization.initializeAtBuildTime(VarHandleW.implClass());
         /* ImageInfo */
         RuntimeClassInitialization.initializeAtRunTime(ImageInfoDelegate.class);
         for (var m : ImageInfo.class.getMethods()) {
@@ -184,5 +187,5 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class, MemorySegment.class /* self */, boolean.class /* IsEnabled */));
     }
 }
-// metadata.generator-version: pni 21.0.0.17
-// sha256:3f9d2a4265351641923134d8cf35574d37bc61e4c444d2906c1df370686c2db2
+// metadata.generator-version: pni 21.0.0.20
+// sha256:cb32e1a6eb9ed93a16146897b04f632c5979b173f2e71ffeca8995e1ba332eb4

@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -22,12 +23,14 @@ public class QuicConnectionEventPeerNeedsStreams extends AbstractNativeObject im
         return MEMORY;
     }
 
-    private static final VarHandle BidirectionalVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Bidirectional")
+    private static final VarHandleW BidirectionalVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Bidirectional")
+        )
     );
 
     public boolean isBidirectional() {
-        return (boolean) BidirectionalVH.get(MEMORY);
+        return BidirectionalVH.getBool(MEMORY);
     }
 
     public void setBidirectional(boolean Bidirectional) {
@@ -130,5 +133,5 @@ public class QuicConnectionEventPeerNeedsStreams extends AbstractNativeObject im
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.18
-// sha256:83f91d4e92f3088c7b196bef05e66f763132fa41ca5eda2b61646e1357e7c7b9
+// metadata.generator-version: pni 21.0.0.20
+// sha256:8d31f5d97973d5d31733c8c7d6c2f93753cb72b4bd125dc9a9d003095aa7cad2

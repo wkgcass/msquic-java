@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -22,12 +23,14 @@ public class QuicConnectionEventLocalAddressChanged extends AbstractNativeObject
         return MEMORY;
     }
 
-    private static final VarHandle AddressVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Address")
+    private static final VarHandleW AddressVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Address")
+        )
     );
 
     public io.vproxy.msquic.QuicAddr getAddress() {
-        var SEG = (MemorySegment) AddressVH.get(MEMORY);
+        var SEG = AddressVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return new io.vproxy.msquic.QuicAddr(SEG);
     }
@@ -137,5 +140,5 @@ public class QuicConnectionEventLocalAddressChanged extends AbstractNativeObject
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:3a7047a7917069a4105df4601c08c924b8830945c8d8313ba6ae7b4790f3f352
+// metadata.generator-version: pni 21.0.0.20
+// sha256:8f7aa0bb77b679ae1912f77ed9cf1bd4f39b61da4f24c7a70b2cb83dfc2b5d9a

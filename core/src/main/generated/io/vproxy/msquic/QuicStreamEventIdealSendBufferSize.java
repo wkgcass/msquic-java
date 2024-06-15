@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -17,12 +18,14 @@ public class QuicStreamEventIdealSendBufferSize extends AbstractNativeObject imp
         return MEMORY;
     }
 
-    private static final VarHandle ByteCountVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("ByteCount")
+    private static final VarHandleW ByteCountVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("ByteCount")
+        )
     );
 
     public long getByteCount() {
-        return (long) ByteCountVH.get(MEMORY);
+        return ByteCountVH.getLong(MEMORY);
     }
 
     public void setByteCount(long ByteCount) {
@@ -125,5 +128,5 @@ public class QuicStreamEventIdealSendBufferSize extends AbstractNativeObject imp
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.15
-// sha256:403ee0ff7a738cfe5f660f2a3c192c7108eb19f7859d9012a399aef4534660fc
+// metadata.generator-version: pni 21.0.0.20
+// sha256:c5dbf158914f705b22f3e71df7f9cf64d44a82d54157467953d50de715b4a964

@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -24,12 +25,14 @@ public class QuicConnectionEventPeerStreamStarted extends AbstractNativeObject i
         return MEMORY;
     }
 
-    private static final VarHandle StreamVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Stream")
+    private static final VarHandleW StreamVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Stream")
+        )
     );
 
     public MemorySegment getStream() {
-        var SEG = (MemorySegment) StreamVH.get(MEMORY);
+        var SEG = StreamVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return SEG;
     }
@@ -42,12 +45,14 @@ public class QuicConnectionEventPeerStreamStarted extends AbstractNativeObject i
         }
     }
 
-    private static final VarHandle FlagsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Flags")
+    private static final VarHandleW FlagsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Flags")
+        )
     );
 
     public int getFlags() {
-        return (int) FlagsVH.get(MEMORY);
+        return FlagsVH.getInt(MEMORY);
     }
 
     public void setFlags(int Flags) {
@@ -157,5 +162,5 @@ public class QuicConnectionEventPeerStreamStarted extends AbstractNativeObject i
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:c92836cabcec96198061489fa08b42b055e8480e1ee50db4732d2df390395de3
+// metadata.generator-version: pni 21.0.0.20
+// sha256:a31cc6dc88a31177b8eee946ccc27bc8f4eedb05f3bb10efce1d2cbef046cf63

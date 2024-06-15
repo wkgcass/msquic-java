@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -24,12 +25,14 @@ public class QuicRegistrationConfig extends AbstractNativeObject implements Nati
         return MEMORY;
     }
 
-    private static final VarHandle AppNameVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("AppName")
+    private static final VarHandleW AppNameVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("AppName")
+        )
     );
 
     public PNIString getAppName() {
-        var SEG = (MemorySegment) AppNameVH.get(MEMORY);
+        var SEG = AppNameVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return new PNIString(SEG);
     }
@@ -46,12 +49,14 @@ public class QuicRegistrationConfig extends AbstractNativeObject implements Nati
         }
     }
 
-    private static final VarHandle ExecutionProfileVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("ExecutionProfile")
+    private static final VarHandleW ExecutionProfileVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("ExecutionProfile")
+        )
     );
 
     public int getExecutionProfile() {
-        return (int) ExecutionProfileVH.get(MEMORY);
+        return ExecutionProfileVH.getInt(MEMORY);
     }
 
     public void setExecutionProfile(int ExecutionProfile) {
@@ -162,5 +167,5 @@ public class QuicRegistrationConfig extends AbstractNativeObject implements Nati
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:a865c83d5a0100bb512f0c79d698d8eb031538c2b503166d1e40d6fcdf07533a
+// metadata.generator-version: pni 21.0.0.20
+// sha256:5a44a35beebb9213052867355725de8321b6e5420227512f41a5506b683c5f0e

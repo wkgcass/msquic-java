@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -25,24 +26,28 @@ public class QuicCredentialConfig extends AbstractNativeObject implements Native
         return MEMORY;
     }
 
-    private static final VarHandle TypeVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Type")
+    private static final VarHandleW TypeVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Type")
+        )
     );
 
     public int getType() {
-        return (int) TypeVH.get(MEMORY);
+        return TypeVH.getInt(MEMORY);
     }
 
     public void setType(int Type) {
         TypeVH.set(MEMORY, Type);
     }
 
-    private static final VarHandle FlagsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Flags")
+    private static final VarHandleW FlagsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Flags")
+        )
     );
 
     public int getFlags() {
-        return (int) FlagsVH.get(MEMORY);
+        return FlagsVH.getInt(MEMORY);
     }
 
     public void setFlags(int Flags) {
@@ -55,12 +60,14 @@ public class QuicCredentialConfig extends AbstractNativeObject implements Native
         return this.Certificate;
     }
 
-    private static final VarHandle PrincipleVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Principle")
+    private static final VarHandleW PrincipleVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Principle")
+        )
     );
 
     public PNIString getPrinciple() {
-        var SEG = (MemorySegment) PrincipleVH.get(MEMORY);
+        var SEG = PrincipleVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return new PNIString(SEG);
     }
@@ -77,12 +84,14 @@ public class QuicCredentialConfig extends AbstractNativeObject implements Native
         }
     }
 
-    private static final VarHandle ReservedVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Reserved")
+    private static final VarHandleW ReservedVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Reserved")
+        )
     );
 
     public MemorySegment getReserved() {
-        var SEG = (MemorySegment) ReservedVH.get(MEMORY);
+        var SEG = ReservedVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return SEG;
     }
@@ -95,12 +104,14 @@ public class QuicCredentialConfig extends AbstractNativeObject implements Native
         }
     }
 
-    private static final VarHandle AsyncHandlerVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("AsyncHandler")
+    private static final VarHandleW AsyncHandlerVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("AsyncHandler")
+        )
     );
 
     public MemorySegment getAsyncHandler() {
-        var SEG = (MemorySegment) AsyncHandlerVH.get(MEMORY);
+        var SEG = AsyncHandlerVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return SEG;
     }
@@ -113,24 +124,28 @@ public class QuicCredentialConfig extends AbstractNativeObject implements Native
         }
     }
 
-    private static final VarHandle AllowedCipherSuitesVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("AllowedCipherSuites")
+    private static final VarHandleW AllowedCipherSuitesVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("AllowedCipherSuites")
+        )
     );
 
     public int getAllowedCipherSuites() {
-        return (int) AllowedCipherSuitesVH.get(MEMORY);
+        return AllowedCipherSuitesVH.getInt(MEMORY);
     }
 
     public void setAllowedCipherSuites(int AllowedCipherSuites) {
         AllowedCipherSuitesVH.set(MEMORY, AllowedCipherSuites);
     }
 
-    private static final VarHandle CaCertificateFileVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("CaCertificateFile")
+    private static final VarHandleW CaCertificateFileVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("CaCertificateFile")
+        )
     );
 
     public PNIString getCaCertificateFile() {
-        var SEG = (MemorySegment) CaCertificateFileVH.get(MEMORY);
+        var SEG = CaCertificateFileVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return new PNIString(SEG);
     }
@@ -289,5 +304,5 @@ public class QuicCredentialConfig extends AbstractNativeObject implements Native
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.15
-// sha256:bde54a73148d77702b85f666f96357ea45d71b8a43f4f60e46bfed31802a6c63
+// metadata.generator-version: pni 21.0.0.20
+// sha256:f05b940fac8c55640c6beecd8e7307e2045666c706a40a7a03584b92a405f2aa

@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -59,300 +60,350 @@ public class QuicSettings extends AbstractNativeObject implements NativeObject {
         return this.IsSet;
     }
 
-    private static final VarHandle MaxBytesPerKeyVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("MaxBytesPerKey")
+    private static final VarHandleW MaxBytesPerKeyVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("MaxBytesPerKey")
+        )
     );
 
     public long getMaxBytesPerKey() {
-        return (long) MaxBytesPerKeyVH.get(MEMORY);
+        return MaxBytesPerKeyVH.getLong(MEMORY);
     }
 
     public void setMaxBytesPerKey(long MaxBytesPerKey) {
         MaxBytesPerKeyVH.set(MEMORY, MaxBytesPerKey);
     }
 
-    private static final VarHandle HandshakeIdleTimeoutMsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("HandshakeIdleTimeoutMs")
+    private static final VarHandleW HandshakeIdleTimeoutMsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("HandshakeIdleTimeoutMs")
+        )
     );
 
     public long getHandshakeIdleTimeoutMs() {
-        return (long) HandshakeIdleTimeoutMsVH.get(MEMORY);
+        return HandshakeIdleTimeoutMsVH.getLong(MEMORY);
     }
 
     public void setHandshakeIdleTimeoutMs(long HandshakeIdleTimeoutMs) {
         HandshakeIdleTimeoutMsVH.set(MEMORY, HandshakeIdleTimeoutMs);
     }
 
-    private static final VarHandle IdleTimeoutMsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("IdleTimeoutMs")
+    private static final VarHandleW IdleTimeoutMsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("IdleTimeoutMs")
+        )
     );
 
     public long getIdleTimeoutMs() {
-        return (long) IdleTimeoutMsVH.get(MEMORY);
+        return IdleTimeoutMsVH.getLong(MEMORY);
     }
 
     public void setIdleTimeoutMs(long IdleTimeoutMs) {
         IdleTimeoutMsVH.set(MEMORY, IdleTimeoutMs);
     }
 
-    private static final VarHandle MtuDiscoverySearchCompleteTimeoutUsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("MtuDiscoverySearchCompleteTimeoutUs")
+    private static final VarHandleW MtuDiscoverySearchCompleteTimeoutUsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("MtuDiscoverySearchCompleteTimeoutUs")
+        )
     );
 
     public long getMtuDiscoverySearchCompleteTimeoutUs() {
-        return (long) MtuDiscoverySearchCompleteTimeoutUsVH.get(MEMORY);
+        return MtuDiscoverySearchCompleteTimeoutUsVH.getLong(MEMORY);
     }
 
     public void setMtuDiscoverySearchCompleteTimeoutUs(long MtuDiscoverySearchCompleteTimeoutUs) {
         MtuDiscoverySearchCompleteTimeoutUsVH.set(MEMORY, MtuDiscoverySearchCompleteTimeoutUs);
     }
 
-    private static final VarHandle TlsClientMaxSendBufferVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("TlsClientMaxSendBuffer")
+    private static final VarHandleW TlsClientMaxSendBufferVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("TlsClientMaxSendBuffer")
+        )
     );
 
     public int getTlsClientMaxSendBuffer() {
-        return (int) TlsClientMaxSendBufferVH.get(MEMORY);
+        return TlsClientMaxSendBufferVH.getInt(MEMORY);
     }
 
     public void setTlsClientMaxSendBuffer(int TlsClientMaxSendBuffer) {
         TlsClientMaxSendBufferVH.set(MEMORY, TlsClientMaxSendBuffer);
     }
 
-    private static final VarHandle TlsServerMaxSendBufferVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("TlsServerMaxSendBuffer")
+    private static final VarHandleW TlsServerMaxSendBufferVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("TlsServerMaxSendBuffer")
+        )
     );
 
     public int getTlsServerMaxSendBuffer() {
-        return (int) TlsServerMaxSendBufferVH.get(MEMORY);
+        return TlsServerMaxSendBufferVH.getInt(MEMORY);
     }
 
     public void setTlsServerMaxSendBuffer(int TlsServerMaxSendBuffer) {
         TlsServerMaxSendBufferVH.set(MEMORY, TlsServerMaxSendBuffer);
     }
 
-    private static final VarHandle StreamRecvWindowDefaultVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("StreamRecvWindowDefault")
+    private static final VarHandleW StreamRecvWindowDefaultVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("StreamRecvWindowDefault")
+        )
     );
 
     public int getStreamRecvWindowDefault() {
-        return (int) StreamRecvWindowDefaultVH.get(MEMORY);
+        return StreamRecvWindowDefaultVH.getInt(MEMORY);
     }
 
     public void setStreamRecvWindowDefault(int StreamRecvWindowDefault) {
         StreamRecvWindowDefaultVH.set(MEMORY, StreamRecvWindowDefault);
     }
 
-    private static final VarHandle StreamRecvBufferDefaultVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("StreamRecvBufferDefault")
+    private static final VarHandleW StreamRecvBufferDefaultVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("StreamRecvBufferDefault")
+        )
     );
 
     public int getStreamRecvBufferDefault() {
-        return (int) StreamRecvBufferDefaultVH.get(MEMORY);
+        return StreamRecvBufferDefaultVH.getInt(MEMORY);
     }
 
     public void setStreamRecvBufferDefault(int StreamRecvBufferDefault) {
         StreamRecvBufferDefaultVH.set(MEMORY, StreamRecvBufferDefault);
     }
 
-    private static final VarHandle ConnFlowControlWindowVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("ConnFlowControlWindow")
+    private static final VarHandleW ConnFlowControlWindowVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("ConnFlowControlWindow")
+        )
     );
 
     public int getConnFlowControlWindow() {
-        return (int) ConnFlowControlWindowVH.get(MEMORY);
+        return ConnFlowControlWindowVH.getInt(MEMORY);
     }
 
     public void setConnFlowControlWindow(int ConnFlowControlWindow) {
         ConnFlowControlWindowVH.set(MEMORY, ConnFlowControlWindow);
     }
 
-    private static final VarHandle MaxWorkerQueueDelayUsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("MaxWorkerQueueDelayUs")
+    private static final VarHandleW MaxWorkerQueueDelayUsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("MaxWorkerQueueDelayUs")
+        )
     );
 
     public int getMaxWorkerQueueDelayUs() {
-        return (int) MaxWorkerQueueDelayUsVH.get(MEMORY);
+        return MaxWorkerQueueDelayUsVH.getInt(MEMORY);
     }
 
     public void setMaxWorkerQueueDelayUs(int MaxWorkerQueueDelayUs) {
         MaxWorkerQueueDelayUsVH.set(MEMORY, MaxWorkerQueueDelayUs);
     }
 
-    private static final VarHandle MaxStatelessOperationsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("MaxStatelessOperations")
+    private static final VarHandleW MaxStatelessOperationsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("MaxStatelessOperations")
+        )
     );
 
     public int getMaxStatelessOperations() {
-        return (int) MaxStatelessOperationsVH.get(MEMORY);
+        return MaxStatelessOperationsVH.getInt(MEMORY);
     }
 
     public void setMaxStatelessOperations(int MaxStatelessOperations) {
         MaxStatelessOperationsVH.set(MEMORY, MaxStatelessOperations);
     }
 
-    private static final VarHandle InitialWindowPacketsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("InitialWindowPackets")
+    private static final VarHandleW InitialWindowPacketsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("InitialWindowPackets")
+        )
     );
 
     public int getInitialWindowPackets() {
-        return (int) InitialWindowPacketsVH.get(MEMORY);
+        return InitialWindowPacketsVH.getInt(MEMORY);
     }
 
     public void setInitialWindowPackets(int InitialWindowPackets) {
         InitialWindowPacketsVH.set(MEMORY, InitialWindowPackets);
     }
 
-    private static final VarHandle SendIdleTimeoutMsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("SendIdleTimeoutMs")
+    private static final VarHandleW SendIdleTimeoutMsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("SendIdleTimeoutMs")
+        )
     );
 
     public int getSendIdleTimeoutMs() {
-        return (int) SendIdleTimeoutMsVH.get(MEMORY);
+        return SendIdleTimeoutMsVH.getInt(MEMORY);
     }
 
     public void setSendIdleTimeoutMs(int SendIdleTimeoutMs) {
         SendIdleTimeoutMsVH.set(MEMORY, SendIdleTimeoutMs);
     }
 
-    private static final VarHandle InitialRttMsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("InitialRttMs")
+    private static final VarHandleW InitialRttMsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("InitialRttMs")
+        )
     );
 
     public int getInitialRttMs() {
-        return (int) InitialRttMsVH.get(MEMORY);
+        return InitialRttMsVH.getInt(MEMORY);
     }
 
     public void setInitialRttMs(int InitialRttMs) {
         InitialRttMsVH.set(MEMORY, InitialRttMs);
     }
 
-    private static final VarHandle MaxAckDelayMsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("MaxAckDelayMs")
+    private static final VarHandleW MaxAckDelayMsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("MaxAckDelayMs")
+        )
     );
 
     public int getMaxAckDelayMs() {
-        return (int) MaxAckDelayMsVH.get(MEMORY);
+        return MaxAckDelayMsVH.getInt(MEMORY);
     }
 
     public void setMaxAckDelayMs(int MaxAckDelayMs) {
         MaxAckDelayMsVH.set(MEMORY, MaxAckDelayMs);
     }
 
-    private static final VarHandle DisconnectTimeoutMsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("DisconnectTimeoutMs")
+    private static final VarHandleW DisconnectTimeoutMsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("DisconnectTimeoutMs")
+        )
     );
 
     public int getDisconnectTimeoutMs() {
-        return (int) DisconnectTimeoutMsVH.get(MEMORY);
+        return DisconnectTimeoutMsVH.getInt(MEMORY);
     }
 
     public void setDisconnectTimeoutMs(int DisconnectTimeoutMs) {
         DisconnectTimeoutMsVH.set(MEMORY, DisconnectTimeoutMs);
     }
 
-    private static final VarHandle KeepAliveIntervalMsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("KeepAliveIntervalMs")
+    private static final VarHandleW KeepAliveIntervalMsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("KeepAliveIntervalMs")
+        )
     );
 
     public int getKeepAliveIntervalMs() {
-        return (int) KeepAliveIntervalMsVH.get(MEMORY);
+        return KeepAliveIntervalMsVH.getInt(MEMORY);
     }
 
     public void setKeepAliveIntervalMs(int KeepAliveIntervalMs) {
         KeepAliveIntervalMsVH.set(MEMORY, KeepAliveIntervalMs);
     }
 
-    private static final VarHandle CongestionControlAlgorithmVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("CongestionControlAlgorithm")
+    private static final VarHandleW CongestionControlAlgorithmVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("CongestionControlAlgorithm")
+        )
     );
 
     public short getCongestionControlAlgorithm() {
-        return (short) CongestionControlAlgorithmVH.get(MEMORY);
+        return CongestionControlAlgorithmVH.getShort(MEMORY);
     }
 
     public void setCongestionControlAlgorithm(short CongestionControlAlgorithm) {
         CongestionControlAlgorithmVH.set(MEMORY, CongestionControlAlgorithm);
     }
 
-    private static final VarHandle PeerBidiStreamCountVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("PeerBidiStreamCount")
+    private static final VarHandleW PeerBidiStreamCountVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("PeerBidiStreamCount")
+        )
     );
 
     public short getPeerBidiStreamCount() {
-        return (short) PeerBidiStreamCountVH.get(MEMORY);
+        return PeerBidiStreamCountVH.getShort(MEMORY);
     }
 
     public void setPeerBidiStreamCount(short PeerBidiStreamCount) {
         PeerBidiStreamCountVH.set(MEMORY, PeerBidiStreamCount);
     }
 
-    private static final VarHandle PeerUnidiStreamCountVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("PeerUnidiStreamCount")
+    private static final VarHandleW PeerUnidiStreamCountVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("PeerUnidiStreamCount")
+        )
     );
 
     public short getPeerUnidiStreamCount() {
-        return (short) PeerUnidiStreamCountVH.get(MEMORY);
+        return PeerUnidiStreamCountVH.getShort(MEMORY);
     }
 
     public void setPeerUnidiStreamCount(short PeerUnidiStreamCount) {
         PeerUnidiStreamCountVH.set(MEMORY, PeerUnidiStreamCount);
     }
 
-    private static final VarHandle MaxBindingStatelessOperationsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("MaxBindingStatelessOperations")
+    private static final VarHandleW MaxBindingStatelessOperationsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("MaxBindingStatelessOperations")
+        )
     );
 
     public short getMaxBindingStatelessOperations() {
-        return (short) MaxBindingStatelessOperationsVH.get(MEMORY);
+        return MaxBindingStatelessOperationsVH.getShort(MEMORY);
     }
 
     public void setMaxBindingStatelessOperations(short MaxBindingStatelessOperations) {
         MaxBindingStatelessOperationsVH.set(MEMORY, MaxBindingStatelessOperations);
     }
 
-    private static final VarHandle StatelessOperationExpirationMsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("StatelessOperationExpirationMs")
+    private static final VarHandleW StatelessOperationExpirationMsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("StatelessOperationExpirationMs")
+        )
     );
 
     public short getStatelessOperationExpirationMs() {
-        return (short) StatelessOperationExpirationMsVH.get(MEMORY);
+        return StatelessOperationExpirationMsVH.getShort(MEMORY);
     }
 
     public void setStatelessOperationExpirationMs(short StatelessOperationExpirationMs) {
         StatelessOperationExpirationMsVH.set(MEMORY, StatelessOperationExpirationMs);
     }
 
-    private static final VarHandle MinimumMtuVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("MinimumMtu")
+    private static final VarHandleW MinimumMtuVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("MinimumMtu")
+        )
     );
 
     public short getMinimumMtu() {
-        return (short) MinimumMtuVH.get(MEMORY);
+        return MinimumMtuVH.getShort(MEMORY);
     }
 
     public void setMinimumMtu(short MinimumMtu) {
         MinimumMtuVH.set(MEMORY, MinimumMtu);
     }
 
-    private static final VarHandle MaximumMtuVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("MaximumMtu")
+    private static final VarHandleW MaximumMtuVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("MaximumMtu")
+        )
     );
 
     public short getMaximumMtu() {
-        return (short) MaximumMtuVH.get(MEMORY);
+        return MaximumMtuVH.getShort(MEMORY);
     }
 
     public void setMaximumMtu(short MaximumMtu) {
         MaximumMtuVH.set(MEMORY, MaximumMtu);
     }
 
-    private static final VarHandle Field01VH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Field01")
+    private static final VarHandleW Field01VH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Field01")
+        )
     );
 
     public byte getField01() {
-        return (byte) Field01VH.get(MEMORY);
+        return Field01VH.getByte(MEMORY);
     }
 
     public void setField01(byte Field01) {
@@ -457,48 +508,56 @@ public class QuicSettings extends AbstractNativeObject implements NativeObject {
         setField01(N);
     }
 
-    private static final VarHandle MaxOperationsPerDrainVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("MaxOperationsPerDrain")
+    private static final VarHandleW MaxOperationsPerDrainVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("MaxOperationsPerDrain")
+        )
     );
 
     public byte getMaxOperationsPerDrain() {
-        return (byte) MaxOperationsPerDrainVH.get(MEMORY);
+        return MaxOperationsPerDrainVH.getByte(MEMORY);
     }
 
     public void setMaxOperationsPerDrain(byte MaxOperationsPerDrain) {
         MaxOperationsPerDrainVH.set(MEMORY, MaxOperationsPerDrain);
     }
 
-    private static final VarHandle MtuDiscoveryMissingProbeCountVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("MtuDiscoveryMissingProbeCount")
+    private static final VarHandleW MtuDiscoveryMissingProbeCountVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("MtuDiscoveryMissingProbeCount")
+        )
     );
 
     public byte getMtuDiscoveryMissingProbeCount() {
-        return (byte) MtuDiscoveryMissingProbeCountVH.get(MEMORY);
+        return MtuDiscoveryMissingProbeCountVH.getByte(MEMORY);
     }
 
     public void setMtuDiscoveryMissingProbeCount(byte MtuDiscoveryMissingProbeCount) {
         MtuDiscoveryMissingProbeCountVH.set(MEMORY, MtuDiscoveryMissingProbeCount);
     }
 
-    private static final VarHandle DestCidUpdateIdleTimeoutMsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("DestCidUpdateIdleTimeoutMs")
+    private static final VarHandleW DestCidUpdateIdleTimeoutMsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("DestCidUpdateIdleTimeoutMs")
+        )
     );
 
     public int getDestCidUpdateIdleTimeoutMs() {
-        return (int) DestCidUpdateIdleTimeoutMsVH.get(MEMORY);
+        return DestCidUpdateIdleTimeoutMsVH.getInt(MEMORY);
     }
 
     public void setDestCidUpdateIdleTimeoutMs(int DestCidUpdateIdleTimeoutMs) {
         DestCidUpdateIdleTimeoutMsVH.set(MEMORY, DestCidUpdateIdleTimeoutMs);
     }
 
-    private static final VarHandle FlagsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Flags")
+    private static final VarHandleW FlagsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Flags")
+        )
     );
 
     public long getFlags() {
-        return (long) FlagsVH.get(MEMORY);
+        return FlagsVH.getLong(MEMORY);
     }
 
     public void setFlags(long Flags) {
@@ -844,5 +903,5 @@ public class QuicSettings extends AbstractNativeObject implements NativeObject {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.18
-// sha256:397e4a15ce72bcf0b796356692455e8c222c4995172d7492529182c77bc5c502
+// metadata.generator-version: pni 21.0.0.20
+// sha256:9613f50f71e5f77f3388feac8d119a9bcc415fff9070f36660df2bfd2d3ac441

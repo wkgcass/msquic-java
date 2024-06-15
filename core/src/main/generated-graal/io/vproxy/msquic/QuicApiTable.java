@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -22,12 +23,14 @@ public class QuicApiTable extends AbstractNativeObject implements NativeObject {
         return MEMORY;
     }
 
-    private static final VarHandle ApiVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Api")
+    private static final VarHandleW ApiVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Api")
+        )
     );
 
     public MemorySegment getApi() {
-        var SEG = (MemorySegment) ApiVH.get(MEMORY);
+        var SEG = ApiVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return SEG;
     }
@@ -159,5 +162,5 @@ public class QuicApiTable extends AbstractNativeObject implements NativeObject {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.18
-// sha256:e6735aabd7f2229cfb415cfafe9655365e133a9a41813e9ce3cb8f61b9b80f35
+// metadata.generator-version: pni 21.0.0.20
+// sha256:649735f0720b8e5e3bdea8546a23bd1a383d456f7114dfb72e471a442c379954

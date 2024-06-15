@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -23,24 +24,28 @@ public class QuicConnectionEventStreamsAvailable extends AbstractNativeObject im
         return MEMORY;
     }
 
-    private static final VarHandle BidirectionalCountVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("BidirectionalCount")
+    private static final VarHandleW BidirectionalCountVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("BidirectionalCount")
+        )
     );
 
     public short getBidirectionalCount() {
-        return (short) BidirectionalCountVH.get(MEMORY);
+        return BidirectionalCountVH.getShort(MEMORY);
     }
 
     public void setBidirectionalCount(short BidirectionalCount) {
         BidirectionalCountVH.set(MEMORY, BidirectionalCount);
     }
 
-    private static final VarHandle UnidirectionalCountVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("UnidirectionalCount")
+    private static final VarHandleW UnidirectionalCountVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("UnidirectionalCount")
+        )
     );
 
     public short getUnidirectionalCount() {
-        return (short) UnidirectionalCountVH.get(MEMORY);
+        return UnidirectionalCountVH.getShort(MEMORY);
     }
 
     public void setUnidirectionalCount(short UnidirectionalCount) {
@@ -149,5 +154,5 @@ public class QuicConnectionEventStreamsAvailable extends AbstractNativeObject im
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:879b075bb6cf98421ad858d4b5021cf5b90f7eb7b4677c006b196785fc5b3b6e
+// metadata.generator-version: pni 21.0.0.20
+// sha256:fc8a6df2c1ec0f8374ed2e59e94ea3a1d06b1c9394085c1c69962e07a98a7702

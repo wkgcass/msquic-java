@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -34,24 +35,28 @@ public class QuicNewConnectionInfo extends AbstractNativeObject implements Nativ
         return MEMORY;
     }
 
-    private static final VarHandle QuicVersionVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("QuicVersion")
+    private static final VarHandleW QuicVersionVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("QuicVersion")
+        )
     );
 
     public int getQuicVersion() {
-        return (int) QuicVersionVH.get(MEMORY);
+        return QuicVersionVH.getInt(MEMORY);
     }
 
     public void setQuicVersion(int QuicVersion) {
         QuicVersionVH.set(MEMORY, QuicVersion);
     }
 
-    private static final VarHandle LocalAddressVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("LocalAddress")
+    private static final VarHandleW LocalAddressVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("LocalAddress")
+        )
     );
 
     public io.vproxy.msquic.QuicAddr getLocalAddress() {
-        var SEG = (MemorySegment) LocalAddressVH.get(MEMORY);
+        var SEG = LocalAddressVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return new io.vproxy.msquic.QuicAddr(SEG);
     }
@@ -64,12 +69,14 @@ public class QuicNewConnectionInfo extends AbstractNativeObject implements Nativ
         }
     }
 
-    private static final VarHandle RemoteAddressVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("RemoteAddress")
+    private static final VarHandleW RemoteAddressVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("RemoteAddress")
+        )
     );
 
     public io.vproxy.msquic.QuicAddr getRemoteAddress() {
-        var SEG = (MemorySegment) RemoteAddressVH.get(MEMORY);
+        var SEG = RemoteAddressVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return new io.vproxy.msquic.QuicAddr(SEG);
     }
@@ -82,60 +89,70 @@ public class QuicNewConnectionInfo extends AbstractNativeObject implements Nativ
         }
     }
 
-    private static final VarHandle CryptoBufferLengthVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("CryptoBufferLength")
+    private static final VarHandleW CryptoBufferLengthVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("CryptoBufferLength")
+        )
     );
 
     public int getCryptoBufferLength() {
-        return (int) CryptoBufferLengthVH.get(MEMORY);
+        return CryptoBufferLengthVH.getInt(MEMORY);
     }
 
     public void setCryptoBufferLength(int CryptoBufferLength) {
         CryptoBufferLengthVH.set(MEMORY, CryptoBufferLength);
     }
 
-    private static final VarHandle ClientAlpnListLengthVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("ClientAlpnListLength")
+    private static final VarHandleW ClientAlpnListLengthVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("ClientAlpnListLength")
+        )
     );
 
     public short getClientAlpnListLength() {
-        return (short) ClientAlpnListLengthVH.get(MEMORY);
+        return ClientAlpnListLengthVH.getShort(MEMORY);
     }
 
     public void setClientAlpnListLength(short ClientAlpnListLength) {
         ClientAlpnListLengthVH.set(MEMORY, ClientAlpnListLength);
     }
 
-    private static final VarHandle ServerNameLengthVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("ServerNameLength")
+    private static final VarHandleW ServerNameLengthVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("ServerNameLength")
+        )
     );
 
     public short getServerNameLength() {
-        return (short) ServerNameLengthVH.get(MEMORY);
+        return ServerNameLengthVH.getShort(MEMORY);
     }
 
     public void setServerNameLength(short ServerNameLength) {
         ServerNameLengthVH.set(MEMORY, ServerNameLength);
     }
 
-    private static final VarHandle NegotiatedAlpnLengthVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("NegotiatedAlpnLength")
+    private static final VarHandleW NegotiatedAlpnLengthVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("NegotiatedAlpnLength")
+        )
     );
 
     public byte getNegotiatedAlpnLength() {
-        return (byte) NegotiatedAlpnLengthVH.get(MEMORY);
+        return NegotiatedAlpnLengthVH.getByte(MEMORY);
     }
 
     public void setNegotiatedAlpnLength(byte NegotiatedAlpnLength) {
         NegotiatedAlpnLengthVH.set(MEMORY, NegotiatedAlpnLength);
     }
 
-    private static final VarHandle CryptoBufferVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("CryptoBuffer")
+    private static final VarHandleW CryptoBufferVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("CryptoBuffer")
+        )
     );
 
     public MemorySegment getCryptoBuffer() {
-        var SEG = (MemorySegment) CryptoBufferVH.get(MEMORY);
+        var SEG = CryptoBufferVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return SEG;
     }
@@ -148,12 +165,14 @@ public class QuicNewConnectionInfo extends AbstractNativeObject implements Nativ
         }
     }
 
-    private static final VarHandle ClientAlpnListVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("ClientAlpnList")
+    private static final VarHandleW ClientAlpnListVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("ClientAlpnList")
+        )
     );
 
     public MemorySegment getClientAlpnList() {
-        var SEG = (MemorySegment) ClientAlpnListVH.get(MEMORY);
+        var SEG = ClientAlpnListVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return SEG;
     }
@@ -166,12 +185,14 @@ public class QuicNewConnectionInfo extends AbstractNativeObject implements Nativ
         }
     }
 
-    private static final VarHandle NegotiatedAlpnVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("NegotiatedAlpn")
+    private static final VarHandleW NegotiatedAlpnVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("NegotiatedAlpn")
+        )
     );
 
     public MemorySegment getNegotiatedAlpn() {
-        var SEG = (MemorySegment) NegotiatedAlpnVH.get(MEMORY);
+        var SEG = NegotiatedAlpnVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return SEG;
     }
@@ -184,12 +205,14 @@ public class QuicNewConnectionInfo extends AbstractNativeObject implements Nativ
         }
     }
 
-    private static final VarHandle ServerNameVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("ServerName")
+    private static final VarHandleW ServerNameVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("ServerName")
+        )
     );
 
     public PNIString getServerName() {
-        var SEG = (MemorySegment) ServerNameVH.get(MEMORY);
+        var SEG = ServerNameVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return new PNIString(SEG);
     }
@@ -367,5 +390,5 @@ public class QuicNewConnectionInfo extends AbstractNativeObject implements Nativ
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:cc5d10f4322b99b4bc02c87eaeec1a39bf1b03689f64ed2ff5e0cfcf113cea42
+// metadata.generator-version: pni 21.0.0.20
+// sha256:669543329c94a4899e6bd814176ba7776cd680d6b0f516a3ffccfff730dac942

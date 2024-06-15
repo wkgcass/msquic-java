@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -23,12 +24,14 @@ public class QuicCertificateFile extends AbstractNativeObject implements NativeO
         return MEMORY;
     }
 
-    private static final VarHandle PrivateKeyFileVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("PrivateKeyFile")
+    private static final VarHandleW PrivateKeyFileVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("PrivateKeyFile")
+        )
     );
 
     public PNIString getPrivateKeyFile() {
-        var SEG = (MemorySegment) PrivateKeyFileVH.get(MEMORY);
+        var SEG = PrivateKeyFileVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return new PNIString(SEG);
     }
@@ -45,12 +48,14 @@ public class QuicCertificateFile extends AbstractNativeObject implements NativeO
         }
     }
 
-    private static final VarHandle CertificateFileVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("CertificateFile")
+    private static final VarHandleW CertificateFileVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("CertificateFile")
+        )
     );
 
     public PNIString getCertificateFile() {
-        var SEG = (MemorySegment) CertificateFileVH.get(MEMORY);
+        var SEG = CertificateFileVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return new PNIString(SEG);
     }
@@ -171,5 +176,5 @@ public class QuicCertificateFile extends AbstractNativeObject implements NativeO
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:17a26922cb2bc83e79c9347355f5ff84f5a48d6251fe1b2b6670221f1a124771
+// metadata.generator-version: pni 21.0.0.20
+// sha256:5e8707cedbde8406aaa41f8518ffe8effe061e3c0cff039730a561adc4b3a435

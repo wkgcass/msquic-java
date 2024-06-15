@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -93,5 +94,5 @@ public class MsQuicValues {
         return RESULT;
     }
 }
-// metadata.generator-version: pni 21.0.0.17
-// sha256:ae5644bbbe762300139971cfcf442e002dcf2219fcdf5eb3b1fcef7516504ba3
+// metadata.generator-version: pni 21.0.0.20
+// sha256:3da299a5596331c95af24aafb654250aaf67475e8ae01c66ceb1020252c8f716

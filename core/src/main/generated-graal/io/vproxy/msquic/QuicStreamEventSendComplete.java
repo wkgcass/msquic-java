@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -24,24 +25,28 @@ public class QuicStreamEventSendComplete extends AbstractNativeObject implements
         return MEMORY;
     }
 
-    private static final VarHandle CanceledVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Canceled")
+    private static final VarHandleW CanceledVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Canceled")
+        )
     );
 
     public boolean isCanceled() {
-        return (boolean) CanceledVH.get(MEMORY);
+        return CanceledVH.getBool(MEMORY);
     }
 
     public void setCanceled(boolean Canceled) {
         CanceledVH.set(MEMORY, Canceled);
     }
 
-    private static final VarHandle ClientContextVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("ClientContext")
+    private static final VarHandleW ClientContextVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("ClientContext")
+        )
     );
 
     public MemorySegment getClientContext() {
-        var SEG = (MemorySegment) ClientContextVH.get(MEMORY);
+        var SEG = ClientContextVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return SEG;
     }
@@ -157,5 +162,5 @@ public class QuicStreamEventSendComplete extends AbstractNativeObject implements
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.18
-// sha256:05b3d5a6c64cc143ed901459031cbd1331ca93a1c423742c1d9ec97fcb2a82d1
+// metadata.generator-version: pni 21.0.0.20
+// sha256:450041b3516f6649393a3cdfcf01c4d5e86eccc3189557809f98c01f7a1b8412

@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -142,5 +143,5 @@ public class QuicListenerEventUnion extends AbstractNativeObject implements Nati
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:11a30dc9b52e91c05f8cbcf48296532b9ed661c6f0b81a214f157d4adde9497b
+// metadata.generator-version: pni 21.0.0.20
+// sha256:67f0711f2a9cba14875a66d060bcdf75b930dfd180f0045f379032b0e14c7588

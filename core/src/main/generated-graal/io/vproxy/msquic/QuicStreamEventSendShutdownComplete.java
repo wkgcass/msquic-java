@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -22,12 +23,14 @@ public class QuicStreamEventSendShutdownComplete extends AbstractNativeObject im
         return MEMORY;
     }
 
-    private static final VarHandle GracefulVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Graceful")
+    private static final VarHandleW GracefulVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Graceful")
+        )
     );
 
     public boolean isGraceful() {
-        return (boolean) GracefulVH.get(MEMORY);
+        return GracefulVH.getBool(MEMORY);
     }
 
     public void setGraceful(boolean Graceful) {
@@ -130,5 +133,5 @@ public class QuicStreamEventSendShutdownComplete extends AbstractNativeObject im
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.18
-// sha256:7c4da166e122779c53472c0ba18ee91cbb8006dbb57e1a330f51d9a5d98aca18
+// metadata.generator-version: pni 21.0.0.20
+// sha256:b93aeed284e2c8a0d9f249be7ce457fa20a464d2cc553017ef66f646822a44c2

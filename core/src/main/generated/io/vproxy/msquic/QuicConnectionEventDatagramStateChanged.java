@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -19,24 +20,28 @@ public class QuicConnectionEventDatagramStateChanged extends AbstractNativeObjec
         return MEMORY;
     }
 
-    private static final VarHandle SendEnabledVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("SendEnabled")
+    private static final VarHandleW SendEnabledVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("SendEnabled")
+        )
     );
 
     public boolean isSendEnabled() {
-        return (boolean) SendEnabledVH.get(MEMORY);
+        return SendEnabledVH.getBool(MEMORY);
     }
 
     public void setSendEnabled(boolean SendEnabled) {
         SendEnabledVH.set(MEMORY, SendEnabled);
     }
 
-    private static final VarHandle MaxSendLengthVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("MaxSendLength")
+    private static final VarHandleW MaxSendLengthVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("MaxSendLength")
+        )
     );
 
     public short getMaxSendLength() {
-        return (short) MaxSendLengthVH.get(MEMORY);
+        return MaxSendLengthVH.getShort(MEMORY);
     }
 
     public void setMaxSendLength(short MaxSendLength) {
@@ -146,5 +151,5 @@ public class QuicConnectionEventDatagramStateChanged extends AbstractNativeObjec
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.18
-// sha256:ab33e11bf597c718301ba89ba8d57e69a24fc874911b0e7d05b11dc751a3ae7f
+// metadata.generator-version: pni 21.0.0.20
+// sha256:39880c4dbdc76a93a82081ef3c494090f41923fba3812ba60962e5fd98ecbbff

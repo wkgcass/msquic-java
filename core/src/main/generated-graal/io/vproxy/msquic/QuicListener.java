@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -166,5 +167,5 @@ public class QuicListener extends io.vproxy.msquic.QuicObjectBase implements Nat
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.18
-// sha256:ec8037d13ce0dc45cfd0225a1692997d2a9afc23fb6ce3b864359de50814dd23
+// metadata.generator-version: pni 21.0.0.20
+// sha256:24a00c44cffa2833c337af497dbe3165c2e57f8a5f31a021162635cac88afee2

@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -17,12 +18,14 @@ public class QuicCertificate extends AbstractNativeObject implements NativeObjec
         return MEMORY;
     }
 
-    private static final VarHandle CertificateFileVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("CertificateFile")
+    private static final VarHandleW CertificateFileVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("CertificateFile")
+        )
     );
 
     public io.vproxy.msquic.QuicCertificateFile getCertificateFile() {
-        var SEG = (MemorySegment) CertificateFileVH.get(MEMORY);
+        var SEG = CertificateFileVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return new io.vproxy.msquic.QuicCertificateFile(SEG);
     }
@@ -134,5 +137,5 @@ public class QuicCertificate extends AbstractNativeObject implements NativeObjec
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.15
-// sha256:fd547a05ae909911cb69a76e46e355387951173d3de9f68266f9f44a7a677a2a
+// metadata.generator-version: pni 21.0.0.20
+// sha256:88874755532a668b00825d215a80aabcc2d60285d6b1099c26ae13981931559b

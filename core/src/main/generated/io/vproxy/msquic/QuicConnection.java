@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -234,5 +235,5 @@ public class QuicConnection extends io.vproxy.msquic.QuicObjectBase implements N
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.18
-// sha256:61a05f942ee9996c14da21e9439d2d3e5e1a807ae241a031bfb412e4a7c7b0f5
+// metadata.generator-version: pni 21.0.0.20
+// sha256:6328c77c52e56b81c0e63d48986a67c388260ded1cf652c379bdcb0c3cc79ea9

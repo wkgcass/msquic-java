@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -18,24 +19,28 @@ public class QuicConnectionEventIdealProcessorChanged extends AbstractNativeObje
         return MEMORY;
     }
 
-    private static final VarHandle IdealProcessorVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("IdealProcessor")
+    private static final VarHandleW IdealProcessorVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("IdealProcessor")
+        )
     );
 
     public short getIdealProcessor() {
-        return (short) IdealProcessorVH.get(MEMORY);
+        return IdealProcessorVH.getShort(MEMORY);
     }
 
     public void setIdealProcessor(short IdealProcessor) {
         IdealProcessorVH.set(MEMORY, IdealProcessor);
     }
 
-    private static final VarHandle PartitionIndexVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("PartitionIndex")
+    private static final VarHandleW PartitionIndexVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("PartitionIndex")
+        )
     );
 
     public short getPartitionIndex() {
-        return (short) PartitionIndexVH.get(MEMORY);
+        return PartitionIndexVH.getShort(MEMORY);
     }
 
     public void setPartitionIndex(short PartitionIndex) {
@@ -144,5 +149,5 @@ public class QuicConnectionEventIdealProcessorChanged extends AbstractNativeObje
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.15
-// sha256:ce0b4f07e24ffedc91db9949fd83c681d285fc354499c98676e55683a1cafbaa
+// metadata.generator-version: pni 21.0.0.20
+// sha256:fcfe94eaf3f9e6c680b69aa50a6688091a9d491aa3fd8e89e9d0ad933dde5738

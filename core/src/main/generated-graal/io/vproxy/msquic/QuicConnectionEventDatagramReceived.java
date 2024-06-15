@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -30,12 +31,14 @@ public class QuicConnectionEventDatagramReceived extends AbstractNativeObject im
         return this.Buffer;
     }
 
-    private static final VarHandle FlagsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Flags")
+    private static final VarHandleW FlagsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Flags")
+        )
     );
 
     public int getFlags() {
-        return (int) FlagsVH.get(MEMORY);
+        return FlagsVH.getInt(MEMORY);
     }
 
     public void setFlags(int Flags) {
@@ -146,5 +149,5 @@ public class QuicConnectionEventDatagramReceived extends AbstractNativeObject im
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:6c4f0c51ad5abe71f445902671a9c3b1f84a30d7da0cfe40f454b74de857f39d
+// metadata.generator-version: pni 21.0.0.20
+// sha256:f47af4c412556532368f7d939a2cf1e37abf9530ac7eddc72ad85bc62d04d86c

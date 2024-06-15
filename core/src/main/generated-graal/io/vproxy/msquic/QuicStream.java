@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -202,5 +203,5 @@ public class QuicStream extends io.vproxy.msquic.QuicObjectBase implements Nativ
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.18
-// sha256:694f379cdefc79e351b09f2bb6eac1c4bb00c2509103516488f3ba1b08ed683a
+// metadata.generator-version: pni 21.0.0.20
+// sha256:cd7c76a0e468066d05bf7e0aeec25a5b72db6bbec957c31f476b627bb2d959b1

@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -19,12 +20,14 @@ public class QuicConnectionEventDatagramSendStateChanged extends AbstractNativeO
         return MEMORY;
     }
 
-    private static final VarHandle ClientContextVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("ClientContext")
+    private static final VarHandleW ClientContextVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("ClientContext")
+        )
     );
 
     public MemorySegment getClientContext() {
-        var SEG = (MemorySegment) ClientContextVH.get(MEMORY);
+        var SEG = ClientContextVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return SEG;
     }
@@ -37,12 +40,14 @@ public class QuicConnectionEventDatagramSendStateChanged extends AbstractNativeO
         }
     }
 
-    private static final VarHandle StateVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("State")
+    private static final VarHandleW StateVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("State")
+        )
     );
 
     public int getState() {
-        return (int) StateVH.get(MEMORY);
+        return StateVH.getInt(MEMORY);
     }
 
     public void setState(int State) {
@@ -152,5 +157,5 @@ public class QuicConnectionEventDatagramSendStateChanged extends AbstractNativeO
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.15
-// sha256:3427c0640a311560b9de2fa5e1bbb90f55f8a38be423490894981ce6fb9e9e23
+// metadata.generator-version: pni 21.0.0.20
+// sha256:0ee7ac47aeaaf770dba50f6c0395d77ffbb5cd7ea1cabf93c9bdd69c4e1a5fe0

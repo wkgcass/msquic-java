@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -53,5 +54,5 @@ public class MsQuicModUpcall {
         int dispatch(io.vproxy.msquic.CXPLAT_THREAD_CONFIG Config, MemorySegment EventQ, MemorySegment Thread, MemorySegment Context);
     }
 }
-// metadata.generator-version: pni 21.0.0.17
-// sha256:a4cad00e4992df9cfc15e13236e020d68297c2a46d082fe44cf221e38397175b
+// metadata.generator-version: pni 21.0.0.20
+// sha256:d90f1b3f77fb4caa39ce2779e160fa73c6964078af88a2dc22235484ec9d2c02

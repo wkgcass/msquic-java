@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -26,36 +27,42 @@ public class QuicStreamEventStartComplete extends AbstractNativeObject implement
         return MEMORY;
     }
 
-    private static final VarHandle StatusVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Status")
+    private static final VarHandleW StatusVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Status")
+        )
     );
 
     public int getStatus() {
-        return (int) StatusVH.get(MEMORY);
+        return StatusVH.getInt(MEMORY);
     }
 
     public void setStatus(int Status) {
         StatusVH.set(MEMORY, Status);
     }
 
-    private static final VarHandle IDVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("ID")
+    private static final VarHandleW IDVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("ID")
+        )
     );
 
     public long getID() {
-        return (long) IDVH.get(MEMORY);
+        return IDVH.getLong(MEMORY);
     }
 
     public void setID(long ID) {
         IDVH.set(MEMORY, ID);
     }
 
-    private static final VarHandle Field01VH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Field01")
+    private static final VarHandleW Field01VH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Field01")
+        )
     );
 
     public byte getField01() {
-        return (byte) Field01VH.get(MEMORY);
+        return Field01VH.getByte(MEMORY);
     }
 
     public void setField01(byte Field01) {
@@ -190,5 +197,5 @@ public class QuicStreamEventStartComplete extends AbstractNativeObject implement
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.18
-// sha256:f33a22a1718fb7446c70e6194c26cf6bb930ece09af27bcdc189b9cf0f7c271d
+// metadata.generator-version: pni 21.0.0.20
+// sha256:80849cee7384dfcd0348602dc2884d17bd6a5145343058ae92720326290699a6

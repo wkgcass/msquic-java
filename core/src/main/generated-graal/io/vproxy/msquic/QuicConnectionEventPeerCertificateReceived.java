@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -25,12 +26,14 @@ public class QuicConnectionEventPeerCertificateReceived extends AbstractNativeOb
         return MEMORY;
     }
 
-    private static final VarHandle CertificateVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Certificate")
+    private static final VarHandleW CertificateVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Certificate")
+        )
     );
 
     public MemorySegment getCertificate() {
-        var SEG = (MemorySegment) CertificateVH.get(MEMORY);
+        var SEG = CertificateVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return SEG;
     }
@@ -43,36 +46,42 @@ public class QuicConnectionEventPeerCertificateReceived extends AbstractNativeOb
         }
     }
 
-    private static final VarHandle DeferredErrorFlagsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("DeferredErrorFlags")
+    private static final VarHandleW DeferredErrorFlagsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("DeferredErrorFlags")
+        )
     );
 
     public int getDeferredErrorFlags() {
-        return (int) DeferredErrorFlagsVH.get(MEMORY);
+        return DeferredErrorFlagsVH.getInt(MEMORY);
     }
 
     public void setDeferredErrorFlags(int DeferredErrorFlags) {
         DeferredErrorFlagsVH.set(MEMORY, DeferredErrorFlags);
     }
 
-    private static final VarHandle DeferredStatusVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("DeferredStatus")
+    private static final VarHandleW DeferredStatusVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("DeferredStatus")
+        )
     );
 
     public int getDeferredStatus() {
-        return (int) DeferredStatusVH.get(MEMORY);
+        return DeferredStatusVH.getInt(MEMORY);
     }
 
     public void setDeferredStatus(int DeferredStatus) {
         DeferredStatusVH.set(MEMORY, DeferredStatus);
     }
 
-    private static final VarHandle ChainVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Chain")
+    private static final VarHandleW ChainVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Chain")
+        )
     );
 
     public MemorySegment getChain() {
-        var SEG = (MemorySegment) ChainVH.get(MEMORY);
+        var SEG = ChainVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return SEG;
     }
@@ -199,5 +208,5 @@ public class QuicConnectionEventPeerCertificateReceived extends AbstractNativeOb
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:f161e0100e4cdca98673a730ea2946612de2eedfa5da2faf306173a893745b6d
+// metadata.generator-version: pni 21.0.0.20
+// sha256:fc673bef9162c0dec64a7adb8f28002de7d505dd20e49e29eb4ef25238eb21d4

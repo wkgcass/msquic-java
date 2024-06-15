@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -29,12 +30,14 @@ public class QuicTLSSecret extends AbstractNativeObject implements NativeObject 
         return MEMORY;
     }
 
-    private static final VarHandle SecretLengthVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("SecretLength")
+    private static final VarHandleW SecretLengthVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("SecretLength")
+        )
     );
 
     public byte getSecretLength() {
-        return (byte) SecretLengthVH.get(MEMORY);
+        return SecretLengthVH.getByte(MEMORY);
     }
 
     public void setSecretLength(byte SecretLength) {
@@ -228,5 +231,5 @@ public class QuicTLSSecret extends AbstractNativeObject implements NativeObject 
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.17
-// sha256:f68d80f6d84b77f6a32b6db42db361e5b0422142175f714fa502e91d4f46a05a
+// metadata.generator-version: pni 21.0.0.20
+// sha256:8d7686e461cca9c553579f0b62293484bc67a18a3cd90a430726502ed16e8422

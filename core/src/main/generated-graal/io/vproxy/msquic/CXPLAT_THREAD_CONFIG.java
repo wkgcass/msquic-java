@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -27,36 +28,42 @@ public class CXPLAT_THREAD_CONFIG extends AbstractNativeObject implements Native
         return MEMORY;
     }
 
-    private static final VarHandle FlagsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Flags")
+    private static final VarHandleW FlagsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Flags")
+        )
     );
 
     public short getFlags() {
-        return (short) FlagsVH.get(MEMORY);
+        return FlagsVH.getShort(MEMORY);
     }
 
     public void setFlags(short Flags) {
         FlagsVH.set(MEMORY, Flags);
     }
 
-    private static final VarHandle IdealProcessorVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("IdealProcessor")
+    private static final VarHandleW IdealProcessorVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("IdealProcessor")
+        )
     );
 
     public short getIdealProcessor() {
-        return (short) IdealProcessorVH.get(MEMORY);
+        return IdealProcessorVH.getShort(MEMORY);
     }
 
     public void setIdealProcessor(short IdealProcessor) {
         IdealProcessorVH.set(MEMORY, IdealProcessor);
     }
 
-    private static final VarHandle NameVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Name")
+    private static final VarHandleW NameVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Name")
+        )
     );
 
     public PNIString getName() {
-        var SEG = (MemorySegment) NameVH.get(MEMORY);
+        var SEG = NameVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return new PNIString(SEG);
     }
@@ -73,12 +80,14 @@ public class CXPLAT_THREAD_CONFIG extends AbstractNativeObject implements Native
         }
     }
 
-    private static final VarHandle CallbackVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Callback")
+    private static final VarHandleW CallbackVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Callback")
+        )
     );
 
     public MemorySegment getCallback() {
-        var SEG = (MemorySegment) CallbackVH.get(MEMORY);
+        var SEG = CallbackVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return SEG;
     }
@@ -91,12 +100,14 @@ public class CXPLAT_THREAD_CONFIG extends AbstractNativeObject implements Native
         }
     }
 
-    private static final VarHandle ContextVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Context")
+    private static final VarHandleW ContextVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Context")
+        )
     );
 
     public MemorySegment getContext() {
-        var SEG = (MemorySegment) ContextVH.get(MEMORY);
+        var SEG = ContextVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return SEG;
     }
@@ -231,5 +242,5 @@ public class CXPLAT_THREAD_CONFIG extends AbstractNativeObject implements Native
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:c0f89a9dea0c0aad5367269022e5e54853b60f58768f5941e09acd2b6cb024b5
+// metadata.generator-version: pni 21.0.0.20
+// sha256:b8a9b689f26eae3d2fccb815f09b83f9569887f2e0ee684054fc2d537c66f817

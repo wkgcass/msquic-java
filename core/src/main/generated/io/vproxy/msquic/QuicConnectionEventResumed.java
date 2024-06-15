@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -19,24 +20,28 @@ public class QuicConnectionEventResumed extends AbstractNativeObject implements 
         return MEMORY;
     }
 
-    private static final VarHandle ResumptionStateLengthVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("ResumptionStateLength")
+    private static final VarHandleW ResumptionStateLengthVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("ResumptionStateLength")
+        )
     );
 
     public short getResumptionStateLength() {
-        return (short) ResumptionStateLengthVH.get(MEMORY);
+        return ResumptionStateLengthVH.getShort(MEMORY);
     }
 
     public void setResumptionStateLength(short ResumptionStateLength) {
         ResumptionStateLengthVH.set(MEMORY, ResumptionStateLength);
     }
 
-    private static final VarHandle ResumptionStateVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("ResumptionState")
+    private static final VarHandleW ResumptionStateVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("ResumptionState")
+        )
     );
 
     public MemorySegment getResumptionState() {
-        var SEG = (MemorySegment) ResumptionStateVH.get(MEMORY);
+        var SEG = ResumptionStateVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return SEG;
     }
@@ -152,5 +157,5 @@ public class QuicConnectionEventResumed extends AbstractNativeObject implements 
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.15
-// sha256:b0297db671fdecdbb61b98d5a75487aba44a9de98e57822d83f28134e42eda55
+// metadata.generator-version: pni 21.0.0.20
+// sha256:da44b5de070b397b9b2419c55ad6e0156dd73a2c62553594de1092a75d2a0184

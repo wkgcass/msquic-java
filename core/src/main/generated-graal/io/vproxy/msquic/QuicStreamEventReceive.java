@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -26,36 +27,42 @@ public class QuicStreamEventReceive extends AbstractNativeObject implements Nati
         return MEMORY;
     }
 
-    private static final VarHandle AbsoluteOffsetVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("AbsoluteOffset")
+    private static final VarHandleW AbsoluteOffsetVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("AbsoluteOffset")
+        )
     );
 
     public long getAbsoluteOffset() {
-        return (long) AbsoluteOffsetVH.get(MEMORY);
+        return AbsoluteOffsetVH.getLong(MEMORY);
     }
 
     public void setAbsoluteOffset(long AbsoluteOffset) {
         AbsoluteOffsetVH.set(MEMORY, AbsoluteOffset);
     }
 
-    private static final VarHandle TotalBufferLengthVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("TotalBufferLength")
+    private static final VarHandleW TotalBufferLengthVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("TotalBufferLength")
+        )
     );
 
     public long getTotalBufferLength() {
-        return (long) TotalBufferLengthVH.get(MEMORY);
+        return TotalBufferLengthVH.getLong(MEMORY);
     }
 
     public void setTotalBufferLength(long TotalBufferLength) {
         TotalBufferLengthVH.set(MEMORY, TotalBufferLength);
     }
 
-    private static final VarHandle BuffersVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Buffers")
+    private static final VarHandleW BuffersVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Buffers")
+        )
     );
 
     public io.vproxy.msquic.QuicBuffer getBuffers() {
-        var SEG = (MemorySegment) BuffersVH.get(MEMORY);
+        var SEG = BuffersVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return new io.vproxy.msquic.QuicBuffer(SEG);
     }
@@ -68,24 +75,28 @@ public class QuicStreamEventReceive extends AbstractNativeObject implements Nati
         }
     }
 
-    private static final VarHandle BufferCountVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("BufferCount")
+    private static final VarHandleW BufferCountVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("BufferCount")
+        )
     );
 
     public int getBufferCount() {
-        return (int) BufferCountVH.get(MEMORY);
+        return BufferCountVH.getInt(MEMORY);
     }
 
     public void setBufferCount(int BufferCount) {
         BufferCountVH.set(MEMORY, BufferCount);
     }
 
-    private static final VarHandle FlagsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Flags")
+    private static final VarHandleW FlagsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Flags")
+        )
     );
 
     public int getFlags() {
-        return (int) FlagsVH.get(MEMORY);
+        return FlagsVH.getInt(MEMORY);
     }
 
     public void setFlags(int Flags) {
@@ -213,5 +224,5 @@ public class QuicStreamEventReceive extends AbstractNativeObject implements Nati
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:36802305b4394ed8ada6cd2b73ba13d924d9136db84c6202b17b289894924583
+// metadata.generator-version: pni 21.0.0.20
+// sha256:d3a7c71de020704112e6a63df627c4a77a99f951257bc5cf680f453bfb1e32f2

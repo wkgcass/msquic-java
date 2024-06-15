@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -24,24 +25,28 @@ public class QuicBuffer extends AbstractNativeObject implements NativeObject {
         return MEMORY;
     }
 
-    private static final VarHandle LengthVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Length")
+    private static final VarHandleW LengthVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Length")
+        )
     );
 
     public int getLength() {
-        return (int) LengthVH.get(MEMORY);
+        return LengthVH.getInt(MEMORY);
     }
 
     public void setLength(int Length) {
         LengthVH.set(MEMORY, Length);
     }
 
-    private static final VarHandle BufferVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Buffer")
+    private static final VarHandleW BufferVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Buffer")
+        )
     );
 
     public MemorySegment getBuffer() {
-        var SEG = (MemorySegment) BufferVH.get(MEMORY);
+        var SEG = BufferVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return SEG;
     }
@@ -157,5 +162,5 @@ public class QuicBuffer extends AbstractNativeObject implements NativeObject {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:22e724270dff682032155880491133da2f7c2aff6004350146a1cd2cdaa3247b
+// metadata.generator-version: pni 21.0.0.20
+// sha256:d4c7e5cf49575951be7185c4f702002846485b7e67c22f605abf78af3b154a5b

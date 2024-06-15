@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -24,12 +25,14 @@ public class QuicStreamEvent extends AbstractNativeObject implements NativeObjec
         return MEMORY;
     }
 
-    private static final VarHandle TypeVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Type")
+    private static final VarHandleW TypeVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Type")
+        )
     );
 
     public int getType() {
-        return (int) TypeVH.get(MEMORY);
+        return TypeVH.getInt(MEMORY);
     }
 
     public void setType(int Type) {
@@ -146,5 +149,5 @@ public class QuicStreamEvent extends AbstractNativeObject implements NativeObjec
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:7d8bed794b12f00f8d4413eebbe7a82d6890998970bb63e113958bf808a3e3e8
+// metadata.generator-version: pni 21.0.0.20
+// sha256:40fdf09bfbbee34c31355173c6a53bc9e55bacb1efedad5860f100d89fbd2518

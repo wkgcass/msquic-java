@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -20,36 +21,42 @@ public class QuicConnectionEventConnected extends AbstractNativeObject implement
         return MEMORY;
     }
 
-    private static final VarHandle SessionResumedVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("SessionResumed")
+    private static final VarHandleW SessionResumedVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("SessionResumed")
+        )
     );
 
     public boolean isSessionResumed() {
-        return (boolean) SessionResumedVH.get(MEMORY);
+        return SessionResumedVH.getBool(MEMORY);
     }
 
     public void setSessionResumed(boolean SessionResumed) {
         SessionResumedVH.set(MEMORY, SessionResumed);
     }
 
-    private static final VarHandle NegotiatedAlpnLengthVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("NegotiatedAlpnLength")
+    private static final VarHandleW NegotiatedAlpnLengthVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("NegotiatedAlpnLength")
+        )
     );
 
     public byte getNegotiatedAlpnLength() {
-        return (byte) NegotiatedAlpnLengthVH.get(MEMORY);
+        return NegotiatedAlpnLengthVH.getByte(MEMORY);
     }
 
     public void setNegotiatedAlpnLength(byte NegotiatedAlpnLength) {
         NegotiatedAlpnLengthVH.set(MEMORY, NegotiatedAlpnLength);
     }
 
-    private static final VarHandle NegotiatedAlpnVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("NegotiatedAlpn")
+    private static final VarHandleW NegotiatedAlpnVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("NegotiatedAlpn")
+        )
     );
 
     public MemorySegment getNegotiatedAlpn() {
-        var SEG = (MemorySegment) NegotiatedAlpnVH.get(MEMORY);
+        var SEG = NegotiatedAlpnVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return SEG;
     }
@@ -171,5 +178,5 @@ public class QuicConnectionEventConnected extends AbstractNativeObject implement
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.18
-// sha256:332286bfa727d565f3e160261270f1a3d272fb72618009bc4f868b3f8c420ef4
+// metadata.generator-version: pni 21.0.0.20
+// sha256:e4971eb59f24eec89c2978d340087b2d9efc38e8ca9192fcf296ef3ebe54a05a

@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -18,12 +19,14 @@ public class QuicListenerEventNewConnection extends AbstractNativeObject impleme
         return MEMORY;
     }
 
-    private static final VarHandle InfoVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Info")
+    private static final VarHandleW InfoVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Info")
+        )
     );
 
     public io.vproxy.msquic.QuicNewConnectionInfo getInfo() {
-        var SEG = (MemorySegment) InfoVH.get(MEMORY);
+        var SEG = InfoVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return new io.vproxy.msquic.QuicNewConnectionInfo(SEG);
     }
@@ -36,12 +39,14 @@ public class QuicListenerEventNewConnection extends AbstractNativeObject impleme
         }
     }
 
-    private static final VarHandle ConnectionVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Connection")
+    private static final VarHandleW ConnectionVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Connection")
+        )
     );
 
     public MemorySegment getConnection() {
-        var SEG = (MemorySegment) ConnectionVH.get(MEMORY);
+        var SEG = ConnectionVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return SEG;
     }
@@ -157,5 +162,5 @@ public class QuicListenerEventNewConnection extends AbstractNativeObject impleme
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.15
-// sha256:4ed9be3ab660042fc74195fdf6534e513984940077cc3e9395b3215ccae378ed
+// metadata.generator-version: pni 21.0.0.20
+// sha256:5c97aff8739ec74235bdde2ec513a0ff61f55136764c495f8e762ecffd7b0fe3

@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -17,12 +18,14 @@ public class QuicSettingsIsSet extends AbstractNativeObject implements NativeObj
         return MEMORY;
     }
 
-    private static final VarHandle IsSetFlagsVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("IsSetFlags")
+    private static final VarHandleW IsSetFlagsVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("IsSetFlags")
+        )
     );
 
     public long getIsSetFlags() {
-        return (long) IsSetFlagsVH.get(MEMORY);
+        return IsSetFlagsVH.getLong(MEMORY);
     }
 
     public void setIsSetFlags(long IsSetFlags) {
@@ -719,5 +722,5 @@ public class QuicSettingsIsSet extends AbstractNativeObject implements NativeObj
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.18
-// sha256:daaa6cb6d8da4e4e7f8dc121d8cbb10289ddf4da538d9f3c78efe9140dc6fda6
+// metadata.generator-version: pni 21.0.0.20
+// sha256:2b55c2c02a3f931f28faac7ea9a1b94cdfcbf26267ed8e7ef43c0addfcac9eb4

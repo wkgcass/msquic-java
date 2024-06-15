@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -22,12 +23,14 @@ public class QuicConnectionEventConnectionShutdownComplete extends AbstractNativ
         return MEMORY;
     }
 
-    private static final VarHandle Field01VH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Field01")
+    private static final VarHandleW Field01VH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Field01")
+        )
     );
 
     public byte getField01() {
-        return (byte) Field01VH.get(MEMORY);
+        return Field01VH.getByte(MEMORY);
     }
 
     public void setField01(byte Field01) {
@@ -180,5 +183,5 @@ public class QuicConnectionEventConnectionShutdownComplete extends AbstractNativ
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.18
-// sha256:1bd0aa32d86bbe05620f3a6c801dcea4f1beac91a071d4bf8312a27391694c84
+// metadata.generator-version: pni 21.0.0.20
+// sha256:b789dc5ad0923c609ca48f003c98994902c7e9af5e24e4c6c69233f376cc2f2b

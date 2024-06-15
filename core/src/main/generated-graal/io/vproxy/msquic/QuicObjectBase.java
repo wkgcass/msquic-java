@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -23,12 +24,14 @@ public class QuicObjectBase extends AbstractNativeObject implements NativeObject
         return MEMORY;
     }
 
-    private static final VarHandle ApiVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Api")
+    private static final VarHandleW ApiVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Api")
+        )
     );
 
     public MemorySegment getApi() {
-        var SEG = (MemorySegment) ApiVH.get(MEMORY);
+        var SEG = ApiVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return SEG;
     }
@@ -41,12 +44,14 @@ public class QuicObjectBase extends AbstractNativeObject implements NativeObject
         }
     }
 
-    private static final VarHandle HandleVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Handle")
+    private static final VarHandleW HandleVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Handle")
+        )
     );
 
     public MemorySegment getHandle() {
-        var SEG = (MemorySegment) HandleVH.get(MEMORY);
+        var SEG = HandleVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return SEG;
     }
@@ -218,5 +223,5 @@ public class QuicObjectBase extends AbstractNativeObject implements NativeObject
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.18
-// sha256:dc7441549915e1ca2b4fb9dea7ba025fd89ecd3295df00325d46ff62737fb6ce
+// metadata.generator-version: pni 21.0.0.20
+// sha256:1a6d3a2283c14be99ccf458720dba808a4a616da68248cde3c50044e71ed7651

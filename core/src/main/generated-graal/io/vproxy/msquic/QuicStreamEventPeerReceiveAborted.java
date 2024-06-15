@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -22,12 +23,14 @@ public class QuicStreamEventPeerReceiveAborted extends AbstractNativeObject impl
         return MEMORY;
     }
 
-    private static final VarHandle ErrorCodeVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("ErrorCode")
+    private static final VarHandleW ErrorCodeVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("ErrorCode")
+        )
     );
 
     public long getErrorCode() {
-        return (long) ErrorCodeVH.get(MEMORY);
+        return ErrorCodeVH.getLong(MEMORY);
     }
 
     public void setErrorCode(long ErrorCode) {
@@ -130,5 +133,5 @@ public class QuicStreamEventPeerReceiveAborted extends AbstractNativeObject impl
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:dee6f2da30eaa1462e70cb4eaa7c7cef60b3c030b7cc6de857c22137facedddf
+// metadata.generator-version: pni 21.0.0.20
+// sha256:180e8810cd621d936f6492c5d874da6af64b7b884e9595accbda90eb804f492f

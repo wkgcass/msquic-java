@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -22,24 +23,28 @@ public class QuicStreamEventShutdownComplete extends AbstractNativeObject implem
         return MEMORY;
     }
 
-    private static final VarHandle ConnectionShutdownVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("ConnectionShutdown")
+    private static final VarHandleW ConnectionShutdownVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("ConnectionShutdown")
+        )
     );
 
     public boolean isConnectionShutdown() {
-        return (boolean) ConnectionShutdownVH.get(MEMORY);
+        return ConnectionShutdownVH.getBool(MEMORY);
     }
 
     public void setConnectionShutdown(boolean ConnectionShutdown) {
         ConnectionShutdownVH.set(MEMORY, ConnectionShutdown);
     }
 
-    private static final VarHandle Field01VH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Field01")
+    private static final VarHandleW Field01VH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Field01")
+        )
     );
 
     public byte getField01() {
-        return (byte) Field01VH.get(MEMORY);
+        return Field01VH.getByte(MEMORY);
     }
 
     public void setField01(byte Field01) {
@@ -88,24 +93,28 @@ public class QuicStreamEventShutdownComplete extends AbstractNativeObject implem
         setField01(N);
     }
 
-    private static final VarHandle ConnectionErrorCodeVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("ConnectionErrorCode")
+    private static final VarHandleW ConnectionErrorCodeVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("ConnectionErrorCode")
+        )
     );
 
     public long getConnectionErrorCode() {
-        return (long) ConnectionErrorCodeVH.get(MEMORY);
+        return ConnectionErrorCodeVH.getLong(MEMORY);
     }
 
     public void setConnectionErrorCode(long ConnectionErrorCode) {
         ConnectionErrorCodeVH.set(MEMORY, ConnectionErrorCode);
     }
 
-    private static final VarHandle ConnectionCloseStatusVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("ConnectionCloseStatus")
+    private static final VarHandleW ConnectionCloseStatusVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("ConnectionCloseStatus")
+        )
     );
 
     public int getConnectionCloseStatus() {
-        return (int) ConnectionCloseStatusVH.get(MEMORY);
+        return ConnectionCloseStatusVH.getInt(MEMORY);
     }
 
     public void setConnectionCloseStatus(int ConnectionCloseStatus) {
@@ -236,5 +245,5 @@ public class QuicStreamEventShutdownComplete extends AbstractNativeObject implem
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.18
-// sha256:d3d49582e970f034367094b3f4ac92566611b136c257d4b82b61754fe7c2b438
+// metadata.generator-version: pni 21.0.0.20
+// sha256:cfa5281e7020d5e5122e40a78388eb4061be91922cd51591b68fa7f2984e5286

@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -173,5 +174,5 @@ public class QuicAddr extends AbstractNativeObject implements NativeObject {
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.17
-// sha256:3797726da6c562ad00ab892f3ee644abb7a0770a5184f3e4c8c01a25461da2f5
+// metadata.generator-version: pni 21.0.0.20
+// sha256:1bf333e04234a9e13cfe3c7fb04d55e501526ca83d155b22b572f3802d8fbe05

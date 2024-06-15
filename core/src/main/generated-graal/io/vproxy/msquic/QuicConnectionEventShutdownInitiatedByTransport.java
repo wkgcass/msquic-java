@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -24,24 +25,28 @@ public class QuicConnectionEventShutdownInitiatedByTransport extends AbstractNat
         return MEMORY;
     }
 
-    private static final VarHandle StatusVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Status")
+    private static final VarHandleW StatusVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Status")
+        )
     );
 
     public int getStatus() {
-        return (int) StatusVH.get(MEMORY);
+        return StatusVH.getInt(MEMORY);
     }
 
     public void setStatus(int Status) {
         StatusVH.set(MEMORY, Status);
     }
 
-    private static final VarHandle ErrorCodeVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("ErrorCode")
+    private static final VarHandleW ErrorCodeVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("ErrorCode")
+        )
     );
 
     public long getErrorCode() {
-        return (long) ErrorCodeVH.get(MEMORY);
+        return ErrorCodeVH.getLong(MEMORY);
     }
 
     public void setErrorCode(long ErrorCode) {
@@ -151,5 +156,5 @@ public class QuicConnectionEventShutdownInitiatedByTransport extends AbstractNat
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:e4675979ec530612572a553ef26eda5c3e70e81c17edf48ac1b812935b2568a7
+// metadata.generator-version: pni 21.0.0.20
+// sha256:28bbabaa19f6ae94eddd6c2c54b41162e688ef4c2e6a942bba21e9271136ffff

@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -17,12 +18,14 @@ public class QuicConnectionEventReliableResetNegotiated extends AbstractNativeOb
         return MEMORY;
     }
 
-    private static final VarHandle IsNegotiatedVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("IsNegotiated")
+    private static final VarHandleW IsNegotiatedVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("IsNegotiated")
+        )
     );
 
     public boolean isIsNegotiated() {
-        return (boolean) IsNegotiatedVH.get(MEMORY);
+        return IsNegotiatedVH.getBool(MEMORY);
     }
 
     public void setIsNegotiated(boolean IsNegotiated) {
@@ -125,5 +128,5 @@ public class QuicConnectionEventReliableResetNegotiated extends AbstractNativeOb
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.18
-// sha256:c8de4e8a244bf031fc38700b85f201283d5091cfd953d4af14dbbba2a744bd76
+// metadata.generator-version: pni 21.0.0.20
+// sha256:b45cee3617683e5b5a104a950571d9c800a3a72a385887e14304d0606c532e96

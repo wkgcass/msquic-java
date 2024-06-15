@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -23,12 +24,14 @@ public class QuicRegistrationConfigEx extends io.vproxy.msquic.QuicRegistrationC
         return MEMORY;
     }
 
-    private static final VarHandle ContextVH = LAYOUT.varHandle(
-        MemoryLayout.PathElement.groupElement("Context")
+    private static final VarHandleW ContextVH = VarHandleW.of(
+        LAYOUT.varHandle(
+            MemoryLayout.PathElement.groupElement("Context")
+        )
     );
 
     public MemorySegment getContext() {
-        var SEG = (MemorySegment) ContextVH.get(MEMORY);
+        var SEG = ContextVH.getMemorySegment(MEMORY);
         if (SEG.address() == 0) return null;
         return SEG;
     }
@@ -158,5 +161,5 @@ public class QuicRegistrationConfigEx extends io.vproxy.msquic.QuicRegistrationC
         }
     }
 }
-// metadata.generator-version: pni 21.0.0.16
-// sha256:539d1091b2e03f8f36af70323efdaa672621ddc901d0e08e7acf829a6122cc74
+// metadata.generator-version: pni 21.0.0.20
+// sha256:203de8d9e19258062d58703993a54fa4adf7719400ae66426e92d1b8241837cd

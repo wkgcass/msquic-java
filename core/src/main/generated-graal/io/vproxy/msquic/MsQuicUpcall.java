@@ -1,6 +1,7 @@
 package io.vproxy.msquic;
 
 import io.vproxy.pni.*;
+import io.vproxy.pni.hack.*;
 import io.vproxy.pni.array.*;
 import java.lang.foreign.*;
 import java.lang.invoke.*;
@@ -106,5 +107,5 @@ public class MsQuicUpcall {
         int streamCallback(MemorySegment Stream, MemorySegment Context, io.vproxy.msquic.QuicStreamEvent Event);
     }
 }
-// metadata.generator-version: pni 21.0.0.17
-// sha256:7b3e7ef4c07d12cce4de25f05b6b697d62bef913859df3032021ef4bf6993bbd
+// metadata.generator-version: pni 21.0.0.20
+// sha256:b11ec70d7ab70942a4246511256041787d81aa71336bc20f4696a734c66bafe1
