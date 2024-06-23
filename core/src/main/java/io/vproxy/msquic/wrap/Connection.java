@@ -19,6 +19,7 @@ public class Connection {
     public final PNIRef<Connection> ref;
     public final Options opts;
     public final QuicConnection connectionQ;
+    private boolean connected = false;
 
     private IPPort remoteAddress;
     private IPPort localAddress;
@@ -45,6 +46,11 @@ public class Connection {
         if (opts.connectionQ != null) {
             canCallClose = false; // opts.connectionQ != null means it's an accepted connection
         }
+    }
+
+    public void setConnectionInfo(QuicListenerEventNewConnection data) {
+        remoteAddress = MsQuicUtils.convertQuicAddrToIPPort(data.getInfo().getRemoteAddress());
+        localAddress = MsQuicUtils.convertQuicAddrToIPPort(data.getInfo().getLocalAddress());
     }
 
     public int start(Configuration conf, IPPort target) {
@@ -123,6 +129,10 @@ public class Connection {
 
     public boolean isClosed() {
         return closed;
+    }
+
+    public boolean isConnected() {
+        return connected;
     }
 
     public void close() {
@@ -204,6 +214,7 @@ public class Connection {
                         Logger.error(LogType.CONN_ERROR, "[MsQuicJava] failed to retrieve remote address from connection " + connectionQ.getHandle().address());
                     }
                 }
+                connected = true;
 
                 int status = opts.callback.connected(this, data);
                 if (status == QUIC_STATUS_NOT_SUPPORTED)

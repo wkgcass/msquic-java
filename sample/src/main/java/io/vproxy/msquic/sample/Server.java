@@ -147,6 +147,7 @@ public class Server {
                     .add(new SampleLogConnectionCallback(cli))
                     .add(new SampleConnectionCallback(cli)),
                 conn_));
+            conn.setConnectionInfo(data);
             conn_.setCallbackHandler(MsQuicUpcall.connectionCallback, conn.ref.MEMORY);
             var err = conn_.setConfiguration(conf.opts.configurationQ);
             if (err != 0) {
