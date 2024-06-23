@@ -73,10 +73,12 @@ public class MsQuicUtils {
             if (noCAValidation) {
                 flags |= QUIC_CREDENTIAL_FLAG_NO_CERTIFICATE_VALIDATION;
             }
-            cred.setFlags(flags);
             if (caFile != null) {
+                flags |= QUIC_CREDENTIAL_FLAG_SET_CA_CERTIFICATE_FILE;
+                flags |= QUIC_CREDENTIAL_FLAG_USE_TLS_BUILTIN_CERTIFICATE_VALIDATION;
                 cred.setCaCertificateFile(caFile, allocator);
             }
+            cred.setFlags(flags);
             setAllowedCipherSuites(cred);
         }
         return cred;
