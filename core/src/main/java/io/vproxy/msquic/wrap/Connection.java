@@ -11,6 +11,8 @@ import io.vproxy.pni.array.IntArray;
 import io.vproxy.vfd.IPPort;
 import io.vproxy.vfd.IPv4;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 
 import static io.vproxy.msquic.MsQuicConsts.*;
@@ -123,9 +125,9 @@ public class Connection {
     }
 
     private volatile boolean closed = false;
-    private volatile boolean connShutdownIsCalled = false;
-    private volatile boolean connCloseIsCalled = false;
+    private volatile boolean shutdownIsCalled = false;
     private volatile boolean canCallClose = true;
+    private final Lock closeLock = new ReentrantLock();
 
     public boolean isClosed() {
         return closed;
@@ -139,57 +141,68 @@ public class Connection {
         if (closed) {
             return;
         }
-        final var canCallClose = this.canCallClose;
-        synchronized (this) {
+        if (shutdownIsCalled) {
+            return;
+        }
+
+        if (canCallClose) {
+            // the conn.start() failed or SHUTDOWN_COMPLETE
+            doClose();
+            return;
+        }
+
+        closeLock.lock();
+        try {
             if (closed) {
                 return;
             }
-            if (canCallClose) {
-                closed = true;
+            if (shutdownIsCalled) {
+                return;
             }
+            doShutdown();
+        } finally {
+            closeLock.unlock();
         }
+    }
 
-        shutdown();
-        if (!canCallClose) {
+    private void closeInWorker() {
+        if (closed) {
             return;
         }
+        canCallClose = true;
+        boolean locked = closeLock.tryLock();
+        if (!locked) {
+            return;
+        }
+        try {
+            doClose();
+        } finally {
+            closeLock.unlock();
+        }
+    }
+
+    private void doShutdown() {
+        shutdownIsCalled = true;
+        if (connectionQ != null) {
+            connectionQ.shutdown(QUIC_CONNECTION_SHUTDOWN_FLAG_NONE, 0);
+        }
+        if (canCallClose) {
+            doClose();
+        }
+    }
+
+    private void doClose() {
+        closed = true;
+        if (connectionQ != null) {
+            connectionQ.close();
+        }
+        releaseResources();
+    }
+
+    private void releaseResources() {
         opts.allocator.close();
         ref.close();
         opts.callback.closed(this);
-    }
-
-    protected void shutdown() {
-        if (connCloseIsCalled) {
-            return;
-        }
-        final var canCallClose = this.canCallClose;
-        synchronized (this) {
-            if (connCloseIsCalled) {
-                return;
-            }
-            if (canCallClose) {
-                connCloseIsCalled = true;
-            }
-        }
-        if (canCallClose) {
-            if (connectionQ != null) {
-                connectionQ.close();
-            }
-            return;
-        }
-        if (connShutdownIsCalled) {
-            return;
-        }
-        synchronized (this) {
-            if (connShutdownIsCalled) {
-                return;
-            }
-            connShutdownIsCalled = true;
-        }
-        if (connectionQ == null) {
-            return;
-        }
-        connectionQ.shutdown(QUIC_CONNECTION_SHUTDOWN_FLAG_NONE, 0);
     }
 
     // need to override
@@ -230,12 +243,12 @@ public class Connection {
                 yield opts.callback.shutdownInitiatedByPeer(this, data);
             }
             case QUIC_CONNECTION_EVENT_SHUTDOWN_COMPLETE -> {
+                canCallClose = true;
                 var data = event.getUnion().getSHUTDOWN_COMPLETE();
                 var status = opts.callback.shutdownComplete(this, data);
                 if (status == QUIC_STATUS_NOT_SUPPORTED)
                     status = 0;
-                canCallClose = true;
-                close();
+                closeInWorker();
                 yield status;
             }
             case QUIC_CONNECTION_EVENT_LOCAL_ADDRESS_CHANGED -> {

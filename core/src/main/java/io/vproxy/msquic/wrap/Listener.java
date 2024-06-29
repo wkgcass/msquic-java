@@ -35,7 +35,7 @@ public class Listener {
         if (alpn.isEmpty())
             throw new IllegalArgumentException("alpn must be specified");
 
-        canReleaseResources = false; // set first, in case the callback immediately calls close()
+        canCallClose = false; // set first, in case the callback immediately calls close()
 
         int res;
         try (var tmpAllocator = Allocator.ofConfined()) {
@@ -47,7 +47,7 @@ public class Listener {
         if (res == 0) {
             this.bindAddress = bindIPPort;
         } else { // res != 0 means starting failed, the callbacks will never be called
-            canReleaseResources = true;
+            canCallClose = true;
         }
         return res;
     }
@@ -77,8 +77,8 @@ public class Listener {
     }
 
     private volatile boolean closed = false;
-    private volatile boolean lsnCloseIsCalled = false;
-    private volatile boolean canReleaseResources = true;
+    private volatile boolean stopIsCalled = false;
+    private volatile boolean canCallClose = true;
 
     public boolean isClosed() {
         return closed;
@@ -88,38 +88,57 @@ public class Listener {
         if (closed) {
             return;
         }
-        final var canReleaseResources = this.canReleaseResources;
+        if (stopIsCalled) {
+            return;
+        }
+
+        if (canCallClose) {
+            // the listener.start() failed
+            doClose();
+            return;
+        }
+
         synchronized (this) {
             if (closed) {
                 return;
             }
-            if (canReleaseResources) {
-                closed = true;
+            if (stopIsCalled) {
+                return;
             }
+            doStop();
         }
+    }
 
-        stop();
-        if (!canReleaseResources) {
+    private void closeInWorker() {
+        if (closed) {
             return;
         }
+        canCallClose = true;
+        synchronized (this) {
+            doClose();
+        }
+    }
+
+    private void doStop() {
+        stopIsCalled = true;
+        if (listenerQ != null) {
+            listenerQ.stop(); // is async
+        }
+        // must not call doClose() here, the stop() call is async
+    }
+
+    private void doClose() {
+        closed = true;
+        if (listenerQ != null) {
+            listenerQ.close(); // is async in stop callback, is blocking otherwise
+        }
+        releaseResources();
+    }
+
+    private void releaseResources() {
         opts.allocator.close();
         ref.close();
         opts.callback.closed(this);
-    }
-
-    protected void stop() {
-        if (lsnCloseIsCalled) {
-            return;
-        }
-        synchronized (this) {
-            if (lsnCloseIsCalled) {
-                return;
-            }
-            lsnCloseIsCalled = true;
-        }
-        if (listenerQ != null) {
-            listenerQ.close();
-        }
     }
 
     // need to override
@@ -131,8 +150,7 @@ public class Listener {
                 if (status == QUIC_STATUS_NOT_SUPPORTED)
                     status = 0;
 
-                canReleaseResources = true;
-                close();
+                closeInWorker();
                 yield status;
             }
             case QUIC_LISTENER_EVENT_NEW_CONNECTION -> {
@@ -143,7 +161,6 @@ public class Listener {
         };
     }
 
-    @SuppressWarnings("StringTemplateMigration")
     public String toString() {
         return "Listener["
                + "bind=" + bindAddress
