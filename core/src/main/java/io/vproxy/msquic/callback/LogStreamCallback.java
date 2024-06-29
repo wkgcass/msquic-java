@@ -9,16 +9,16 @@ import io.vproxy.msquic.wrap.Stream;
 import static io.vproxy.msquic.MsQuicConsts.QUIC_STATUS_NOT_SUPPORTED;
 
 public class LogStreamCallback implements StreamCallback {
-    public static final boolean DEFAULT_VALUE_FOR_WITH_DATA = false;
+    public static final boolean DEFAULT_VALUE_FOR_WITH_DETAIL = false;
 
-    private final boolean withData;
+    private final boolean withDetail;
 
     public LogStreamCallback() {
-        this(DEFAULT_VALUE_FOR_WITH_DATA);
+        this(DEFAULT_VALUE_FOR_WITH_DETAIL);
     }
 
-    public LogStreamCallback(boolean withData) {
-        this.withData = withData;
+    public LogStreamCallback(boolean withDetail) {
+        this.withDetail = withDetail;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class LogStreamCallback implements StreamCallback {
 
     @Override
     public int receive(Stream stream, QuicStreamEventReceive data) {
-        if (!withData) {
+        if (!withDetail) {
             return QUIC_STATUS_NOT_SUPPORTED;
         }
 
@@ -50,7 +50,7 @@ public class LogStreamCallback implements StreamCallback {
 
     @Override
     public int sendComplete(Stream stream, QuicStreamEventSendComplete data) {
-        if (!withData) {
+        if (!withDetail) {
             return QUIC_STATUS_NOT_SUPPORTED;
         }
 

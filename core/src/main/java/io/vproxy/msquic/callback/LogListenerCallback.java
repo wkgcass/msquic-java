@@ -12,16 +12,16 @@ import io.vproxy.msquic.wrap.Listener;
 import static io.vproxy.msquic.MsQuicConsts.QUIC_STATUS_NOT_SUPPORTED;
 
 public class LogListenerCallback implements ListenerCallback {
-    public static final boolean DEFAULT_VALUE_FOR_WITH_DATA = false;
+    public static final boolean DEFAULT_VALUE_FOR_WITH_DETAIL = false;
 
-    private final boolean withData;
+    private final boolean withDetail;
 
     public LogListenerCallback() {
-        this(DEFAULT_VALUE_FOR_WITH_DATA);
+        this(DEFAULT_VALUE_FOR_WITH_DETAIL);
     }
 
-    public LogListenerCallback(boolean withData) {
-        this.withData = withData;
+    public LogListenerCallback(boolean withDetail) {
+        this.withDetail = withDetail;
     }
 
     @Override
@@ -36,7 +36,7 @@ public class LogListenerCallback implements ListenerCallback {
             Logger.trace(LogType.ALERT, "RemoteAddress: " + MsQuicUtils.convertQuicAddrToIPPort(info.getRemoteAddress()));
         }
 
-        if (!withData) {
+        if (!withDetail) {
             return QUIC_STATUS_NOT_SUPPORTED;
         }
 

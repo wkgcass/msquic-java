@@ -12,27 +12,27 @@ public class StreamCallbackList implements StreamCallback {
     private final List<StreamCallback> callbacks = new ArrayList<>(4);
 
     public static StreamCallbackList withLog(StreamCallback cb) {
-        return withLog(cb, LogStreamCallback.DEFAULT_VALUE_FOR_WITH_DATA);
+        return withLog(cb, LogStreamCallback.DEFAULT_VALUE_FOR_WITH_DETAIL);
     }
 
-    public static StreamCallbackList withLog(StreamCallback cb, boolean withLog) {
+    public static StreamCallbackList withLog(StreamCallback cb, boolean withDetail) {
         if (cb instanceof StreamCallbackList cbls) {
-            cbls.callbacks.addFirst(new LogStreamCallback(withLog));
+            cbls.callbacks.addFirst(new LogStreamCallback(withDetail));
             return cbls;
         } else {
             return new StreamCallbackList()
-                .add(new LogStreamCallback())
+                .add(new LogStreamCallback(withDetail))
                 .add(cb);
         }
     }
 
     public static StreamCallback withLogIf(boolean checkRes, StreamCallback cb) {
-        return withLogIf(checkRes, cb, LogStreamCallback.DEFAULT_VALUE_FOR_WITH_DATA);
+        return withLogIf(checkRes, cb, LogStreamCallback.DEFAULT_VALUE_FOR_WITH_DETAIL);
     }
 
-    public static StreamCallback withLogIf(boolean checkRes, StreamCallback cb, boolean withLog) {
+    public static StreamCallback withLogIf(boolean checkRes, StreamCallback cb, boolean withDetail) {
         if (checkRes) {
-            return withLog(cb, withLog);
+            return withLog(cb, withDetail);
         }
         return cb;
     }

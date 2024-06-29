@@ -14,27 +14,27 @@ public class ListenerCallbackList implements ListenerCallback {
     private final List<ListenerCallback> callbacks = new ArrayList<>(4);
 
     public static ListenerCallbackList withLog(ListenerCallback cb) {
-        return withLog(cb, LogListenerCallback.DEFAULT_VALUE_FOR_WITH_DATA);
+        return withLog(cb, LogListenerCallback.DEFAULT_VALUE_FOR_WITH_DETAIL);
     }
 
-    public static ListenerCallbackList withLog(ListenerCallback cb, boolean withData) {
+    public static ListenerCallbackList withLog(ListenerCallback cb, boolean withDetail) {
         if (cb instanceof ListenerCallbackList cbls) {
-            cbls.callbacks.addFirst(new LogListenerCallback(withData));
+            cbls.callbacks.addFirst(new LogListenerCallback(withDetail));
             return cbls;
         } else {
             return new ListenerCallbackList()
-                .add(new LogListenerCallback())
+                .add(new LogListenerCallback(withDetail))
                 .add(cb);
         }
     }
 
     public static ListenerCallback withLogIf(boolean checkRes, ListenerCallback cb) {
-        return withLogIf(checkRes, cb, LogListenerCallback.DEFAULT_VALUE_FOR_WITH_DATA);
+        return withLogIf(checkRes, cb, LogListenerCallback.DEFAULT_VALUE_FOR_WITH_DETAIL);
     }
 
-    public static ListenerCallback withLogIf(boolean checkRes, ListenerCallback cb, boolean withData) {
+    public static ListenerCallback withLogIf(boolean checkRes, ListenerCallback cb, boolean withDetail) {
         if (checkRes) {
-            return withLog(cb, withData);
+            return withLog(cb, withDetail);
         }
         return cb;
     }

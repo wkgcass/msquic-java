@@ -38,7 +38,7 @@ class SampleConnectionCallback implements ConnectionCallback {
         }
         var stream = new Stream(new Stream.Options(conn, allocator,
             new StreamCallbackList()
-                .add(new LogStreamCallback())
+                .add(new LogStreamCallback(true))
                 .add(new SampleStreamCallback(cli)),
             stream_));
         stream_.setCallbackHandler(MsQuicUpcall.streamCallback, stream.ref.MEMORY);

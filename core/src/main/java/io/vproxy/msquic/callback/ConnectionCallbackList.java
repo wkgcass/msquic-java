@@ -12,27 +12,27 @@ public class ConnectionCallbackList implements ConnectionCallback {
     private final List<ConnectionCallback> callbacks = new ArrayList<>(4);
 
     public static ConnectionCallbackList withLog(ConnectionCallback cb) {
-        return withLog(cb, LogConnectionCallback.DEFAULT_VALUE_FOR_WITH_DATA);
+        return withLog(cb, LogConnectionCallback.DEFAULT_VALUE_FOR_WITH_DETAIL);
     }
 
-    public static ConnectionCallbackList withLog(ConnectionCallback cb, boolean withData) {
+    public static ConnectionCallbackList withLog(ConnectionCallback cb, boolean withDetail) {
         if (cb instanceof ConnectionCallbackList cbls) {
-            cbls.callbacks.addFirst(new LogConnectionCallback(withData));
+            cbls.callbacks.addFirst(new LogConnectionCallback(withDetail));
             return cbls;
         } else {
             return new ConnectionCallbackList()
-                .add(new LogConnectionCallback())
+                .add(new LogConnectionCallback(withDetail))
                 .add(cb);
         }
     }
 
     public static ConnectionCallback withLogIf(boolean checkRes, ConnectionCallback cb) {
-        return withLogIf(checkRes, cb, LogConnectionCallback.DEFAULT_VALUE_FOR_WITH_DATA);
+        return withLogIf(checkRes, cb, LogConnectionCallback.DEFAULT_VALUE_FOR_WITH_DETAIL);
     }
 
-    public static ConnectionCallback withLogIf(boolean checkRes, ConnectionCallback cb, boolean withData) {
+    public static ConnectionCallback withLogIf(boolean checkRes, ConnectionCallback cb, boolean withDetail) {
         if (checkRes) {
-            return withLog(cb, withData);
+            return withLog(cb, withDetail);
         }
         return cb;
     }

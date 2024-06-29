@@ -17,16 +17,16 @@ import java.nio.file.StandardOpenOption;
 import static io.vproxy.msquic.MsQuicConsts.QUIC_STATUS_NOT_SUPPORTED;
 
 public class LogConnectionCallback implements ConnectionCallback {
-    public static final boolean DEFAULT_VALUE_FOR_WITH_DATA = false;
+    public static final boolean DEFAULT_VALUE_FOR_WITH_DETAIL = false;
 
-    private final boolean withData;
+    private final boolean withDetail;
 
     public LogConnectionCallback() {
-        this(DEFAULT_VALUE_FOR_WITH_DATA);
+        this(DEFAULT_VALUE_FOR_WITH_DETAIL);
     }
 
-    public LogConnectionCallback(boolean withData) {
-        this.withData = withData;
+    public LogConnectionCallback(boolean withDetail) {
+        this.withDetail = withDetail;
     }
 
     protected Path getSSLKeyLogFilePath() {
@@ -43,7 +43,7 @@ public class LogConnectionCallback implements ConnectionCallback {
         Logger.trace(LogType.ALERT, "QUIC_CONNECTION_EVENT_CONNECTED: " + conn);
         Logger.trace(LogType.ALERT, "" + data);
 
-        if (!withData) {
+        if (!withDetail) {
             return QUIC_STATUS_NOT_SUPPORTED;
         }
 
@@ -156,7 +156,7 @@ public class LogConnectionCallback implements ConnectionCallback {
         Logger.trace(LogType.ALERT, "QUIC_CONNECTION_EVENT_DATAGRAM_RECEIVED: " + conn);
         Logger.trace(LogType.ALERT, "" + data);
 
-        if (!withData) {
+        if (!withDetail) {
             return QUIC_STATUS_NOT_SUPPORTED;
         }
 
@@ -179,7 +179,7 @@ public class LogConnectionCallback implements ConnectionCallback {
         Logger.trace(LogType.ALERT, "QUIC_CONNECTION_EVENT_RESUMED: " + conn);
         Logger.trace(LogType.ALERT, "" + data);
 
-        if (!withData) {
+        if (!withDetail) {
             return QUIC_STATUS_NOT_SUPPORTED;
         }
 
@@ -198,7 +198,7 @@ public class LogConnectionCallback implements ConnectionCallback {
         Logger.trace(LogType.ALERT, "QUIC_CONNECTION_EVENT_RESUMPTION_TICKET_RECEIVED: " + conn);
         Logger.trace(LogType.ALERT, "" + data);
 
-        if (!withData) {
+        if (!withDetail) {
             return QUIC_STATUS_NOT_SUPPORTED;
         }
 
