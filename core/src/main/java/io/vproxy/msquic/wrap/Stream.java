@@ -15,8 +15,8 @@ import java.lang.foreign.MemorySegment;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import static io.vproxy.msquic.MsQuicConsts.*;
@@ -42,17 +42,17 @@ public class Stream {
 
         if (opts.streamQ != null) {
             // opts.streamQ != null means it's accepted
-            this.canCallClose = false;
+            refCount.incrementAndGet();
             getIdFromStream(streamQ);
         }
     }
 
     public int start(int flags) {
-        canCallClose = false; // set first, in case the callback immediately calls close()
+        refCount.incrementAndGet(); // incr first, in case the callback immediately calls close()
 
         int res = streamQ.start(flags);
         if (res != 0) { // res != 0 means starting failed, the callbacks will never be called
-            canCallClose = true;
+            refCount.decrementAndGet(); // only decr, no other actions
         }
         return res;
     }
@@ -110,79 +110,47 @@ public class Stream {
         return pendingSendContexts;
     }
 
-    private volatile boolean closed = false;
-    private volatile boolean shutdownIsCalled = false;
-    private volatile boolean canCallClose = true;
-    private final Lock closeLock = new ReentrantLock();
+    private final AtomicBoolean closed = new AtomicBoolean(false);
+    private final AtomicInteger refCount = new AtomicInteger(1); // will decrease on closing
 
     public boolean isClosed() {
-        return closed;
+        return closed.get();
     }
 
     public void close() {
-        if (closed) {
+        if (closed.get()) {
             return;
         }
-        if (shutdownIsCalled) {
-            return;
-        }
-
-        if (canCallClose) {
-            // the stream.start() failed or SHUTDOWN_COMPLETE
-            doClose();
+        if (!closed.compareAndSet(false, true)) {
             return;
         }
 
-        closeLock.lock();
-        try {
-            if (closed) {
-                return;
-            }
-            if (shutdownIsCalled) {
-                return;
-            }
+        var ref = refCount.decrementAndGet();
+        if (ref > 0) {
             doShutdown();
-        } finally {
-            closeLock.unlock();
+        } else if (ref == 0) {
+            releaseResources();
         }
     }
 
-    private void closeInWorker() {
-        if (closed) {
-            return;
-        }
-        canCallClose = true;
-        boolean locked = closeLock.tryLock();
-        if (!locked) {
-            return;
-        }
-        try {
-            doClose();
-        } finally {
-            closeLock.unlock();
+    private void deRef() {
+        close();
+        if (refCount.decrementAndGet() == 0) {
+            releaseResources();
         }
     }
 
     private void doShutdown() {
-        shutdownIsCalled = true;
         if (streamQ != null) {
             streamQ.shutdown(QUIC_STREAM_SHUTDOWN_FLAG_ABORT_RECEIVE |
                              QUIC_STREAM_SHUTDOWN_FLAG_ABORT_SEND, 0);
         }
-        if (canCallClose) {
-            doClose();
-        }
-    }
-
-    private void doClose() {
-        closed = true;
-        if (streamQ != null) {
-            streamQ.close();
-        }
-        releaseResources();
     }
 
     private void releaseResources() {
+        if (streamQ != null) {
+            streamQ.close();
+        }
         opts.allocator.close();
         ref.close();
         if (!pendingSendContexts.isEmpty()) {
@@ -241,7 +209,7 @@ public class Stream {
                 var data = event.getUnion().getSTART_COMPLETE();
                 if (data.getStatus() != 0) {
                     Logger.error(LogType.CONN_ERROR, "StreamStart failed, status: " + data.getStatus() + ", stream: " + this);
-                    closeInWorker();
+                    deRef();
                     yield 0;
                 }
                 id = data.getID();
@@ -285,13 +253,12 @@ public class Stream {
                 yield opts.callback.sendShutdownComplete(this, data);
             }
             case QUIC_STREAM_EVENT_SHUTDOWN_COMPLETE -> {
-                canCallClose = true;
                 var data = event.getUnion().getSHUTDOWN_COMPLETE();
                 var status = opts.callback.shutdownComplete(this, data);
                 if (status == QUIC_STATUS_NOT_SUPPORTED) {
                     status = 0;
                 }
-                closeInWorker();
+                deRef();
                 yield status;
             }
             case QUIC_STREAM_EVENT_IDEAL_SEND_BUFFER_SIZE -> {

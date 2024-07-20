@@ -4,6 +4,7 @@ import io.vproxy.base.util.Logger;
 import io.vproxy.msquic.CXPLAT_THREAD_CONFIG;
 import io.vproxy.msquic.MsQuicMod;
 import io.vproxy.msquic.MsQuicModUpcall;
+import io.vproxy.msquic.wrap.ApiExtraTables;
 import io.vproxy.pni.graal.GraalUtils;
 
 import java.lang.foreign.MemorySegment;
@@ -30,10 +31,10 @@ public class MsQuicModUpcallImpl implements MsQuicModUpcall.Interface {
             GraalUtils.setThread();
             Logger.alert("new msquic thread spawn: " + java.lang.Thread.currentThread());
 
-            MsQuicMod.get().CxPlatGetCurThread(Thread);
+            ApiExtraTables.V2EXTRA.ThreadGetCur(Thread);
             latch.countDown();
 
-            MsQuicMod.get().MsQuicSetIsWorker(true);
+            ApiExtraTables.V2EXTRA.ThreadSetIsWorker(true);
             MsQuicMod.get().INVOKE_LPTHREAD_START_ROUTINE(cb, ctx);
         }).start();
 

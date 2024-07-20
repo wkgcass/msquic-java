@@ -137,6 +137,9 @@ project(':template') {
         dependsOn pniGenerate1
         dependsOn pniGenerate2
     }
+    if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
+    task pniCompile() {}
+    } else {
     task pniCompile(type: Exec) {
         workingDir project.rootProject.rootDir.getAbsolutePath() + '/core/src/main/c'
         commandLine './make-quic.sh'
@@ -145,6 +148,7 @@ project(':template') {
         }
 
         dependsOn pniGenerate
+    }
     }
 }
 

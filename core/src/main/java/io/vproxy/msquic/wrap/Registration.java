@@ -3,6 +3,8 @@ package io.vproxy.msquic.wrap;
 import io.vproxy.msquic.QuicRegistration;
 import io.vproxy.pni.Allocator;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class Registration {
     public final Options opts;
 
@@ -36,21 +38,18 @@ public class Registration {
         }
     }
 
-    private volatile boolean closed = false;
+    private final AtomicBoolean closed = new AtomicBoolean(false);
 
     public boolean isClosed() {
-        return closed;
+        return closed.get();
     }
 
     public void close() {
-        if (closed) {
+        if (closed.get()) {
             return;
         }
-        synchronized (this) {
-            if (closed) {
-                return;
-            }
-            closed = true;
+        if (!closed.compareAndSet(false, true)) {
+            return;
         }
 
         opts.registrationQ.close();

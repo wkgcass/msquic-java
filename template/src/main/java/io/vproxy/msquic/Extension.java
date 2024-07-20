@@ -26,22 +26,65 @@ class PNICXPLAT_THREAD_CONFIG {
     MemorySegment Context;
 }
 
+@Struct(skip = true)
+@PointerOnly
+@Include("msquic.h")
+@Name("QUIC_EXTRA_API_TABLE")
+abstract class PNIQuicExtraApiTable {
+    @Style(Styles.critical)
+    @Impl(
+        c = """
+            self->ThreadCountLimitSet(limit);
+            """
+    )
+    abstract void ThreadCountLimitSet(@Unsigned int limit);
+
+    @Style(Styles.critical)
+    @NativeReturnType("QUIC_STATUS")
+    @Impl(
+        c = """
+            return self->EventLoopThreadDispatcherSet(dispatcher);
+            """
+    )
+    abstract int EventLoopThreadDispatcherSet(@NativeType("QUIC_EVENT_LOOP_THREAD_DISPATCH_FN") MemorySegment dispatcher);
+
+    @Style(Styles.critical)
+    @NativeReturnType("QUIC_STATUS")
+    @Impl(
+        c = """
+            return self->ThreadGetCur(Thread);
+            """
+    )
+    abstract int ThreadGetCur(@NativeType("CXPLAT_THREAD*") MemorySegment Thread);
+
+    @Style(Styles.critical)
+    @Impl(
+        c = """
+            self->ThreadSetIsWorker(isWorker);
+            """
+    )
+    abstract void ThreadSetIsWorker(boolean isWorker);
+}
+
 @Downcall
 @Include("msquic.h")
 interface PNIMsQuicMod {
+    @Impl(
+        // language="c"
+        c = """
+            QUIC_EXTRA_API_TABLE* api;
+            QUIC_STATUS res = MsQuicOpenExtra(Version, (const void**) &api);
+            if (returnStatus != NULL)
+                *returnStatus = res;
+            if (QUIC_SUCCEEDED(res)) {
+                return api;
+            }
+            return NULL;
+            """
+    )
     @Style(Styles.critical)
-    @Name("MsQuicSetThreadCountLimit")
-    void MsQuicSetThreadCountLimit(@Unsigned int limit);
-
-    @Style(Styles.critical)
-    @Name("MsQuicSetEventLoopThreadDispatcher")
-    @NativeReturnType("QUIC_STATUS")
-    int MsQuicSetEventLoopThreadDispatcher(@NativeType("QUIC_EVENT_LOOP_THREAD_DISPATCH_FN") MemorySegment dispatcher);
-
-    @Style(Styles.critical)
-    @Name("CxPlatGetCurThread")
-    @NativeReturnType("QUIC_STATUS")
-    int CxPlatGetCurThread(@NativeType("CXPLAT_THREAD*") MemorySegment Thread);
+    @NoAlloc
+    PNIQuicExtraApiTable openExtra(@Unsigned int Version, @Raw int[] returnStatus);
 
     @Impl(
         // language="c"
@@ -51,10 +94,6 @@ interface PNIMsQuicMod {
     )
     @Style(Styles.critical)
     void INVOKE_LPTHREAD_START_ROUTINE(MemorySegment Callback, MemorySegment Context);
-
-    @Style(Styles.critical)
-    @Name("MsQuicSetIsWorker")
-    void MsQuicSetIsWorker(boolean isWorker);
 }
 
 @Upcall

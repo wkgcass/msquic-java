@@ -13,20 +13,18 @@ extern "C" {
 #include <jni.h>
 #include <pni.h>
 #include "msquic.h"
+#include "io_vproxy_msquic_QuicExtraApiTable.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-JNIEXPORT void JNICALL MsQuicSetThreadCountLimit(uint32_t limit);
-JNIEXPORT QUIC_STATUS JNICALL MsQuicSetEventLoopThreadDispatcher(QUIC_EVENT_LOOP_THREAD_DISPATCH_FN dispatcher);
-JNIEXPORT QUIC_STATUS JNICALL CxPlatGetCurThread(CXPLAT_THREAD* Thread);
+JNIEXPORT QUIC_EXTRA_API_TABLE * JNICALL JavaCritical_io_vproxy_msquic_MsQuicMod_openExtra(uint32_t Version, int32_t * returnStatus);
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_MsQuicMod_INVOKE_LPTHREAD_START_ROUTINE(void * Callback, void * Context);
-JNIEXPORT void JNICALL MsQuicSetIsWorker(uint8_t isWorker);
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_MsQuicMod
 // metadata.generator-version: pni 21.0.0.17
-// sha256:b987d2d8f9f40321d08c71d20ebedc7eb03e55506a92b52424ae71676faeb861
+// sha256:e116836c8b505ad085baca0e775e3ee3301a9fec4f9e6ee311dbd9c76cca1258

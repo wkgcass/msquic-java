@@ -3,6 +3,8 @@ package io.vproxy.msquic.wrap;
 import io.vproxy.msquic.QuicApiTable;
 import io.vproxy.pni.Allocator;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class ApiTable {
     public final Options opts;
 
@@ -31,10 +33,10 @@ public class ApiTable {
         }
     }
 
-    private volatile boolean closed = false;
+    private final AtomicBoolean closed = new AtomicBoolean(false);
 
     public boolean isClosed() {
-        return closed;
+        return closed.get();
     }
 
     public void close() {
@@ -42,14 +44,11 @@ public class ApiTable {
             return; // silently swallow because it's not allowed to be closed
         }
 
-        if (closed) {
+        if (closed.get()) {
             return;
         }
-        synchronized (this) {
-            if (closed) {
-                return;
-            }
-            closed = true;
+        if (!closed.compareAndSet(false, true)) {
+            return;
         }
 
         opts.apiTableQ.close();

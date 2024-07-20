@@ -10,6 +10,8 @@ import io.vproxy.vfd.IPPort;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import static io.vproxy.msquic.MsQuicConsts.*;
@@ -35,7 +37,7 @@ public class Listener {
         if (alpn.isEmpty())
             throw new IllegalArgumentException("alpn must be specified");
 
-        canCallClose = false; // set first, in case the callback immediately calls close()
+        refCount.incrementAndGet(); // incr first, in case the callback immediately calls close()
 
         int res;
         try (var tmpAllocator = Allocator.ofConfined()) {
@@ -47,7 +49,7 @@ public class Listener {
         if (res == 0) {
             this.bindAddress = bindIPPort;
         } else { // res != 0 means starting failed, the callbacks will never be called
-            canCallClose = true;
+            refCount.decrementAndGet(); // only decrease, no other actions
         }
         return res;
     }
@@ -76,66 +78,46 @@ public class Listener {
         }
     }
 
-    private volatile boolean closed = false;
-    private volatile boolean stopIsCalled = false;
-    private volatile boolean canCallClose = true;
+    private final AtomicBoolean closed = new AtomicBoolean(false);
+    private final AtomicInteger refCount = new AtomicInteger(1); // will decrease on closing
 
     public boolean isClosed() {
-        return closed;
+        return closed.get();
     }
 
     public void close() {
-        if (closed) {
+        if (closed.get()) {
             return;
         }
-        if (stopIsCalled) {
-            return;
-        }
-
-        if (canCallClose) {
-            // the listener.start() failed
-            doClose();
+        if (!closed.compareAndSet(false, true)) {
             return;
         }
 
-        synchronized (this) {
-            if (closed) {
-                return;
-            }
-            if (stopIsCalled) {
-                return;
-            }
+        var ref = refCount.decrementAndGet();
+        if (ref > 0) {
             doStop();
+        } else if (ref == 0) {
+            releaseResources();
         }
     }
 
-    private void closeInWorker() {
-        if (closed) {
-            return;
-        }
-        canCallClose = true;
-        synchronized (this) {
-            doClose();
+    private void deRef() {
+        close();
+        if (refCount.decrementAndGet() == 0) {
+            releaseResources();
         }
     }
 
     private void doStop() {
-        stopIsCalled = true;
         if (listenerQ != null) {
             listenerQ.stop(); // is async
         }
-        // must not call doClose() here, the stop() call is async
-    }
-
-    private void doClose() {
-        closed = true;
-        if (listenerQ != null) {
-            listenerQ.close(); // is async in stop callback, is blocking otherwise
-        }
-        releaseResources();
     }
 
     private void releaseResources() {
+        if (listenerQ != null) {
+            listenerQ.close(); // is async in stop callback, is blocking otherwise
+        }
         opts.allocator.close();
         ref.close();
         opts.callback.closed(this);
@@ -150,7 +132,7 @@ public class Listener {
                 if (status == QUIC_STATUS_NOT_SUPPORTED)
                     status = 0;
 
-                closeInWorker();
+                deRef();
                 yield status;
             }
             case QUIC_LISTENER_EVENT_NEW_CONNECTION -> {

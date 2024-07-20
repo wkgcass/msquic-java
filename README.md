@@ -5,11 +5,13 @@
 1. At least JDK 21
 2. Follow the instructions [modify-gradle-compiler-args](https://github.com/vproxy-tools/modify-gradle-compiler-args) to install the java-agent for Gradle
 3. Clone and compile the [modified msquic](https://github.com/wkgcass/msquic/blob/modified/README_MODIFIED.md)
+4. If you are using Windows, you will need MinGW UCRT64
 
 ## tasks
 
 * `pniGenerate`: generate files
-* `pniCompile`: compile the c shim lib
+* `pniCompile`: compile the c shim lib. On Windows, this is task does nothing, and you will have to
+  run `make build-native` manually instead
 * `buildSampleNativeImage`: build native image
 
 ## scripts
@@ -64,3 +66,8 @@ fi
 ## graal
 
 To compile the graal native-image version code, change content of file `./is-graal-build` to `true`.
+
+## windows
+
+If you are using Windows, you will need `MinGW UCRT64` to build and run, and you will have to call
+`make build-native` manually before running.

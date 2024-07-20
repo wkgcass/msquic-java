@@ -31,20 +31,11 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
         /* JavaCritical_io_vproxy_msquic_MsQuic_buildQuicAddr */
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(boolean.class, String.class /* addr */, int.class /* port */, MemoryLayout.class /* io.vproxy.msquic.QuicAddr.LAYOUT.getClass() */ /* result */));
 
-        /* MsQuicSetThreadCountLimit */
-        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, int.class /* limit */));
-
-        /* MsQuicSetEventLoopThreadDispatcher */
-        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class, MemorySegment.class /* dispatcher */));
-
-        /* CxPlatGetCurThread */
-        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class, MemorySegment.class /* Thread */));
+        /* JavaCritical_io_vproxy_msquic_MsQuicMod_openExtra */
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(MemoryLayout.class /* io.vproxy.msquic.QuicExtraApiTable.LAYOUT.getClass() */, int.class /* Version */, MemorySegment.class /* returnStatus */));
 
         /* JavaCritical_io_vproxy_msquic_MsQuicMod_INVOKE_LPTHREAD_START_ROUTINE */
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class /* Callback */, MemorySegment.class /* Context */));
-
-        /* MsQuicSetIsWorker */
-        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, boolean.class /* isWorker */));
 
         /* graal upcall for io.vproxy.msquic.MsQuicModUpcall */
         RuntimeClassInitialization.initializeAtBuildTime(io.vproxy.msquic.MsQuicModUpcall.class);
@@ -129,6 +120,18 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
         /* JavaCritical_io_vproxy_msquic_QuicConnection_certificateValidationComplete */
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class, MemorySegment.class /* self */, boolean.class /* Result */, int.class /* TlsAlert */));
 
+        /* JavaCritical_io_vproxy_msquic_QuicExtraApiTable_ThreadCountLimitSet */
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class /* self */, int.class /* limit */));
+
+        /* JavaCritical_io_vproxy_msquic_QuicExtraApiTable_EventLoopThreadDispatcherSet */
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class, MemorySegment.class /* self */, MemorySegment.class /* dispatcher */));
+
+        /* JavaCritical_io_vproxy_msquic_QuicExtraApiTable_ThreadGetCur */
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class, MemorySegment.class /* self */, MemorySegment.class /* Thread */));
+
+        /* JavaCritical_io_vproxy_msquic_QuicExtraApiTable_ThreadSetIsWorker */
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class /* self */, boolean.class /* isWorker */));
+
         /* JavaCritical_io_vproxy_msquic_QuicListener_close */
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class /* self */));
 
@@ -188,4 +191,4 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
     }
 }
 // metadata.generator-version: pni 21.0.0.20
-// sha256:cb32e1a6eb9ed93a16146897b04f632c5979b173f2e71ffeca8995e1ba332eb4
+// sha256:3dc282983cf67dc4d631275d09e48cecf3c693b5f9b6ad06b5196d4e065db3ef

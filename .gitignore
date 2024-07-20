@@ -45,6 +45,7 @@ bin/
 *.dll
 
 my-server.sh
+my-server-mingw.sh
 my-client.sh
 
 sample/sample.run

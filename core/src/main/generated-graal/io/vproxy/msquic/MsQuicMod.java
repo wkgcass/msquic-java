@@ -22,38 +22,17 @@ public class MsQuicMod {
         return INSTANCE;
     }
 
-    private static final MethodHandle MsQuicSetThreadCountLimitMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "MsQuicSetThreadCountLimit", int.class /* limit */);
+    private static final MethodHandle openExtraMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), io.vproxy.msquic.QuicExtraApiTable.LAYOUT.getClass(), "JavaCritical_io_vproxy_msquic_MsQuicMod_openExtra", int.class /* Version */, MemorySegment.class /* returnStatus */);
 
-    public void MsQuicSetThreadCountLimit(int limit) {
+    public io.vproxy.msquic.QuicExtraApiTable openExtra(int Version, IntArray returnStatus) {
+        MemorySegment RESULT;
         try {
-            MsQuicSetThreadCountLimitMH.invokeExact(limit);
+            RESULT = (MemorySegment) openExtraMH.invokeExact(Version, (MemorySegment) (returnStatus == null ? MemorySegment.NULL : returnStatus.MEMORY));
         } catch (Throwable THROWABLE) {
             throw PanamaUtils.convertInvokeExactException(THROWABLE);
         }
-    }
-
-    private static final MethodHandle MsQuicSetEventLoopThreadDispatcherMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "MsQuicSetEventLoopThreadDispatcher", MemorySegment.class /* dispatcher */);
-
-    public int MsQuicSetEventLoopThreadDispatcher(MemorySegment dispatcher) {
-        int RESULT;
-        try {
-            RESULT = (int) MsQuicSetEventLoopThreadDispatcherMH.invokeExact((MemorySegment) (dispatcher == null ? MemorySegment.NULL : dispatcher));
-        } catch (Throwable THROWABLE) {
-            throw PanamaUtils.convertInvokeExactException(THROWABLE);
-        }
-        return RESULT;
-    }
-
-    private static final MethodHandle CxPlatGetCurThreadMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "CxPlatGetCurThread", MemorySegment.class /* Thread */);
-
-    public int CxPlatGetCurThread(MemorySegment Thread) {
-        int RESULT;
-        try {
-            RESULT = (int) CxPlatGetCurThreadMH.invokeExact((MemorySegment) (Thread == null ? MemorySegment.NULL : Thread));
-        } catch (Throwable THROWABLE) {
-            throw PanamaUtils.convertInvokeExactException(THROWABLE);
-        }
-        return RESULT;
+        if (RESULT.address() == 0) return null;
+        return RESULT == null ? null : new io.vproxy.msquic.QuicExtraApiTable(RESULT);
     }
 
     private static final MethodHandle INVOKE_LPTHREAD_START_ROUTINEMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "JavaCritical_io_vproxy_msquic_MsQuicMod_INVOKE_LPTHREAD_START_ROUTINE", MemorySegment.class /* Callback */, MemorySegment.class /* Context */);
@@ -65,16 +44,6 @@ public class MsQuicMod {
             throw PanamaUtils.convertInvokeExactException(THROWABLE);
         }
     }
-
-    private static final MethodHandle MsQuicSetIsWorkerMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "MsQuicSetIsWorker", boolean.class /* isWorker */);
-
-    public void MsQuicSetIsWorker(boolean isWorker) {
-        try {
-            MsQuicSetIsWorkerMH.invokeExact(isWorker);
-        } catch (Throwable THROWABLE) {
-            throw PanamaUtils.convertInvokeExactException(THROWABLE);
-        }
-    }
 }
 // metadata.generator-version: pni 21.0.0.20
-// sha256:25a4ead45f98bb56981cff3362fe6c8912fc2ef167017f1949cb62383382703a
+// sha256:6111e3e38c2eb86ad9c1bd975ac7790d0f62002e5233696265a3bc1c9aa4d387

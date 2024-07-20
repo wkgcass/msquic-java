@@ -11,8 +11,8 @@ import io.vproxy.pni.array.IntArray;
 import io.vproxy.vfd.IPPort;
 import io.vproxy.vfd.IPv4;
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import static io.vproxy.msquic.MsQuicConsts.*;
@@ -46,7 +46,7 @@ public class Connection {
         opts.connectionSupplier = null; // gc
 
         if (opts.connectionQ != null) {
-            canCallClose = false; // opts.connectionQ != null means it's an accepted connection
+            refCount.incrementAndGet(); // opts.connectionQ != null means it's an accepted connection
         }
     }
 
@@ -56,7 +56,7 @@ public class Connection {
     }
 
     public int start(Configuration conf, IPPort target) {
-        canCallClose = false; // set first, in case the callback immediately calls close()
+        refCount.incrementAndGet(); // incr first, in case the callback immediately calls close()
 
         int res;
         try (var allocator = Allocator.ofConfined()) {
@@ -76,7 +76,7 @@ public class Connection {
                 target.getPort());
         }
         if (res != 0) { // res != 0 means starting failed, the callbacks will never be called
-            canCallClose = true;
+            refCount.decrementAndGet(); // only decr, no other actions
         }
         return res;
     }
@@ -124,13 +124,11 @@ public class Connection {
         }
     }
 
-    private volatile boolean closed = false;
-    private volatile boolean shutdownIsCalled = false;
-    private volatile boolean canCallClose = true;
-    private final Lock closeLock = new ReentrantLock();
+    private final AtomicBoolean closed = new AtomicBoolean(false);
+    private final AtomicInteger refCount = new AtomicInteger(1); // will decrease on closing
 
     public boolean isClosed() {
-        return closed;
+        return closed.get();
     }
 
     public boolean isConnected() {
@@ -138,68 +136,38 @@ public class Connection {
     }
 
     public void close() {
-        if (closed) {
+        if (closed.get()) {
             return;
         }
-        if (shutdownIsCalled) {
-            return;
-        }
-
-        if (canCallClose) {
-            // the conn.start() failed or SHUTDOWN_COMPLETE
-            doClose();
+        if (!closed.compareAndSet(false, true)) {
             return;
         }
 
-        closeLock.lock();
-        try {
-            if (closed) {
-                return;
-            }
-            if (shutdownIsCalled) {
-                return;
-            }
+        var ref = refCount.decrementAndGet();
+        if (ref > 0) {
             doShutdown();
-        } finally {
-            closeLock.unlock();
+        } else if (ref == 0) {
+            releaseResources();
         }
     }
 
-    private void closeInWorker() {
-        if (closed) {
-            return;
-        }
-        canCallClose = true;
-        boolean locked = closeLock.tryLock();
-        if (!locked) {
-            return;
-        }
-        try {
-            doClose();
-        } finally {
-            closeLock.unlock();
+    private void deRef() {
+        close();
+        if (refCount.decrementAndGet() == 0) {
+            releaseResources();
         }
     }
 
     private void doShutdown() {
-        shutdownIsCalled = true;
         if (connectionQ != null) {
             connectionQ.shutdown(QUIC_CONNECTION_SHUTDOWN_FLAG_NONE, 0);
         }
-        if (canCallClose) {
-            doClose();
-        }
-    }
-
-    private void doClose() {
-        closed = true;
-        if (connectionQ != null) {
-            connectionQ.close();
-        }
-        releaseResources();
     }
 
     private void releaseResources() {
+        if (connectionQ != null) {
+            connectionQ.close();
+        }
         opts.allocator.close();
         ref.close();
         opts.callback.closed(this);
@@ -243,12 +211,11 @@ public class Connection {
                 yield opts.callback.shutdownInitiatedByPeer(this, data);
             }
             case QUIC_CONNECTION_EVENT_SHUTDOWN_COMPLETE -> {
-                canCallClose = true;
                 var data = event.getUnion().getSHUTDOWN_COMPLETE();
                 var status = opts.callback.shutdownComplete(this, data);
                 if (status == QUIC_STATUS_NOT_SUPPORTED)
                     status = 0;
-                closeInWorker();
+                deRef();
                 yield status;
             }
             case QUIC_CONNECTION_EVENT_LOCAL_ADDRESS_CHANGED -> {
