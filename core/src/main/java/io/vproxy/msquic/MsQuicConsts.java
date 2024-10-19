@@ -159,4 +159,5 @@ public class MsQuicConsts {
     public static final int QUIC_PARAM_CONN_RESUMPTION_TICKET = 0x05000010;
     public static final int QUIC_PARAM_CONN_TLS_SECRETS = 0x05000013;
     public static final int QUIC_PARAM_STREAM_ID = 0x08000000;
+    public static final int QUIC_PARAM_GLOBAL_EXECUTION_CONFIG = 0x01000009;
 }

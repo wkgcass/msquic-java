@@ -32,14 +32,6 @@ class PNICXPLAT_THREAD_CONFIG {
 @Name("QUIC_EXTRA_API_TABLE")
 abstract class PNIQuicExtraApiTable {
     @Style(Styles.critical)
-    @Impl(
-        c = """
-            self->ThreadCountLimitSet(limit);
-            """
-    )
-    abstract void ThreadCountLimitSet(@Unsigned int limit);
-
-    @Style(Styles.critical)
     @NativeReturnType("QUIC_STATUS")
     @Impl(
         c = """

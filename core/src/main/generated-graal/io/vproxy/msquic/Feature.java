@@ -87,6 +87,12 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
         /* JavaCritical_io_vproxy_msquic_QuicApiTable_openRegistration */
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(MemoryLayout.class /* io.vproxy.msquic.QuicRegistration.LAYOUT.getClass() */, MemorySegment.class /* self */, MemoryLayout.class /* io.vproxy.msquic.QuicRegistrationConfig.LAYOUT.getClass() */ /* Config */, MemorySegment.class /* returnStatus */, MemorySegment.class /* return */));
 
+        /* JavaCritical_io_vproxy_msquic_QuicApiTable_setParam */
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class, MemorySegment.class /* self */, int.class /* Param */, int.class /* BufferLength */, MemorySegment.class /* Buffer */));
+
+        /* JavaCritical_io_vproxy_msquic_QuicApiTable_getParam */
+        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class, MemorySegment.class /* self */, int.class /* Param */, MemorySegment.class /* BufferLength */, MemorySegment.class /* Buffer */));
+
         /* JavaCritical_io_vproxy_msquic_QuicConfiguration_close */
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class /* self */));
 
@@ -119,9 +125,6 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
 
         /* JavaCritical_io_vproxy_msquic_QuicConnection_certificateValidationComplete */
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class, MemorySegment.class /* self */, boolean.class /* Result */, int.class /* TlsAlert */));
-
-        /* JavaCritical_io_vproxy_msquic_QuicExtraApiTable_ThreadCountLimitSet */
-        RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(void.class, MemorySegment.class /* self */, int.class /* limit */));
 
         /* JavaCritical_io_vproxy_msquic_QuicExtraApiTable_EventLoopThreadDispatcherSet */
         RuntimeForeignAccess.registerForDowncall(PanamaUtils.buildCriticalFunctionDescriptor(int.class, MemorySegment.class /* self */, MemorySegment.class /* dispatcher */));
@@ -191,4 +194,4 @@ public class Feature implements org.graalvm.nativeimage.hosted.Feature {
     }
 }
 // metadata.generator-version: pni 21.0.0.20
-// sha256:3dc282983cf67dc4d631275d09e48cecf3c693b5f9b6ad06b5196d4e065db3ef
+// sha256:9e68780787fa3940f51f3cb665d4c2a2b5499e5475ec1f8b3227d1d9878355c8

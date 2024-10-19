@@ -21,7 +21,6 @@ extern "C" {
 PNIEnvExpand(QUIC_EXTRA_API_TABLE, QUIC_EXTRA_API_TABLE *)
 PNIBufExpand(QUIC_EXTRA_API_TABLE, QUIC_EXTRA_API_TABLE, (0 /* !!invalid!! */))
 
-JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicExtraApiTable_ThreadCountLimitSet(QUIC_EXTRA_API_TABLE * self, uint32_t limit);
 JNIEXPORT QUIC_STATUS JNICALL JavaCritical_io_vproxy_msquic_QuicExtraApiTable_EventLoopThreadDispatcherSet(QUIC_EXTRA_API_TABLE * self, QUIC_EVENT_LOOP_THREAD_DISPATCH_FN dispatcher);
 JNIEXPORT QUIC_STATUS JNICALL JavaCritical_io_vproxy_msquic_QuicExtraApiTable_ThreadGetCur(QUIC_EXTRA_API_TABLE * self, CXPLAT_THREAD* Thread);
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicExtraApiTable_ThreadSetIsWorker(QUIC_EXTRA_API_TABLE * self, uint8_t isWorker);
@@ -31,4 +30,4 @@ JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicExtraApiTable_ThreadSet
 #endif
 #endif // _Included_io_vproxy_msquic_QuicExtraApiTable
 // metadata.generator-version: pni 21.0.0.17
-// sha256:46ce1193ee8dad35f373fe5da024587cafbd170ccf40f49833e98042324b6ae3
+// sha256:88b552741e9d60f48c1477bd5a61d35a59d99354636c31436166531d94cddeb6

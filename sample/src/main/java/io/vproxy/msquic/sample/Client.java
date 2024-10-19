@@ -32,7 +32,6 @@ public class Client {
     public static void main(String[] args) {
         System.loadLibrary("msquic");
         System.loadLibrary("msquic-java");
-        ApiExtraTables.V2EXTRA.ThreadCountLimitSet(2);
         MsQuicUpcall.setImpl(MsQuicUpcallImpl.get());
         MsQuicModUpcall.setImpl(MsQuicModUpcallImpl.get());
         ApiExtraTables.V2EXTRA.EventLoopThreadDispatcherSet(MsQuicModUpcall.dispatch);
@@ -79,6 +78,17 @@ public class Client {
         System.out.println("MsQuicOpenVersion begin ...");
         api = ApiTables.V2;
         System.out.println("MsQuicOpenVersion done");
+
+        try (var allocator = Allocator.ofConfined()) {
+            int cpucnt = 1;
+            var config = new QuicExecutionConfig(allocator.allocate(QuicExecutionConfig.LAYOUT.byteSize() + (cpucnt - 1) * 2));
+            config.setProcessorCount(cpucnt);
+            config.getProcessorList().set(0, (short) 0);
+            int ret = api.opts.apiTableQ.setParam(QUIC_PARAM_GLOBAL_EXECUTION_CONFIG, (int) config.MEMORY.byteSize(), config.MEMORY);
+            if (ret != 0) {
+                throw new RuntimeException("setting processor data failed: " + ret);
+            }
+        }
 
         System.out.println("Init Registration begin ...");
         {

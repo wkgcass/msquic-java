@@ -28,16 +28,6 @@ public class QuicExtraApiTable extends AbstractNativeObject implements NativeObj
         this(ALLOCATOR.allocate(LAYOUT));
     }
 
-    private static final MethodHandle ThreadCountLimitSetMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), void.class, "JavaCritical_io_vproxy_msquic_QuicExtraApiTable_ThreadCountLimitSet", MemorySegment.class /* self */, int.class /* limit */);
-
-    public void ThreadCountLimitSet(int limit) {
-        try {
-            ThreadCountLimitSetMH.invokeExact(MEMORY, limit);
-        } catch (Throwable THROWABLE) {
-            throw PanamaUtils.convertInvokeExactException(THROWABLE);
-        }
-    }
-
     private static final MethodHandle EventLoopThreadDispatcherSetMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_QuicExtraApiTable_EventLoopThreadDispatcherSet", MemorySegment.class /* self */, MemorySegment.class /* dispatcher */);
 
     public int EventLoopThreadDispatcherSet(MemorySegment dispatcher) {
@@ -153,4 +143,4 @@ public class QuicExtraApiTable extends AbstractNativeObject implements NativeObj
     }
 }
 // metadata.generator-version: pni 21.0.0.20
-// sha256:6964cc9175d07393c27d7bd182340b14b9096f0d87f0a87c8468c68c7ee78cd5
+// sha256:ca5cb0b052fd8536d8b70f89199f71bf886f7b9fa70609dcbb979e2afd24b32f

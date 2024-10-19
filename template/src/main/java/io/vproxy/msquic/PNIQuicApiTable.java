@@ -38,6 +38,34 @@ public abstract class PNIQuicApiTable {
     )
     @Style(Styles.critical)
     abstract PNIQuicRegistration openRegistration(PNIQuicRegistrationConfig Config, @Raw int[] returnStatus);
+
+    @Impl(
+        // language="c"
+        c = """
+            QUIC_API_TABLE* api = self->Api;
+            QUIC_STATUS res = api->SetParam(NULL, Param, BufferLength, Buffer);
+            if (QUIC_SUCCEEDED(res)) {
+                return 0;
+            }
+            return res;
+            """
+    )
+    @Style(Styles.critical)
+    abstract int setParam(int Param, int BufferLength, MemorySegment Buffer);
+
+    @Impl(
+        // language="c"
+        c = """
+            QUIC_API_TABLE* api = self->Api;
+            QUIC_STATUS res = api->GetParam(NULL, Param, BufferLength, Buffer);
+            if (QUIC_SUCCEEDED(res)) {
+                return 0;
+            }
+            return res;
+            """
+    )
+    @Style(Styles.critical)
+    abstract int getParam(int Param, @Unsigned @Raw int[] BufferLength, MemorySegment Buffer);
 }
 
 @Struct(skip = true)
@@ -53,4 +81,15 @@ abstract class PNIQuicRegistrationConfig {
 @AlwaysAligned
 abstract class PNIQuicRegistrationConfigEx extends PNIQuicRegistrationConfig {
     MemorySegment Context;
+}
+
+@Struct(skip = true)
+@AlwaysAligned
+@Include("msquic.h")
+@Name("QUIC_EXECUTION_CONFIG")
+class PNIQuicExecutionConfig {
+    @Name("Flags") int flags;
+    @Name("PollingIdleTimeoutUs") @Unsigned int pollingIdleTimeoutUs;
+    @Name("ProcessorCount") @Unsigned int processorCount;
+    @Name("ProcessorList") @Unsigned @Len(1) short[] processorList;
 }

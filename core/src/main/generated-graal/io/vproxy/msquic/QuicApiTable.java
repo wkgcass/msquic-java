@@ -77,6 +77,30 @@ public class QuicApiTable extends AbstractNativeObject implements NativeObject {
         return RESULT == null ? null : new io.vproxy.msquic.QuicRegistration(RESULT);
     }
 
+    private static final MethodHandle setParamMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_QuicApiTable_setParam", MemorySegment.class /* self */, int.class /* Param */, int.class /* BufferLength */, MemorySegment.class /* Buffer */);
+
+    public int setParam(int Param, int BufferLength, MemorySegment Buffer) {
+        int RESULT;
+        try {
+            RESULT = (int) setParamMH.invokeExact(MEMORY, Param, BufferLength, (MemorySegment) (Buffer == null ? MemorySegment.NULL : Buffer));
+        } catch (Throwable THROWABLE) {
+            throw PanamaUtils.convertInvokeExactException(THROWABLE);
+        }
+        return RESULT;
+    }
+
+    private static final MethodHandle getParamMH = PanamaUtils.lookupPNICriticalFunction(new PNILinkOptions(), int.class, "JavaCritical_io_vproxy_msquic_QuicApiTable_getParam", MemorySegment.class /* self */, int.class /* Param */, MemorySegment.class /* BufferLength */, MemorySegment.class /* Buffer */);
+
+    public int getParam(int Param, IntArray BufferLength, MemorySegment Buffer) {
+        int RESULT;
+        try {
+            RESULT = (int) getParamMH.invokeExact(MEMORY, Param, (MemorySegment) (BufferLength == null ? MemorySegment.NULL : BufferLength.MEMORY), (MemorySegment) (Buffer == null ? MemorySegment.NULL : Buffer));
+        } catch (Throwable THROWABLE) {
+            throw PanamaUtils.convertInvokeExactException(THROWABLE);
+        }
+        return RESULT;
+    }
+
     @Override
     public void toString(StringBuilder SB, int INDENT, java.util.Set<NativeObjectTuple> VISITED, boolean CORRUPTED_MEMORY) {
         if (!VISITED.add(new NativeObjectTuple(this))) {
@@ -163,4 +187,4 @@ public class QuicApiTable extends AbstractNativeObject implements NativeObject {
     }
 }
 // metadata.generator-version: pni 21.0.0.20
-// sha256:649735f0720b8e5e3bdea8546a23bd1a383d456f7114dfb72e471a442c379954
+// sha256:f643fec3a5ae7e221b734ed3bc2551cfd4127361112ce6463cc7384365df55bf

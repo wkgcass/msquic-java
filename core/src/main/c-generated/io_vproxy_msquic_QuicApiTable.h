@@ -32,10 +32,12 @@ struct QuicApiTable {
 
 JNIEXPORT void JNICALL JavaCritical_io_vproxy_msquic_QuicApiTable_close(QuicApiTable * self);
 JNIEXPORT QuicRegistration * JNICALL JavaCritical_io_vproxy_msquic_QuicApiTable_openRegistration(QuicApiTable * self, QUIC_REGISTRATION_CONFIG * Config, int32_t * returnStatus, QuicRegistration * return_);
+JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_QuicApiTable_setParam(QuicApiTable * self, int32_t Param, int32_t BufferLength, void * Buffer);
+JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_QuicApiTable_getParam(QuicApiTable * self, int32_t Param, uint32_t * BufferLength, void * Buffer);
 
 #ifdef __cplusplus
 }
 #endif
 #endif // _Included_io_vproxy_msquic_QuicApiTable
 // metadata.generator-version: pni 21.0.0.17
-// sha256:908c02c135b7f09f95eb650d00e7f712b93f08ddb341f55a678c435d2e2ae47d
+// sha256:2dc95111bb531f4162b40472e77298a9eec4918f39f0eea989fc83852f611ccc

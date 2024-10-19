@@ -23,8 +23,26 @@ JNIEXPORT QuicRegistration * JNICALL JavaCritical_io_vproxy_msquic_QuicApiTable_
     return NULL;
 }
 
+JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_QuicApiTable_setParam(QuicApiTable * self, int32_t Param, int32_t BufferLength, void * Buffer) {
+    QUIC_API_TABLE* api = self->Api;
+    QUIC_STATUS res = api->SetParam(NULL, Param, BufferLength, Buffer);
+    if (QUIC_SUCCEEDED(res)) {
+        return 0;
+    }
+    return res;
+}
+
+JNIEXPORT int32_t JNICALL JavaCritical_io_vproxy_msquic_QuicApiTable_getParam(QuicApiTable * self, int32_t Param, uint32_t * BufferLength, void * Buffer) {
+    QUIC_API_TABLE* api = self->Api;
+    QUIC_STATUS res = api->GetParam(NULL, Param, BufferLength, Buffer);
+    if (QUIC_SUCCEEDED(res)) {
+        return 0;
+    }
+    return res;
+}
+
 #ifdef __cplusplus
 }
 #endif
 // metadata.generator-version: pni 21.0.0.17
-// sha256:7baf44a713047c32c956b0c568f36530a8ae22521c22928b75f87f2c658a14a0
+// sha256:4b5289240e0eac2bdd05843044257f09fc1709a09c79f541e851dc9ef5b8a0d6

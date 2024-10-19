@@ -38,6 +38,7 @@
 #include "io_vproxy_msquic_QuicConnectionEventStreamsAvailable.h"
 #include "io_vproxy_msquic_QuicConnectionEventUnion.h"
 #include "io_vproxy_msquic_QuicCredentialConfig.h"
+#include "io_vproxy_msquic_QuicExecutionConfig.h"
 #include "io_vproxy_msquic_QuicExtraApiTable.h"
 #include "io_vproxy_msquic_QuicExtraApiTable.impl.h"
 #include "io_vproxy_msquic_QuicListener.h"
